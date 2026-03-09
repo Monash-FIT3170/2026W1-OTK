@@ -10,3 +10,4 @@
 - Nathan Yeoh (nyeo0003@student.monash.edu)
 - Iris Neerakal (inee0001@student.monash.edu)
 - Eric Blyth (ebly0002@student.monash.edu / ericblyth56@gmail.com)
+- Jordan Lee Russo (jrus0025@student.monash.edu)
