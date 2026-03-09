@@ -5,3 +5,5 @@
 - Immanuel Amalraj (iama0001@student.monash.edu)
 - Nathan Bu (nbuu0001@student.monash.edu)
 - Maheshan Peiris (mpei0013@student.monash.edu)
+- Joshua Gong (jgon0030@student.monash.edu)
+- Nathan Yeoh (nyeo0003@student.monash.edu)
