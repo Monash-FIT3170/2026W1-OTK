@@ -3,3 +3,4 @@
 ## Contributors
 - Ahmad Abu-Shaqra (aabu0012@student.monash.edu)
 - Immanuel Amalraj (iama0001@student.monash.edu)
+- Kayden Nguyen (kngu0087@student.monash.edu / kayden.nguyen2004@gmail.com)
