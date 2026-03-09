@@ -6,3 +6,6 @@
 - Kayden Nguyen (kngu0087@student.monash.edu / kayden.nguyen2004@gmail.com)
 - Nathan Bu (nbuu0001@student.monash.edu)
 - Maheshan Peiris (mpei0013@student.monash.edu)
+- Joshua Gong (jgon0030@student.monash.edu)
+- Nathan Yeoh (nyeo0003@student.monash.edu)
+- Iris Neerakal (inee0001@student.monash.edu)
