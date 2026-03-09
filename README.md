@@ -12,4 +12,8 @@
 - Joshua Gong (jgon0030@student.monash.edu)
 - Nathan Yeoh (nyeo0003@student.monash.edu)
 - Iris Neerakal (inee0001@student.monash.edu)
+<<<<<<< HEAD
 >>>>>>> 8390a2df574f332c13c5ea25cedb8b7a745074bb
+=======
+- Jordan Lee Russo (jrus0025@student.monash.edu)
+>>>>>>> c705849d312f60cfe08eada8458efde3968b5e68
