@@ -17,30 +17,22 @@ otk/
     engine/               game logic
       card/
         Card.js
-        DamageCard.js
-        DrawCard.js
-        ZeroCostCard.js
         CardRegistry.js
       enemy/
         Enemy.js
-        Grunt.js
-        Warlock.js
-        ShadowKing.js
         EnemyRegistry.js
       GameEngine.js
       DeckBuilder.js
     api/                  {feature}/{methods,publications, collections}
       {feature}/          
+        publications.js
         methods/          
           {action}.js
           index.js        imports all methods in this folder
-        publications/     
-          {name}.js
-          index.js        imports all publications in this folder
         collections/
           {Name}.js
           index.js        imports all collections in this folder
-        index.js          imports methods/, publications/, collections/
+        index.js          imports methods/, collections/, publications
     ui/                   
       hooks/              custom hooks
       screens/            e.g. main menu, stage, game end pages
