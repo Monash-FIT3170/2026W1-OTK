@@ -19,10 +19,9 @@ if (Meteor.isServer) {
 
     it('throws if not authenticated', function () {
       expect(() => {
-        Meteor.server.method_handlers['notes.insert'].apply(
-          {},
-          [{ title: 'Groceries', body: 'Milk, Eggs' }]
-        );
+        Meteor.server.method_handlers['notes.insert'].apply({}, [
+          { title: 'Groceries', body: 'Milk, Eggs' },
+        ]);
       }).to.throw();
     });
   });

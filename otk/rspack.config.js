@@ -1,4 +1,4 @@
-const { defineConfig } = require("@meteorjs/rspack");
+const { defineConfig } = require('@meteorjs/rspack');
 
 /**
  * Rspack configuration for Meteor projects.
@@ -18,7 +18,7 @@ module.exports = defineConfig((_Meteor) => {
         {
           test: /\.svg$/i,
           issuer: /\.[jt]sx?$/,
-          use: ["@svgr/webpack"],
+          use: ['@svgr/webpack'],
         },
       ],
     },

@@ -54,7 +54,6 @@ jobs:
         env:
           METEOR_DISABLE_OPTIMISTIC_CACHING: 1
 
-
   tag-sprint:
     name: Tag sprint version
     runs-on: ubuntu-latest
