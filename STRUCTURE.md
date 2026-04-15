@@ -2,6 +2,9 @@
 
 ```
 otk/
+  docs/                   documentation
+    /testing              example code snippets for writing frontend and backend tests
+  .github/                GitHub Actions
   public/
     sounds/
     images/
