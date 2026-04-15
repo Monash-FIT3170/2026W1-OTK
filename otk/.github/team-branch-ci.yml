@@ -1,0 +1,69 @@
+# Triggers on PRs targeting any team branch (team-1, team-2, team-3).
+# Runs: ESLint, scoped unit tests, Meteor build check.
+
+name: Team Branch CI
+
+on:
+  pull_request:
+    branches:
+      - team-1
+      - team-2
+      - team-3
+
+jobs:
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run lint
+        run: meteor npm run lint
+
+  unit-tests:
+    name: Unit tests (affected scope)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run unit tests (Mocha/Chai + React Testing Library)
+        run: meteor npm run test:unit
+        env:
+          METEOR_DISABLE_OPTIMISTIC_CACHING: 1
+
+  build-check:
+    name: Meteor build check
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Build
+        run: meteor build /tmp/build-output --directory
+        env:
+          METEOR_DISABLE_OPTIMISTIC_CACHING: 1
