@@ -26,9 +26,10 @@ export default [
         ecmaFeatures: { jsx: true },
       },
       globals: {
-        // Browser + Node
+        // Browser + Node + Mocha
         ...globals.browser,
         ...globals.node,
+        ...globals.mocha,
         // Meteor globals
         Meteor: "readonly",
         Mongo: "readonly",
