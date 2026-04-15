@@ -29,6 +29,24 @@ jobs:
       - name: Run lint
         run: meteor npm run lint
 
+  format:
+    name: Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run format
+        run: meteor npm run format:check
+
   unit-tests:
     name: Unit tests
     runs-on: ubuntu-latest
