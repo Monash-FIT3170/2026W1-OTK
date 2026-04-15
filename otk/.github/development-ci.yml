@@ -1,38 +1,17 @@
-# Triggers on PRs targeting any team branch (team-1, team-2, team-3).
-# Runs: ESLint, scoped unit tests, Meteor build check.
+# Triggers on PRs targeting the development branch (end-of-sprint merge).
+# Runs: full unit tests, integration tests, then deploys to Galaxy staging (handled by meteor galaxy)
 
-name: Team Branch CI
+name: Development CI + Staging Deploy
 
 on:
   pull_request:
     branches:
-      - team-1
-      - team-2
-      - team-3
+      - development
 
 jobs:
-  lint:
-    name: ESLint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Meteor
-        run: curl https://install.meteor.com/ | sh
-
-      - name: Add Meteor to PATH
-        run: echo "$HOME/.meteor" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        run: meteor npm ci
-
-      - name: Run lint
-        run: meteor npm run lint
-
   unit-tests:
-    name: Unit tests
+    name: All unit tests
     runs-on: ubuntu-latest
-    needs: lint
     steps:
       - uses: actions/checkout@v4
 
@@ -50,10 +29,10 @@ jobs:
         env:
           METEOR_DISABLE_OPTIMISTIC_CACHING: 1
 
-  build-check:
-    name: Meteor build check
+  integration-tests:
+    name: Integration tests
     runs-on: ubuntu-latest
-    needs: lint
+    needs: unit-tests
     steps:
       - uses: actions/checkout@v4
 
@@ -63,7 +42,10 @@ jobs:
       - name: Add Meteor to PATH
         run: echo "$HOME/.meteor" >> $GITHUB_PATH
 
-      - name: Build
-        run: meteor build /tmp/build-output --directory
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run integration tests
+        run: meteor npm run test:integration
         env:
           METEOR_DISABLE_OPTIMISTIC_CACHING: 1
