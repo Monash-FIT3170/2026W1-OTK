@@ -1,7 +1,6 @@
 {
   "name": "otk",
   "private": true,
-  "type": "module",
   "scripts": {
     "start": "meteor run",
     "lint": "eslint . --ext .js,.jsx",
