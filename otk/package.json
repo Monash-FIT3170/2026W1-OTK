@@ -1,11 +1,13 @@
 {
   "name": "otk",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "meteor run",
-    "lint": "eslint .",
-    "test": "meteor test --once --driver-package meteortesting:mocha",
-    "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
+    "lint": "eslint . --ext .js,.jsx",
+    "test:unit": "meteor test --once --driver-package meteortesting:mocha",
+    "test:unit:watch": "TEST_WATCH=1 meteor test --driver-package meteortesting:mocha --port 3100",
+    "test:integration": "meteor test --full-app --once --driver-package meteortesting:mocha",
     "visualize": "meteor --production --extra-packages bundle-visualizer"
   },
   "dependencies": {
@@ -21,22 +23,21 @@
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@meteorjs/eslint-config-meteor": "^1.0.5",
+    "@babel/core": "^7.29.0",
+    "@babel/eslint-parser": "^7.28.6",
+    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-react": "^7.28.5",
     "@meteorjs/rspack": "^1.0.0",
     "@rsdoctor/rspack-plugin": "^1.2.3",
     "@rspack/cli": "^1.7.1",
     "@rspack/core": "^1.7.1",
     "@rspack/plugin-react-refresh": "^1.4.3",
     "@svgr/webpack": "^8.1.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-import-resolver-meteor": "^0.4.0",
+    "eslint": "^9.39.4",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-meteor": "^7.3.0",
     "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.5.0",
     "react-refresh": "^0.17.0"
   },

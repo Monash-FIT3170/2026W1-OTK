@@ -1,6 +1,0 @@
-_build/
-rspack.config.js
-
-# TODO: remove once implemented
-server/main.js
-tests/main.js
