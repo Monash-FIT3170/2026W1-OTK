@@ -9,10 +9,7 @@ otk/
     main.jsx              
   server/
     main.js               
-  tests/                  mirrors imports/ exactly
-    engine/
-    api/
-    ui/
+  tests/                  integration tests (unit tests belong in relevant folders)
   imports/
     engine/               game logic
       card/
@@ -42,5 +39,6 @@ otk/
 ## Rules
 - One method per file, one publication per file
 - When you add a file, add it to the nearest `index.js`
-- Every file in `imports/` has a matching test in `tests/`
+- All unit tests are written in the same folder as the component / feature
+- Name unit test file the same as the original (eg. testing NoteItem.jsx => NoteItem.tests.jsx)
 - New feature → new folder under `api/`
