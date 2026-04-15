@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "meteor run",
-    "lint": "eslint . --ext .js,.jsx",
+    "lint": "eslint .",
     "test:unit": "meteor test --once --driver-package meteortesting:mocha",
     "test:unit:watch": "TEST_WATCH=1 meteor test --driver-package meteortesting:mocha --port 3100",
     "test:integration": "meteor test --full-app --once --driver-package meteortesting:mocha",
