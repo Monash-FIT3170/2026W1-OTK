@@ -1,0 +1,84 @@
+# Triggers when a PR is merged into main.
+# Runs: all unit + integration tests, then deploys to Galaxy production (handled by meteor galaxy)
+# On success, automatically creates a sprint tag (e.g. sprint-42).
+
+name: Main CI + Production Deploy
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  unit-tests:
+    name: All unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run unit tests (Mocha/Chai + React Testing Library)
+        run: meteor npm run test:unit
+        env:
+          METEOR_DISABLE_OPTIMISTIC_CACHING: 1
+
+  integration-tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run integration tests
+        run: meteor npm run test:integration
+        env:
+          METEOR_DISABLE_OPTIMISTIC_CACHING: 1
+
+
+  tag-sprint:
+    name: Tag sprint version
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Fetch all history so we can enumerate existing sprint tags
+          fetch-depth: 0
+
+      - name: Compute next sprint number
+        id: sprint
+        run: |
+          # Find the highest existing sprint-N tag and increment by 1
+          LAST=$(git tag --list 'sprint-*' | sed 's/sprint-//' | sort -n | tail -1)
+          NEXT=$(( ${LAST:-0} + 1 ))
+          echo "tag=sprint-${NEXT}" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push sprint tag
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.sprint.outputs.tag }}" -m "Release ${{ steps.sprint.outputs.tag }}"
+          git push origin "${{ steps.sprint.outputs.tag }}"
