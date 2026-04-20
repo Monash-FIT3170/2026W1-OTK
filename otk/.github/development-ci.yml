@@ -1,0 +1,51 @@
+# Triggers on PRs targeting the development branch (end-of-sprint merge).
+# Runs: full unit tests, integration tests, then deploys to Galaxy staging (handled by meteor galaxy)
+
+name: Development CI + Staging Deploy
+
+on:
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  unit-tests:
+    name: All unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run unit tests (Mocha/Chai + React Testing Library)
+        run: meteor npm run test:unit
+        env:
+          METEOR_DISABLE_OPTIMISTIC_CACHING: 1
+
+  integration-tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Meteor
+        run: curl https://install.meteor.com/ | sh
+
+      - name: Add Meteor to PATH
+        run: echo "$HOME/.meteor" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: meteor npm ci
+
+      - name: Run integration tests
+        run: meteor npm run test:integration
+        env:
+          METEOR_DISABLE_OPTIMISTIC_CACHING: 1

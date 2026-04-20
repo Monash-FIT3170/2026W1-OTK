@@ -13,3 +13,5 @@
 - Eric Blyth (ebly0002@student.monash.edu)
 - Jordan Lee Russo (jrus0025@student.monash.edu)
 - Justin La         (jlaa0008@student.monash.edu)
+- Jasmine Paskah Wang (jwan0518@student.monash.edu)
+- Gia Thinh Nguyen (gngu0011@student.monash.edu)
