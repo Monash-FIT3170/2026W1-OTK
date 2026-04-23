@@ -1,0 +1,26 @@
+/**
+ * Abstract base class for all enemies.
+ * Do not instantiate directly - extend it and register the subclass
+ * via EnemyRegistry.
+ */
+export class Enemy {
+  constructor({ enemyId, name, health, debuffs = [] }) {
+    // abstract check so that this class is not instantiated
+    if (new.target === Enemy) {
+      throw new Error('Enemy is abstract and cannot be instantiated directly.');
+    }
+    this.enemyId = enemyId;
+    this.name = name;
+    this.health = health;
+    this.debuffs = debuffs;
+  }
+
+  toJSON() {
+    return {
+      enemyId: this.enemyId,
+      name: this.name,
+      health: this.health,
+      debuffs: [...this.debuffs],
+    };
+  }
+}
