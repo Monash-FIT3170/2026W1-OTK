@@ -2,8 +2,8 @@
  * @author Justin La
  * Represents the gameplay effect during card action
  */
+import { GameEngine } from "../GameEngine";
 
-type Effect = {
-    resolve: (engine: GameEngine, targetCardIds?: string[]) => void
+export interface Effect {
+    resolve(engine: GameEngine, targetCardIds?: string[]): void;
 }
-
