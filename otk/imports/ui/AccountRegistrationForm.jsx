@@ -27,8 +27,9 @@ export const AccountRegistrationForm = () => {
         <h2 className="text-xl font-bold text-slate-800 text-center">Register Account</h2>
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-slate-700">Username</label>
+          <label htmlFor="username" className="text-sm font-medium text-slate-700">Username</label>
           <input
+            id="username"
             type="text"
             required
             className="border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -36,8 +37,9 @@ export const AccountRegistrationForm = () => {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-slate-700">Email</label>
+          <label htmlFor="email" className="text-sm font-medium text-slate-700">Email</label>
           <input
+            id="email"
             type="email"
             required
             className="border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -45,8 +47,9 @@ export const AccountRegistrationForm = () => {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-slate-700">Password</label>
+          <label htmlFor="password" className="text-sm font-medium text-slate-700">Password</label>
           <input
+            id="password"
             type="password"
             required
             className="border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
