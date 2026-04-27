@@ -9,10 +9,11 @@ import { DamageEffect } from "../effect/DamageEffect";
 export class FerociousClaw extends Card {
 
   // constructs card
-  constructor(cardId: string) {
+  constructor() {
     super({
-      cardId: cardId,
+      cardId: "fer",
       name: "Ferocious Claw",
+      description: "Discard 1 card from hand.",
       baseCost: 3,
       currentCost: 3,
       baseAttack: 24,
@@ -22,8 +23,8 @@ export class FerociousClaw extends Card {
   }
 
   // executes card effects
-  execute(engine: GameEngine, targetCardIds: string[]): void {
-    DiscardEffect().resolve(engine, targetCardIds)
+  execute(engine: GameEngine, targetCardIndexes: string[]): void {
+    DiscardEffect().resolve(engine, targetCardIndexes)
     DamageEffect(this.currentAttack).resolve(engine)
   }
 

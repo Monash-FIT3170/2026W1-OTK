@@ -10,8 +10,9 @@ export class Transcode extends Card {
   // constructs card
   constructor(cardId: string) {
     super({
-      cardId: cardId,
+      cardId: "tra",
       name: "Transcode",
+      description: "Return 3 card from hand to deck.",
       baseCost: 4,
       currentCost: 4,
       cardAmountToSelect: { min: 3, max: 3 }
@@ -19,8 +20,8 @@ export class Transcode extends Card {
   }
 
   // executes card effects
-  execute(engine: GameEngine, targetCardIds: string[]): void {
-    ReturnToDeckEffect().resolve(engine, targetCardIds)
+  execute(engine: GameEngine, targetCardIndexes: string[]): void {
+    ReturnToDeckEffect().resolve(engine, targetCardIndexes)
   }
 
 }

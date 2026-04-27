@@ -4,9 +4,10 @@
 import { GameEngine } from "../GameEngine";
 
 // defining card data types
-type cardData = {
+export type cardData = {
   cardId: string;
   name: string;
+  description: string;
   baseCost: number;
   currentCost: number;
   baseAttack?: number;
@@ -15,8 +16,11 @@ type cardData = {
 };
 
 export abstract class Card {
+
+  // defining attributes
   public cardId: string;
   public name: string;
+  public description: string;
   public baseCost: number;
   public currentCost: number;
   public baseAttack?: number;
@@ -27,6 +31,7 @@ export abstract class Card {
   constructor(data: {
     cardId: string;
     name: string;
+    description: string;
     baseCost: number;
     currentCost: number;
     baseAttack?: number;
@@ -35,6 +40,7 @@ export abstract class Card {
   }) {
     this.cardId = data.cardId;
     this.name = data.name;
+    this.description = data.description;
     this.baseCost = data.baseCost;
     this.currentCost = data.currentCost;
     this.baseAttack = data.baseAttack;
@@ -43,7 +49,7 @@ export abstract class Card {
   }
 
   // executes card effects
-  abstract execute(engine: GameEngine, targetCardIds?: string[]): void;
+  abstract execute(engine: GameEngine, targetCardIndexes?: string[]): void;
 
   // runs when card is discarded: does nothing
   onDiscard(): void {}
@@ -59,6 +65,7 @@ export abstract class Card {
     return {
       cardId: this.cardId,
       name: this.name,
+      description: this.description,
       baseCost: this.baseCost,
       currentCost: this.currentCost,
       baseAttack: this.baseAttack,

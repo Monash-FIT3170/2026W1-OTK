@@ -8,10 +8,11 @@ import { DamageEffect } from "../effect/DamageEffect";
 export class FogClearing extends Card {
 
   // constructs card
-  constructor(cardId: string) {
+  constructor() {
     super({
-      cardId: cardId,
+      cardId: "fog",
       name: "Fog Clearing",
+      description: "",
       baseCost: 2,
       currentCost: 2,
       baseAttack: 12,
