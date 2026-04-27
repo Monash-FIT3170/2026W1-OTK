@@ -11,7 +11,7 @@ export class ReturnToDeckEffect implements Effect {
             if (card) {
                 card.resetStats();
                 engine.deck.push(card)
-                engine.hand = engine.hand.filter(card => card.cardId != id)
+                engine.removeFromHand(id);
             }
         })
     }

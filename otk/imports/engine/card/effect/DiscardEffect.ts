@@ -11,6 +11,7 @@ export class DiscardEffect implements Effect {
             const card = engine.hand.find(card => card.cardId === id)
             if (card) {
                 card.onDiscard();
+                engine.removeFromHand(id);
             }
         })
     }
