@@ -9,8 +9,12 @@ export const AccountRegistrationForm = () => {
   
   const submit = e => {
     e.preventDefault();
-      Meteor.call('auth.registerUser', { username, email, password }, err => {
-          if (err) setError(err.reason);
+    Meteor.call('auth.registerUser', { username, email, password }, err => {
+      if (err && err.error !== 403) {
+        setError(err.reason)
+      } else {
+        setError("")
+      };
     });
   };
 
