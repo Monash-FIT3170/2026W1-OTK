@@ -16,6 +16,9 @@ import { assert } from 'chai';
  *
  * Each test runs in isolation by clearing the `Meteor.users`
  * collection before execution to ensure no shared state.
+ * 
+ * @author Hydar Rabiaa
+ * @version 1.0
  */
 if (Meteor.isServer) {
   describe('auth.registerUser', function () {

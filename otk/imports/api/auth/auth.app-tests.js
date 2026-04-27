@@ -17,6 +17,9 @@ import { assert } from 'chai';
  * - Client-side app tests
  * - Uses Meteor's built-in `loginWithPassword` authentication flow
  * - Uses test helper methods to create and clear test users
+ * 
+ * @author Hydar Rabiaa
+ * @version 1.0
  */
 describe('auth login and current user retrieval', function () {
   /**

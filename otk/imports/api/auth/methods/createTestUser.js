@@ -26,6 +26,8 @@ Meteor.methods({
    * - No duplicate key errors occur
    * - Each test starts with a clean, known user state
    *
+   * @author Hydar Rabiaa
+   * @version 1.0
    * @method auth.createTestUser
    *
    * @param {Object} params - Test user data

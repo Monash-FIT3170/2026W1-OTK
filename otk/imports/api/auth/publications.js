@@ -16,6 +16,8 @@ import { Meteor } from 'meteor/meteor';
  * - Only selected fields are published (username, email, profile)
  * - Prevents access to other users' data
  *
+ * @author Hydar Rabiaa
+ * @version 1.0
  * @publication auth.currentUser
  *
  * @returns {Mongo.Cursor | this.ready()}

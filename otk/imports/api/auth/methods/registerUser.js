@@ -15,6 +15,8 @@ import { check } from 'meteor/check';
  * - Email must be a valid string (format not strictly validated here)
  * - Password must be a string with a minimum length of 6 characters
  *
+ * @author Hydar Rabiaa
+ * @version 1.0
  * @method auth.registerUser
  *
  * @param {Object} params - The user registration data
