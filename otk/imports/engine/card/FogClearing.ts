@@ -2,26 +2,26 @@
 
 // importing components
 import { Card } from "./Card";
+import { GameEngine } from "../GameEngine";
 import { DamageEffect } from "../effect/DamageEffect";
 
 export class FogClearing extends Card {
 
   // constructs card
-  constructor() {
+  constructor(cardId: string) {
     super({
-      cardId: "", // ??
+      cardId: cardId,
       name: "Fog Clearing",
-      cost: 2,
+      baseCost: 2,
+      currentCost: 2,
       baseAttack: 12,
-      currentAttack: 12,
-      effects: [DamageEffect(12)]
+      currentAttack: 12
     });
   }
 
-  // TODO: discards card
-  onDiscard(): void {}
-
-  // TODO: resets stats of card
-  resetStats(): void {}
+  // executes card effects
+  execute(engine: GameEngine): void {
+    DamageEffect(this.currentAttack).resolve(engine)
+  }
 
 }

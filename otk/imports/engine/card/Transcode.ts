@@ -2,28 +2,25 @@
 
 // importing components
 import { Card } from "./Card";
-import type { ReturnToDeckEffect } from "../effect/ReturnToDeckEffect";
+import { GameEngine } from "../GameEngine";
+import { ReturnToDeckEffect } from "../effect/ReturnToDeckEffect";
 
 export class Transcode extends Card {
 
   // constructs card
-  constructor() {
+  constructor(cardId: string) {
     super({
-      cardId: "", // ??
+      cardId: cardId,
       name: "Transcode",
-      cost: 4,
-      effects: [ReturnToDeckEffect(cards)]
-      // TODO:
-      // unsure how ReturnToDeckEffect would work here,
-      // the player needs to be able to select which cards
-      // they would like to return to deck first
+      baseCost: 4,
+      currentCost: 4,
+      cardAmountToSelect: { min: 3, max: 3 }
     });
   }
 
-  // TODO: discards card
-  onDiscard(): void {}
-
-  // TODO: resets stats of card
-  resetStats(): void {}
+  // executes card effects
+  execute(engine: GameEngine, targetCardIds: string[]): void {
+    ReturnToDeckEffect().resolve(engine, targetCardIds)
+  }
 
 }
