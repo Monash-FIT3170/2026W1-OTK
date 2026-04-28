@@ -21,7 +21,7 @@ export default function Card({ cardProps }) {
   };
 
   return (
-    <motion.div>
+    <motion.div className="flex justify-center">
       <motion.div
         whileHover={{
           scale: 1.1,
@@ -37,7 +37,7 @@ export default function Card({ cardProps }) {
       >
         <div
           className="flex flex-2/12 min-h-5 justify-center box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono 
-        font-semibold tracking-wide truncate min-w-0"
+        font-semibold tracking-wide text-ellipsis overflow-y-clip min-w-0"
         >
           {cardProps.name}
         </div>
