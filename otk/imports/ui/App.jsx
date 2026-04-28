@@ -20,8 +20,8 @@ const cards = {
 };
 
 export const App = () => (
-  <div className="page">
-    <h1>Hello</h1>
+  <div className="bg-gray-800 min-h-screen">
+    <div className="page flex grow">
     <CardCollection cards={cards} />
   </div>
 );
