@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Card = ({cardProps}) => {
+export default function Card({cardProps}) {
   return (
     <div>
       <div className="flex flex-col gap-3 bg-white rounded-xl shadow-md p-6">
@@ -17,7 +17,7 @@ export const Card = ({cardProps}) => {
               </div>
           </div>
           <div className="flex-5"> 
-            /** TODO - Placeholder image */
+            {/* TODO - Placeholder image */}
           </div>
         </div>
         <div className="flex-5">
@@ -25,7 +25,7 @@ export const Card = ({cardProps}) => {
         </div>
       </div>
 
-      {cardProps.getName()}
+      {/* {cardProps.getName()} */}
     </div>
   );
 };
