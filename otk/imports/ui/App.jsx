@@ -1,7 +1,6 @@
 import React from 'react';
+import { AccountRegistrationForm } from './AccountRegistrationForm';
 
 export const App = () => (
-  <div className="page">
-    <h1>Hello</h1>
-  </div>
+  <AccountRegistrationForm />
 );
