@@ -38,7 +38,7 @@ import { check } from 'meteor/check';
  * - duplicate email
  */
 Meteor.methods({
-  'auth.registerUser'({ username, email, password }) {
+  'auth.registerUser': async function({ username, email, password }) {
     check(username, String);
     check(email, String);
     check(password, String);
@@ -55,6 +55,17 @@ Meteor.methods({
         'auth.invalidPassword',
         'Password must be at least 6 characters.'
       );
+    }
+
+    const existingUser = await Accounts.findUserByUsername(username.trim());
+    if (existingUser) {
+      console.log('existing user check:', existingUser);
+      throw new Meteor.Error('auth.usernameTaken', 'Username is already taken.');
+    }
+
+    const existingEmail = await Accounts.findUserByEmail(email.trim().toLowerCase());
+    if (existingEmail) {
+      throw new Meteor.Error('auth.emailTaken', 'Email is already registered.');
     }
 
     return Accounts.createUser({

@@ -139,5 +139,37 @@ if (Meteor.isServer) {
       assert.equal(user.username, validUser.username);
       assert.equal(user.emails[0].address, validUser.email);
     });
+
+    it('rejects an existing username', async function () {
+      const invalidUser = {
+        username: 'testuser1',
+        email: 'testuserunique@example.com',
+        password: 'secure123',
+      }
+
+      try {
+        await Meteor.server.method_handlers['auth.registerUser'].apply({}, [validUser]);
+        await Meteor.server.method_handlers['auth.registerUser'].apply({}, [invalidUser]);
+        assert.fail('Expected existing username error');
+      } catch (error) {
+        assert.equal(error.error, 'auth.usernameTaken');
+      }
+    });
+
+    it('rejects an existing email', async function () {
+      const invalidUser = {
+        username: 'testUserUnique',
+        email: 'testuser1@example.com',
+        password: 'secure123',
+      };
+
+      try {
+        await Meteor.server.method_handlers['auth.registerUser'].apply({}, [validUser]);
+        await Meteor.server.method_handlers['auth.registerUser'].apply({}, [invalidUser]);
+        assert.fail('Expected existing email error');
+      } catch (error) {
+        assert.equal(error.error, 'auth.emailTaken');
+      }
+    });
   });
 }
