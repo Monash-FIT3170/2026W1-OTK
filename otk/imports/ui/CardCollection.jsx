@@ -1,9 +1,12 @@
 import Card from './Card';
 
-export default function CardCollection() {
+export default function CardCollection(cards) {
     return (
-        <ul className="flex ">
-            <li></li>
-        </ul>
+        <div className='flex flex-wrap'>
+            {cards.map((card) => (
+                <Card
+            ))}
+        </div>
+    
     )
 }

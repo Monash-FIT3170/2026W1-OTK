@@ -1,4 +1,6 @@
-export default function Card(cardProps) {
+import React from 'react';
+
+export const Card = ({cardProps}) => {
   return (
     <div>
       <div className="flex flex-col gap-3 bg-white rounded-xl shadow-md p-6">
@@ -26,4 +28,4 @@ export default function Card(cardProps) {
       {cardProps.getName()}
     </div>
   );
-}
+};
