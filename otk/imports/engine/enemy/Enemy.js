@@ -12,6 +12,7 @@ export class Enemy {
     this.enemyId = enemyId;
     this.name = name;
     this.health = health;
+    this.currentHealth = health;
     this.debuffs = debuffs;
   }
 
@@ -20,6 +21,7 @@ export class Enemy {
       enemyId: this.enemyId,
       name: this.name,
       health: this.health,
+      currentHealth: this.currentHealth, 
       debuffs: [...this.debuffs],
     };
   }
