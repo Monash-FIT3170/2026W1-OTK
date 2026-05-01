@@ -7,16 +7,19 @@ export class EnemyDamage {
     this.enemy = enemy;
   }
 
+  //Getter method to return current health
   get currentHealth() {
     return this.enemy.currentHealth;
   }
 
+  // Helper method to update enemy current health
   getDamage(damageValues) {
     const damage = EnemyDamage.totalDamage(damageValues);
     this.enemy.currentHealth = Math.max(0, this.enemy.currentHealth - damage);
     return this.enemy.currentHealth;
   }
 
+  //Finds total damage value from a single card or an array of multiple cards
   static totalDamage(damageValues) {
     const values = Array.isArray(damageValues) ? damageValues : [damageValues];
     return values.reduce((total, damageValue) => {
@@ -33,5 +36,6 @@ export class EnemyDamage {
   }
 }
 
+// Helper method to apply final damage to any enemy 
 export const applyEnemyDamage = (enemy, damageValues) =>
   new EnemyDamage(enemy).getDamage(damageValues);
