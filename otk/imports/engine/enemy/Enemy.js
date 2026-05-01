@@ -4,7 +4,7 @@
  * via EnemyRegistry.
  */
 export class Enemy {
-  constructor({ enemyId, name, health, debuffs = [] }) {
+  constructor({ enemyId, name, health, currentHealth = health, debuffs = [] }) {
     // abstract check so that this class is not instantiated
     if (new.target === Enemy) {
       throw new Error('Enemy is abstract and cannot be instantiated directly.');
@@ -12,7 +12,7 @@ export class Enemy {
     this.enemyId = enemyId;
     this.name = name;
     this.health = health;
-    this.currentHealth = health;
+    this.currentHealth = currentHealth;
     this.debuffs = debuffs;
   }
 
@@ -21,7 +21,7 @@ export class Enemy {
       enemyId: this.enemyId,
       name: this.name,
       health: this.health,
-      currentHealth: this.currentHealth, 
+      currentHealth: this.currentHealth,
       debuffs: [...this.debuffs],
     };
   }

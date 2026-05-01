@@ -1,3 +1,4 @@
+
 import { Meteor } from 'meteor/meteor';
 import { EnemiesCollection } from './collections/Enemies.js';
 
