@@ -3,24 +3,16 @@ import sinon from 'sinon';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { expect } from 'chai';
 import { EnemyDisplay } from './EnemyDisplay';
-import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
+import { Goblin } from '/imports/engine/enemy/enemies/Goblin';
 
 let goblin;
 let animateSpy;
-let useAnimateStub;
+let fakeUseAnimate;
 
 beforeEach(() => {
   goblin = new Goblin();
   animateSpy = sinon.stub().resolves();
-
-  useAnimateStub = sinon.stub(require('motion/react'), 'useAnimate').callsFake(() => {
-    const scope = { current: document.createElement('div') };
-    return [scope, animateSpy];
-  });
-});
-
-afterEach(() => {
-  sinon.restore();
+  fakeUseAnimate = () => [{ current: document.createElement('div') }, animateSpy];
 });
 
 // ─── Tests ───
@@ -29,7 +21,7 @@ describe('EnemyDisplay', () => {
 
   // 1. Renders the enemy image when isVisible is true
   it('renders the enemy image when visible', () => {
-    render(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} />);
+    render(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} _useAnimate={fakeUseAnimate} />);
 
     expect(screen.getByRole('img')).to.exist;
     expect(screen.getByRole('img').getAttribute('src')).to.equal(
@@ -40,7 +32,7 @@ describe('EnemyDisplay', () => {
 
   // 2. Renders nothing when isVisible is false
   it('renders nothing when not visible', () => {
-    render(<EnemyDisplay enemy={goblin} isVisible={false} isTakingDamage={false} />);
+    render(<EnemyDisplay enemy={goblin} isVisible={false} isTakingDamage={false} _useAnimate={fakeUseAnimate} />);
 
     expect(screen.queryByRole('img')).to.not.exist;
   });
@@ -49,10 +41,10 @@ describe('EnemyDisplay', () => {
   // 3. Shows the -hit sprite when isTakingDamage flips to true
   it('shows hit sprite when isTakingDamage becomes true', () => {
     const { rerender } = render(
-      <EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} />
+      <EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} _useAnimate={fakeUseAnimate} />
     );
 
-    rerender(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={true} />);
+    rerender(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={true} _useAnimate={fakeUseAnimate} />);
 
     expect(screen.getByRole('img').getAttribute('src')).to.include('-hit')
   });
@@ -61,10 +53,10 @@ describe('EnemyDisplay', () => {
   // 4. Resets back to the normal sprite after the animation promise resolves
   it('resets to normal sprite after hit animation completes', async () => {
     const { rerender } = render(
-      <EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} />
+      <EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} _useAnimate={fakeUseAnimate} />
     );
 
-    rerender(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={true} />);
+    rerender(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={true} _useAnimate={fakeUseAnimate} />);
 
     // Checks the expect every 50ms for 1000ms 
     // It doesnt need to be longer because we are mocking animations so they should be done instantly
@@ -77,10 +69,10 @@ describe('EnemyDisplay', () => {
   // 5. onError falls back to normal sprite if the -hit sprite fails to load
   it('falls back to normal sprite if hit sprite fails to load', () => {
     const { rerender } = render(
-      <EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} />
+      <EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={false} _useAnimate={fakeUseAnimate} />
     );
 
-    rerender(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={true} />);
+    rerender(<EnemyDisplay enemy={goblin} isVisible={true} isTakingDamage={true} _useAnimate={fakeUseAnimate} />);
 
     const img = screen.getByRole('img');
 

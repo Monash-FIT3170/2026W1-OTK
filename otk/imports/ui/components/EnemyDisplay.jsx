@@ -14,8 +14,8 @@ import { EntryAnimations, HitAnimations } from './EnemyAnimations';
  * @param {boolean} isTakingDamage - When toggled to true, triggers a shake animation
  *
  */
-export function EnemyDisplay({ enemy, isVisible, isTakingDamage }) {
-  const [scope, animate] = useAnimate();
+export function EnemyDisplay({ enemy, isVisible, isTakingDamage, _useAnimate = useAnimate }) {
+  const [scope, animate] = _useAnimate();
 
   // Used to swap out the hit sprite when taking damage. Resets to normal sprite after animation completes.
   const [isHit, setIsHit] = useState(false);
