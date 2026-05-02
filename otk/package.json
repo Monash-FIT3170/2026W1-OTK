@@ -4,8 +4,8 @@
   "scripts": {
     "start": "meteor run",
     "lint": "eslint .",
-    "test:unit": "meteor test --once --driver-package meteortesting:mocha",
-    "test:unit:watch": "TEST_WATCH=1 meteor test --driver-package meteortesting:mocha --port 3100",
+    "test:unit": "cross-env TEST_BROWSER_DRIVER=puppeteer meteor test --once --driver-package meteortesting:mocha",
+    "test:unit:watch": "cross-env TEST_WATCH=1 meteor test --driver-package meteortesting:mocha --port 3100",
     "test:integration": "meteor test --full-app --once --driver-package meteortesting:mocha",
     "visualize": "meteor --production --extra-packages bundle-visualizer",
     "format:check": "prettier --check .",
@@ -37,6 +37,7 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "chai": "^6.2.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
@@ -45,6 +46,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.5.0",
     "prettier": "^3.8.3",
+    "puppeteer": "^24.42.0",
     "react-refresh": "^0.17.0",
     "sinon": "^21.1.2"
   },
