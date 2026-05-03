@@ -5,5 +5,5 @@
 import { GameEngine } from "../GameEngine";
 
 export interface Effect {
-    resolve(engine: GameEngine, targetCardIds?: string[]): void;
+    resolve(engine: GameEngine, targetCardIndexes?: string[]): void;
 }
