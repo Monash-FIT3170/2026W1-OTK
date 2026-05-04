@@ -8,13 +8,13 @@ import { Card } from "../card/Card";
 export class DiscardEffect implements Effect {
 
     resolve(engine: GameEngine, targetCardIds?: string[]) {        
-        if (!targetCardIndexes) return;
+        if (!targetCardIds) return;
  
         // collect the matching card instances
         const cardsToDiscard: Card[] = [];
-        targetCardIndexes.forEach(id => {
+        targetCardIds.forEach((id: string) => {
             // look up the card in the current hand by its cardId
-            const card = engine.hand.find(card => card.cardId === id);
+            const card = engine.hand.find((card: Card) => card.cardId === id);
             // check if card exists in hand
             if (card) {
                 cardsToDiscard.push(card);

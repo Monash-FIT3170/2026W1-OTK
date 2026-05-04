@@ -4,13 +4,14 @@
 import { Card } from "./Card";
 import { GameEngine } from "../GameEngine";
 import { ReturnToDeckEffect } from "../effect/ReturnToDeckEffect";
+import { cardRegistry } from "./CardRegistry";
 
 export class Transcode extends Card {
 
   // constructs card
-  constructor(cardId: string) {
+  constructor() {
     super({
-      cardId: "tra",
+      cardId: "transcode",
       name: "Transcode",
       description: "Return 3 card from hand to deck.",
       baseCost: 4,
@@ -21,7 +22,9 @@ export class Transcode extends Card {
 
   // executes card effects
   execute(engine: GameEngine, targetCardIndexes: string[]): void {
-    ReturnToDeckEffect().resolve(engine, targetCardIndexes)
+    new ReturnToDeckEffect().resolve(engine, targetCardIndexes)
   }
 
 }
+
+cardRegistry.register("transcode", new Transcode().toJSON());
