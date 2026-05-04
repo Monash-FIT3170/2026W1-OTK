@@ -1,5 +1,6 @@
 import React from 'react';
 import { HealthBar } from './HealthBar';
+import { EnemyDisplay } from './EnemyDisplay';
 
 export const EnemyList = ({ enemies }) => {
   if (!enemies || enemies.length === 0) {
@@ -20,9 +21,12 @@ export const EnemyList = ({ enemies }) => {
             className="enemy-card bg-white p-4 rounded-lg shadow-md border border-gray-200"
           >
             <HealthBar
-              current={enemy.health}
-              max={100}
+              current={enemy.currentHealth}
+              max={enemy.health}
               name={enemy.name}
+            />
+            <EnemyDisplay 
+              enemy={enemy}
             />
           </div>
         ))}
