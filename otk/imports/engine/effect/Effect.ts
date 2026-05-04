@@ -1,9 +1,9 @@
-// Effect.ts
-
-// importing components
+/**
+ * @author Justin La
+ * Represents the gameplay effect during card action
+ */
 import { GameEngine } from "../GameEngine";
 
-// defining interface
 export interface Effect {
-    resolve(engine: GameEngine, targetCardIds?: string[]): void;
+    resolve(engine: GameEngine, targetCardIndexes?: string[]): void;
 }
