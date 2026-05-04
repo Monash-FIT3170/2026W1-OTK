@@ -24,3 +24,5 @@ export class CardRegistry {
   }
 
 }
+
+export const cardRegistry = new CardRegistry();

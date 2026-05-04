@@ -4,6 +4,7 @@
 import { Card } from "./Card";
 import { GameEngine } from "../GameEngine";
 import { DamageEffect } from "../effect/DamageEffect";
+import { cardRegistry } from "./CardRegistry";
 
 export class FogClearing extends Card {
 
@@ -22,7 +23,9 @@ export class FogClearing extends Card {
 
   // executes card effects
   execute(engine: GameEngine): void {
-    DamageEffect(this.currentAttack).resolve(engine)
+    new DamageEffect(this.currentAttack).resolve(engine)
   }
 
 }
+
+cardRegistry.register("fog", new FogClearing().toJSON());

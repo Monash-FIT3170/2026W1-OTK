@@ -4,11 +4,12 @@
 import { Card } from "./Card";
 import { GameEngine } from "../GameEngine";
 import { ReturnToDeckEffect } from "../effect/ReturnToDeckEffect";
+import { cardRegistry } from "./CardRegistry";
 
 export class Transcode extends Card {
 
   // constructs card
-  constructor(cardId: string) {
+  constructor() {
     super({
       cardId: "tra",
       name: "Transcode",
@@ -21,7 +22,9 @@ export class Transcode extends Card {
 
   // executes card effects
   execute(engine: GameEngine, targetCardIndexes: string[]): void {
-    ReturnToDeckEffect().resolve(engine, targetCardIndexes)
+    new ReturnToDeckEffect().resolve(engine, targetCardIndexes)
   }
 
 }
+
+cardRegistry.register("tra", new Transcode().toJSON());

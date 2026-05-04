@@ -5,6 +5,7 @@ import { Card } from "./Card";
 import { GameEngine } from "../GameEngine";
 import { DiscardEffect } from "../effect/DiscardEffect";
 import { DamageEffect } from "../effect/DamageEffect";
+import { cardRegistry } from "./CardRegistry";
 
 export class FerociousClaw extends Card {
 
@@ -24,8 +25,10 @@ export class FerociousClaw extends Card {
 
   // executes card effects
   execute(engine: GameEngine, targetCardIndexes: string[]): void {
-    DiscardEffect().resolve(engine, targetCardIndexes)
-    DamageEffect(this.currentAttack).resolve(engine)
+    new DiscardEffect().resolve(engine, targetCardIndexes)
+    new DamageEffect(this.currentAttack).resolve(engine)
   }
 
 }
+
+cardRegistry.register("fer", new FerociousClaw().toJSON());
