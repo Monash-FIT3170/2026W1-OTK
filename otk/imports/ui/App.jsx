@@ -4,6 +4,7 @@ import { EnemyList } from './components';
 import { EnemyDisplay } from './components/EnemyDisplay';
 import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
 import { HealthBar } from './components/HealthBar';
+import CardHand from './cards/CardHand';
 
 export const App = () => {
   const [enemy, setEnemy] = useState(new Goblin());
@@ -32,6 +33,6 @@ export const App = () => {
                   />
       <EnemyDisplay enemy={enemy} isVisible={isVisible} isTakingDamage={isTakingDamage} />
       <button onClick={handleAttack}>Attack</button>
-    </div>
+      <CardHand cards={cards} />
   );
 };
