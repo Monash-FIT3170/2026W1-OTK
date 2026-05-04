@@ -5,6 +5,9 @@
  */
 export class Enemy {
   constructor({ enemyId, name, health, currentHealth = health, debuffs = [] }) {
+  static entryAnimation = 'fade'; // default animation for all enemies, can be overridden by subclasses
+  static hitAnimation = 'shake';  // default hit animation for all enemies, can be overridden by subclasses
+
     // abstract check so that this class is not instantiated
     if (new.target === Enemy) {
       throw new Error('Enemy is abstract and cannot be instantiated directly.');
