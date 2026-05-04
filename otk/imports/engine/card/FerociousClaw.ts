@@ -3,8 +3,8 @@
 // importing components
 import { Card } from "./Card";
 import { GameEngine } from "../GameEngine";
-// import { DiscardEffect } from "../effect/DiscardEffect";
-// import { DamageEffect } from "../effect/DamageEffect";
+import { DiscardEffect } from "../effect/DiscardEffect";
+import { DamageEffect } from "../effect/DamageEffect";
 
 export class FerociousClaw extends Card {
 
@@ -23,9 +23,9 @@ export class FerociousClaw extends Card {
   }
 
   // executes card effects
-  // execute(GameEngine, targetCardIndexes: string[]): void {
-  //   DiscardEffect().resolve(engine, targetCardIndexes)
-  //   DamageEffect(this.currentAttack).resolve(engine)
-  // }
+  execute(engine: GameEngine, targetCardIndexes: string[]): void {
+    DiscardEffect().resolve(engine, targetCardIndexes)
+    DamageEffect(this.currentAttack).resolve(engine)
+  }
 
 }
