@@ -6,10 +6,13 @@ export class Goblin extends Enemy {
   static hitAnimation = 'squish';
 
   constructor(data = {}) {
+    const health = data.health ?? 20;
+
     super({
       enemyId: Goblin.enemyId,
       name: data.name ?? 'Goblin',
-      health: data.health ?? 20,
+      health,
+      currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],
     });
   }
