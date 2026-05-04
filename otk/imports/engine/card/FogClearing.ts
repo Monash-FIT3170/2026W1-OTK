@@ -11,7 +11,7 @@ export class FogClearing extends Card {
   // constructs card
   constructor() {
     super({
-      cardId: "fog",
+      cardId: "fog-clearing",
       name: "Fog Clearing",
       description: "",
       baseCost: 2,
@@ -28,4 +28,4 @@ export class FogClearing extends Card {
 
 }
 
-cardRegistry.register("fog", new FogClearing().toJSON());
+cardRegistry.register("fog-clearing", new FogClearing().toJSON());

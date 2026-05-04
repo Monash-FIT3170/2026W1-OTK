@@ -11,7 +11,7 @@ export class Transcode extends Card {
   // constructs card
   constructor() {
     super({
-      cardId: "tra",
+      cardId: "transcode",
       name: "Transcode",
       description: "Return 3 card from hand to deck.",
       baseCost: 4,
@@ -27,4 +27,4 @@ export class Transcode extends Card {
 
 }
 
-cardRegistry.register("tra", new Transcode().toJSON());
+cardRegistry.register("transcode", new Transcode().toJSON());
