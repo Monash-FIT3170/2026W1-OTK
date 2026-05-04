@@ -67,8 +67,6 @@ export default function Card({ cardProps }) {
           <p className="ml-1 mt-1">{cardProps.description}</p>
         </div>
       </motion.div>
-
-      {/* {cardProps.getName()} */}
     </motion.div>
   );
 }

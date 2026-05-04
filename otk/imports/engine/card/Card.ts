@@ -49,7 +49,7 @@ export abstract class Card {
   }
 
   // executes card effects
-  // abstract execute(engine: GameEngine, targetCardIndexes?: string[]): void;
+  abstract execute(engine: GameEngine, targetCardIndexes?: string[]): void;
 
   // runs when card is discarded: does nothing
   onDiscard(): void {}
