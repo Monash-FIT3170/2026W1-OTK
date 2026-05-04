@@ -26,7 +26,7 @@ export default [
       'react-hooks': reactHooks,
     },
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: 2020,
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: { jsx: true },
