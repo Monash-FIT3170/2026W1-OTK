@@ -5,27 +5,26 @@ import { Card, cardData } from './Card';
 
 export class CardHand {
   // defining attributes
-  public cards: Record<string, cardData> = {};
+  // defining attributes
+  public cards: Card[];
 
   // constructs registry
-  constructor(initialData: Record<string, cardData> = {}) {
-    this.cards = initialData;
-  }
-
-  // add an entry
-  register(cardId: string, value: cardData): void {
-    this.cards[cardId] = value;
-  }
-
-  // get an entry
-  get(cardId: string): cardData | undefined {
-    return this.cards[cardId];
+  constructor(initCards: Card[]) {
+    this.cards = initCards;
   }
 
   // remove an entry
-  remove(cardId: string): void {
-    delete this.cards[cardId];
+  removeCard(card: Card): void {
+    this.cards = this.cards.filter((x) => x !== card);
+  }
+
+  addCard(card: Card): void {
+    this.cards = this.cards.concat(card);
+  }
+
+  returnAllCards(): Card[] {
+    return this.cards.concat(this.cards);
   }
 }
 
-export const cardHand = new CardHand();
+export const cardHand = new CardHand([]);
