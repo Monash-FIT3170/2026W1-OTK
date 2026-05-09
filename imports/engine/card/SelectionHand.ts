@@ -24,10 +24,11 @@ export class SelectionHand {
     this.selections = this.selections.filter((x) => x !== card);
   }
 
-  addSelection(card: Card): void {
+  addSelection(card: Card): boolean {
     if (this.selections.length == this.maxSelectAmount)
-      return
+      return false
     this.selections = this.selections.concat(card);
+    return true
   }
 
   isSelectableAmount(): boolean {
