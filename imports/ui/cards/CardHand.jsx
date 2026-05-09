@@ -43,7 +43,7 @@ export default function CardHand({ cards: cardHand }) {
   return (
     <div>
       <SelectionPanel
-        cardHand={this.cardArray}
+        cardHand={this}
         selectionHand={selectionHand}
         onHandCardClick={onHandCardClick}
         onSelectionCardClick={onSelectionCardClick}
