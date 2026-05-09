@@ -98,6 +98,8 @@ export const App = () => {
     },
   };
 
+  const discardHand = {};
+
   // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
   const handleAttack = () => {
     setEnemy((prev) => {
@@ -162,6 +164,7 @@ export const App = () => {
     //     </div>
     //   </div>
     // );
+    <DiscardPanel hand={cards} discardHand={discardHand} />
     <CardHand cards={cards} />
   );
 };
