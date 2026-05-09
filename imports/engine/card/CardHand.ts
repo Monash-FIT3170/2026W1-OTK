@@ -1,7 +1,7 @@
 // CardHand.ts
 
 // importing components
-import { Card, cardData } from './Card';
+import { Card } from './Card';
 
 export class CardHand {
   // defining attributes
@@ -22,7 +22,7 @@ export class CardHand {
   }
 
   returnAllCards(): Card[] {
-    return this.cards.concat(this.cards);
+    return [...this.cards];
   }
 }
 
