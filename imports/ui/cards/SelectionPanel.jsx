@@ -3,7 +3,6 @@ import { motion } from 'motion/react';
 
 export function SelectionPanel({
   selectionHand,
-  onHandCardClick,
   onSelectionCardClick,
 }) {
   const cardHand = Object.entries(cardHand);
