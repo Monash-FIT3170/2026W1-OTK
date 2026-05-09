@@ -113,6 +113,30 @@ export const App = () => {
     setTimeout(() => setIsTakingDamage(false), 400);
   };
 
+  const onHandCardClick = (cardId) => {
+    const card = cardHand[cardId];
+
+    setHandCard((prev) => {
+      const newHand = { ...prev };
+      delete newHand[cardId];
+      return newHand;
+    });
+
+    setDiscardHand((prev) => ({ ...prev, [cardId]: card }));
+  };
+
+  const onDiscardCardClick = (cardId) => {
+    const card = discardHand[cardId];
+
+    setDiscardHand((prev) => {
+      const newDiscardHand = { ...prev };
+      delete newDiscardHand[cardId];
+      return newDiscardHand;
+    });
+
+    setHand((prev) => ({ ...prev, [cardId]: card }));
+  };
+
   /*
   return (
     <div className="page">
@@ -164,7 +188,13 @@ export const App = () => {
     //     </div>
     //   </div>
     // );
-    <DiscardPanel hand={cards} discardHand={discardHand} />
-    <CardHand cards={cards} />
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+      <SelectionPanel
+        cardHand={cards}
+        discardHand={discardHand}
+        onHandCardClick={onHandCardClick}
+        onDiscardCardClick={onDiscardCardClick}
+      />
+    </div>
   );
 };
