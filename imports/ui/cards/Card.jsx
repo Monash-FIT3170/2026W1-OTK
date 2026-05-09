@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
 
-export default function Card({ cardProps }) {
+export function Card({ cardProps }) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'

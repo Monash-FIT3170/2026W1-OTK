@@ -3,7 +3,7 @@ import { EnemyList } from './components';
 import { EnemyDisplay } from './components/EnemyDisplay';
 import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
 import { HealthBar } from './components/HealthBar';
-import  CardHandPanel from './cards/CardHand';
+import { CardHandPanel } from './cards/CardHandPanel';
 import { CardHand } from 'imports/engine/card/CardHand';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
@@ -98,6 +98,8 @@ export const App = () => {
       description: 'hello!',
     },
   };
+  const [hand, setHand] = useState(() => new CardHand([]));
+  const [selectionHand, setSelectionHand] = useState(null);
 
   // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
   const handleAttack = () => {
@@ -112,6 +114,29 @@ export const App = () => {
     setTimeout(() => setIsTakingDamage(false), 400);
   };
 
+  const onHandCardClick = (card) => {
+    const card = cardHand[card];
+
+    setHand((prev) => {
+      const newHand = { ...prev };
+      delete newHand[card];
+      return newHand;
+    });
+
+    setSelectionHand((prev) => ({ ...prev, [card]: card }));
+  };
+
+  const onSelectionCardClick = (card) => {
+    const card = SelectionHand[card];
+
+    setSelectionHand((prev) => {
+      const newSelectionHand = { ...prev };
+      delete newSelectionHand[card];
+      return newSelectionHand;
+    });
+
+    setHand((prev) => ({ ...prev, [card]: card }));
+  };
   /*
   return (
     <div className="page">
@@ -126,22 +151,22 @@ export const App = () => {
   );
   */
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        {showRegister ? <AccountRegistrationForm /> : <LoginForm />}
+  // if (!user) {
+  //   return (
+  //     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+  //       {showRegister ? <AccountRegistrationForm /> : <LoginForm />}
 
-        <button
-          onClick={() => setShowRegister(!showRegister)}
-          className="mt-6 text-slate-600 underline hover:text-slate-900"
-        >
-          {showRegister
-            ? 'Already have an account? Login'
-            : 'Need an account? Register'}
-        </button>
-      </div>
-    );
-  }
+  //       <button
+  //         onClick={() => setShowRegister(!showRegister)}
+  //         className="mt-6 text-slate-600 underline hover:text-slate-900"
+  //       >
+  //         {showRegister
+  //           ? 'Already have an account? Login'
+  //           : 'Need an account? Register'}
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   return (
     //   <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
@@ -164,7 +189,12 @@ export const App = () => {
     //   </div>
     // );
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <CardHandUI cardHand={new CardHand(cards)} />
+      <CardHandPanel
+        hand={hand}
+        selectionHand={selectionHand}
+        onHandCardClick={onHandCardClick}
+        onSelectionCardClick={onSelectionCardClick}
+      />
     </div>
   );
 };

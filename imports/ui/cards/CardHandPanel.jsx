@@ -1,51 +1,24 @@
-import Card from './Card';
+import { Card } from './Card';
 import { motion } from 'motion/react';
-import SelectionPanel from './SelectionPanel';
-import SelectionHand from 'imports/engine/card/SelectionHand';
+import { SelectionPanel } from './SelectionPanel';
+import { SelectionHand } from 'imports/engine/card/SelectionHand';
 
-export default function CardHandPanel({ cards: cardHand }) {
-  const cardArray = Object.values(cardHand);
+export function CardHandPanel({ hand, selectionHand, onHandCardClick, onSelectionCardClick }) {
+  const cardArray = hand.returnAllCards();
   const numCards = cardArray.length;
-  const selectionHand = new SelectionHand();
 
   const cardWidth = 176;
   const containerWidth = window.innerWidth - 40;
-
   const marginLeft =
     numCards > 1
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
       : 0;
 
-  const onHandCardClick = (cardId) => {
-    const card = cardHand[cardId];
-
-    setHand((prev) => {
-      const newHand = { ...prev };
-      delete newHand[cardId];
-      return newHand;
-    });
-
-    setSelectionHand((prev) => ({ ...prev, [cardId]: card }));
-  };
-
-  const onSelectionCardClick = (cardId) => {
-    const card = SelectionHand[cardId];
-
-    setSelectionHand((prev) => {
-      const newSelectionHand = { ...prev };
-      delete newSelectionHand[cardId];
-      return newSelectionHand;
-    });
-
-    setHand((prev) => ({ ...prev, [cardId]: card }));
-  };
-
   return (
     <div>
+      <p>hello</p>
       <SelectionPanel
-        cardHand={this}
         selectionHand={selectionHand}
-        onHandCardClick={onHandCardClick}
         onSelectionCardClick={onSelectionCardClick}
       />
       <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 w-full">

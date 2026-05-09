@@ -1,8 +1,7 @@
-import Card from './Card';
+import { Card } from './Card';
 import { motion } from 'motion/react';
 
-export default function SelectionPanel({
-  cardHand,
+export function SelectionPanel({
   selectionHand,
   onHandCardClick,
   onSelectionCardClick,

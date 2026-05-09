@@ -21,7 +21,7 @@ module.exports = defineConfig((_Meteor) => {
             options: {
               jsc: {
                 parser: {
-                  syntax: 'typescript', // ← fix
+                  syntax: 'typescript',
                   tsx: false,
                 },
               },
