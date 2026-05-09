@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
+import { Meteor } from 'meteor/meteor';
 
-export default function Card({ cardProps }) {
+export default function Card({ cardProps, handRef }) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'
@@ -13,8 +14,20 @@ export default function Card({ cardProps }) {
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const cardRef = useRef(null);
+
+  const isOutsideHand = () => {
+    if (!handRef?.current || !cardRef?.current) return false;
+    const hand = handRef.current.getBoundingClientRect();
+    const card = cardRef.current.getBoundingClientRect();
+    return card.bottom < hand.top;
+  };
 
   const handleDragEnd = () => {
+    if (isOutsideHand()) {
+      console.log('Playing card:', cardProps.name);
+      //Meteor.call('game.playCard', { cardId: cardProps.cardId });
+    }
     // Animate back to origin
     animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
     animate(y, 0, { type: 'spring', stiffness: 300, damping: 20 });
@@ -28,11 +41,11 @@ export default function Card({ cardProps }) {
           backgroundColor: 'oklch(90.5% 0.233 277.117)',
         }}
         whileTap={{ scale: 0.95 }}
+        ref={cardRef}
         drag
         onDragEnd={handleDragEnd}
         dragMomentum={false}
         style={{ x, y }}
-        onDragEnd={handleDragEnd}
         className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-40 min-h-50 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
       >
         <div
