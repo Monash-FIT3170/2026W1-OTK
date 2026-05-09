@@ -5,7 +5,6 @@ import { Card, cardData } from './Card';
 
 export class CardHand {
   // defining attributes
-  // defining attributes
   public cards: Card[];
 
   // constructs registry

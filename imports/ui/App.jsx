@@ -3,7 +3,7 @@ import { EnemyList } from './components';
 import { EnemyDisplay } from './components/EnemyDisplay';
 import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
 import { HealthBar } from './components/HealthBar';
-import { CardHand as CardHandUI } from './cards/CardHand';
+import  CardHandPanel from './cards/CardHand';
 import { CardHand } from 'imports/engine/card/CardHand';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
