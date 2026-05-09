@@ -25,6 +25,8 @@ export class SelectionHand {
   }
 
   addSelection(card: Card): void {
+    if (this.selections.length == this.maxSelectAmount)
+      return
     this.selections = this.selections.concat(card);
   }
 
