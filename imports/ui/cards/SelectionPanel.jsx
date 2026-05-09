@@ -23,24 +23,6 @@ export default function SelectionPanel({
             <Card cardProps={card} />
           </div>
         ))}
-
-        <button
-          onClick={onConfirm}
-          className="px-5 py-2 bg-red-600 text-white font-bold rounded-xl"
-        >
-          Done
-        </button>
-
-        <p>Current hand</p>
-        {cardHand.map(([cardId, card]) => (
-          <div
-            key={cardId}
-            onClick={() => onHandCardClick(cardId)}
-            className=""
-          >
-            <Card cardProps={card} />
-          </div>
-        ))}
       </div>
     </div>
   );

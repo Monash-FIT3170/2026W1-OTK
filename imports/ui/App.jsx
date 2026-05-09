@@ -3,7 +3,8 @@ import { EnemyList } from './components';
 import { EnemyDisplay } from './components/EnemyDisplay';
 import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
 import { HealthBar } from './components/HealthBar';
-import CardHand from './cards/CardHand';
+import { CardHand as CardHandUI } from './cards/CardHand';
+import { CardHand } from 'imports/engine/card/CardHand';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 import { LoginForm } from './auth/LoginForm';
@@ -98,8 +99,6 @@ export const App = () => {
     },
   };
 
-  const discardHand = {};
-
   // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
   const handleAttack = () => {
     setEnemy((prev) => {
@@ -111,30 +110,6 @@ export const App = () => {
 
     setIsTakingDamage(true);
     setTimeout(() => setIsTakingDamage(false), 400);
-  };
-
-  const onHandCardClick = (cardId) => {
-    const card = cardHand[cardId];
-
-    setHandCard((prev) => {
-      const newHand = { ...prev };
-      delete newHand[cardId];
-      return newHand;
-    });
-
-    setDiscardHand((prev) => ({ ...prev, [cardId]: card }));
-  };
-
-  const onDiscardCardClick = (cardId) => {
-    const card = discardHand[cardId];
-
-    setDiscardHand((prev) => {
-      const newDiscardHand = { ...prev };
-      delete newDiscardHand[cardId];
-      return newDiscardHand;
-    });
-
-    setHand((prev) => ({ ...prev, [cardId]: card }));
   };
 
   /*
@@ -189,12 +164,7 @@ export const App = () => {
     //   </div>
     // );
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <SelectionPanel
-        cardHand={cards}
-        discardHand={discardHand}
-        onHandCardClick={onHandCardClick}
-        onDiscardCardClick={onDiscardCardClick}
-      />
+      <CardHandUI cardHand={new CardHand(cards)} />
     </div>
   );
 };
