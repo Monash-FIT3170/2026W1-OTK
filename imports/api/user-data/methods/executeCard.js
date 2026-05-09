@@ -1,16 +1,17 @@
 import { Meteor } from 'meteor/meteor';
 import { UserDataCollection } from '../collections/UserDataCollection';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 import { GameEngine } from '../../../engine/GameEngine';
 
 Meteor.methods({
-  'game.playCard': async function ({ cardId }) {
+  'game.executeCard': async function ({ cardId, selectedCardIds }) {
     check(cardId, String);
+    check(selectedCardIds, Match.Optional([String]));
 
     if (!this.userId) {
       throw new Meteor.Error(
-        'game.playCard.notLoggedIn',
-        'Must be logged in to play a card.'
+        'game.executeCard.notLoggedIn',
+        'Must be logged in to execute a card.'
       );
     }
 
@@ -18,11 +19,14 @@ Meteor.methods({
       userId: this.userId,
     });
     if (!userData) {
-      throw new Meteor.Error('game.playCard.noUserData', 'No user data found.');
+      throw new Meteor.Error(
+        'game.executeCard.noUserData',
+        'No user data found.'
+      );
     }
 
     const engine = new GameEngine(userData.gameState);
-    engine.playCard(cardId);
+    engine.executeCard(cardId, selectedCardIds ?? []);
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },

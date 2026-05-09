@@ -25,23 +25,7 @@ const dummyCards = {
     baseAttack: 8,
     currentAttack: 10,
     description: 'Convert all shield into attack damage. Deals bonus damage equal to shields consumed.',
-  },
-  card4: {
-    name: 'Stone Wall',
-    baseCost: 2,
-    currentCost: 2,
-    baseAttack: null,
-    currentAttack: null,
-    description: 'Gain 8 shield. If you have no cards in hand after playing this, gain 4 extra shield.',
-  },
-  card5: {
-    name: 'Shadow Strike',
-    baseCost: 1,
-    currentCost: 1,
-    baseAttack: 3,
-    currentAttack: 3,
-    description: 'Deal 3 damage. If played first this turn, deal 6 damage instead and draw a card.',
-  },
+  }
 };
 
 export const App = () => {
