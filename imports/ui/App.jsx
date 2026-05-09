@@ -5,12 +5,16 @@ import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
 import { HealthBar } from './components/HealthBar';
 import { CardHandPanel } from './cards/CardHandPanel';
 import { CardHand } from 'imports/engine/card/CardHand';
+import { SelectionHand } from 'imports/engine/card/SelectionHand';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
+import { FerociousClaw } from 'imports/engine/card/FerociousClaw';
+import { Transcode } from 'imports/engine/card/Transcode';
 
 export const App = () => {
+  debugger;
   const [enemy, setEnemy] = useState(new Goblin());
   const [isTakingDamage, setIsTakingDamage] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -98,8 +102,8 @@ export const App = () => {
       description: 'hello!',
     },
   };
-  const [hand, setHand] = useState(() => new CardHand([]));
-  const [selectionHand, setSelectionHand] = useState(null);
+  const cardHand = new CardHand([new FerociousClaw(), new Transcode()]);
+  const selectionHand = new SelectionHand(cardHand.cards[0]);
 
   // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
   const handleAttack = () => {
@@ -114,29 +118,6 @@ export const App = () => {
     setTimeout(() => setIsTakingDamage(false), 400);
   };
 
-  const onHandCardClick = (card) => {
-    const card = cardHand[card];
-
-    setHand((prev) => {
-      const newHand = { ...prev };
-      delete newHand[card];
-      return newHand;
-    });
-
-    setSelectionHand((prev) => ({ ...prev, [card]: card }));
-  };
-
-  const onSelectionCardClick = (card) => {
-    const card = SelectionHand[card];
-
-    setSelectionHand((prev) => {
-      const newSelectionHand = { ...prev };
-      delete newSelectionHand[card];
-      return newSelectionHand;
-    });
-
-    setHand((prev) => ({ ...prev, [card]: card }));
-  };
   /*
   return (
     <div className="page">
@@ -189,12 +170,7 @@ export const App = () => {
     //   </div>
     // );
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <CardHandPanel
-        hand={hand}
-        selectionHand={selectionHand}
-        onHandCardClick={onHandCardClick}
-        onSelectionCardClick={onSelectionCardClick}
-      />
+      <CardHandPanel cardHand={cardHand} />
     </div>
   );
 };

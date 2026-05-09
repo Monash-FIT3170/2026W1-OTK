@@ -8,8 +8,8 @@ export class CardHand {
   public cards: Card[];
 
   // constructs registry
-  constructor(initCards: Card[]) {
-    this.cards = initCards;
+  constructor(initCards: Card[] = []) {
+    this.cards = initCards || [];
   }
 
   // remove an entry
@@ -22,6 +22,7 @@ export class CardHand {
   }
 
   returnAllCards(): Card[] {
+    console.log('value of this.cards:', this.cards)
     return [...this.cards];
   }
 }

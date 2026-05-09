@@ -31,8 +31,7 @@ export function Card({ cardProps }) {
         drag
         onDragEnd={handleDragEnd}
         dragMomentum={false}
-        style={{ x, y, outline: isSelected ? '3px solid blue' : 'none' }}
-        onDragEnd={handleDragEnd}
+        style={{ x, y }}
         className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-40 min-h-50 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
       >
         <div
