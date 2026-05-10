@@ -28,4 +28,4 @@ export class FogClearing extends Card {
 
 }
 
-cardRegistry.register("fog-clearing", new FogClearing().toJSON());
+cardRegistry.register("fog-clearing", new FogClearing());

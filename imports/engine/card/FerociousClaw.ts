@@ -31,4 +31,4 @@ export class FerociousClaw extends Card {
 
 }
 
-cardRegistry.register("ferocious-claw", new FerociousClaw().toJSON());
+cardRegistry.register("ferocious-claw", new FerociousClaw());

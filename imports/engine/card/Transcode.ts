@@ -27,4 +27,4 @@ export class Transcode extends Card {
 
 }
 
-cardRegistry.register("transcode", new Transcode().toJSON());
+cardRegistry.register("transcode", new Transcode());
