@@ -56,10 +56,14 @@ export class GameEngine {
     this.removeFromHand(cardId);
   }
 
+  
+
   // ------------------
   //  helper functions
   // ------------------
-
+  initialDraw(n: number = 5): void {
+  }
+  
   getCard(cardId: string): Card {}
 
   getHand(): Card[] {}
