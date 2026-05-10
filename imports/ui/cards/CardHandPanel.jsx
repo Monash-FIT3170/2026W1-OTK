@@ -34,7 +34,7 @@ export function CardHandPanel({ cardHand, setCardHand }) {
 
   return (
     <div>
-      {selectionHand && <SelectionPanel selectionHand={selectionHand} />}
+      {selectionHand && <SelectionPanel selectionHand={selectionHand} setSelectionHand={setSelectionHand} cardHand={cardHand} setCardHand={setCardHand} />}
       <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 min-h-70 w-full">
         <div className="flex flex-row justify-center w-full">
           {cardHand.cards.map((card, idx) => (

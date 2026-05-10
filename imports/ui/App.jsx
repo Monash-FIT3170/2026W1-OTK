@@ -102,7 +102,14 @@ export const App = () => {
       description: 'hello!',
     },
   };
-  const [cardHand, setCardHand] = useState(new CardHand([new FerociousClaw(), new Transcode()]));
+  const [cardHand, setCardHand] = useState(
+    new CardHand([
+      new FerociousClaw(),
+      new Transcode(),
+      new Transcode(),
+      new FerociousClaw(),
+    ])
+  );
 
   // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
   const handleAttack = () => {
