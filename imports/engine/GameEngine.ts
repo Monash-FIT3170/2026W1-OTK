@@ -6,7 +6,7 @@ import { enemyData, Enemy } from "./enemy/Enemy";
 import { cardRegistry, CardRegistry } from "./card/CardRegistry";
 import { enemyRegistry } from "./enemy/EnemyRegistry";
 
-export interface GameState {
+export type GameState = {
   hand: cardData[];
   deck: cardData[];
   enemy: enemyData;
