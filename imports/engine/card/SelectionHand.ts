@@ -25,7 +25,7 @@ export class SelectionHand {
   }
 
   addSelection(card: Card): boolean {
-    if (this.selections.length == this.maxSelectAmount) return false;
+    if ( this.maxSelectAmount !== undefined && this.selections.length >= this.maxSelectAmount) return false;
     this.selections = this.selections.concat(card);
     return true;
   }

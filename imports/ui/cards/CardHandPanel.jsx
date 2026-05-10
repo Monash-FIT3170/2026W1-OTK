@@ -21,12 +21,16 @@ export function CardHandPanel({ cardHand, setCardHand }) {
       let currentSelectionHand = selectionHand;
       if (!currentSelectionHand) {
         currentSelectionHand = new SelectionHand(card);
+        currentCardHand.removeCard(card);
       }
-      currentCardHand.removeCard(card);
-
-      if (currentSelectionHand.selectedCard !== card) {
-        currentSelectionHand.addSelection(card);
+      else{
+        if (currentSelectionHand.selectedCard !== card) {
+         if (currentSelectionHand.addSelection(card)){
+            currentCardHand.removeCard(card);
+          }
+        }
       }
+      
       setCardHand(currentCardHand);
       setSelectionHand(currentSelectionHand);
     }
