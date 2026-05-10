@@ -25,7 +25,7 @@ export function SelectionPanel({ selectionHand }) {
             <Card cardProps={selectionHand.selectedCard} />
           </div>
           <div className="flex flex-col justify-center overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-gray-70 w-8/10">
-            {selectionHand.selections.map((card) => (
+            {selectionHand.selections.map((card, idx) => (
               <div key={card.cardId} onClick={() => onSelectedCardClick(card)}>
                 <Card 
                 style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}

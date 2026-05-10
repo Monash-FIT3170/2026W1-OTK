@@ -16,7 +16,7 @@ export function CardHandPanel({ cardHand, setCardHand }) {
       : 0;
 
   const onHandCardClick = (card) => {
-    let currentCardHand = cardHand;
+    let currentCardHand = Object.assign(Object.create(Object.getPrototypeOf(cardHand)), cardHand);
     if (card.cardAmountToSelect !== null) {
       let currentSelectionHand = selectionHand;
       if (!currentSelectionHand) {
