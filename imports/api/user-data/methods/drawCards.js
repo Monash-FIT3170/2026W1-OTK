@@ -4,7 +4,7 @@ import { check } from 'meteor/check';
 import { GameEngine } from '../../../engine/GameEngine';
 
 Meteor.methods({
-  // TODO: load game state, draw cards equal to card cost, save with pendingPlay: { cardId },
+  // TODO: load game state, call engine.drawCost(cardId), save updated state to UserDataCollection,
   // return { requiresSelection, cardAmountToSelect } to client
   'game.drawCards': async function ({ cardId }) {
     // TODO: implement draw logic
