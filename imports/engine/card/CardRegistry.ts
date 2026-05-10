@@ -5,29 +5,30 @@ import { Card, cardData } from "./Card";
 
 export class CardRegistry {
 
-  // defining attributes
-  public registry: Map<string, Card>;
+  private factories: Map<string, () => Card>;
 
-  // constructs registry
   constructor() {
-    this.registry = new Map()
+    this.factories = new Map();
   }
 
-  // add an entry
-  register(cardId: string, cardObject: Card): void {
-    if (this.registry.has(cardId)) {
+  // add an entry - cardFactory is a function that returns a fresh Card instance
+  register(cardId: string, cardFactory: () => Card): void {
+    if (this.factories.has(cardId)) {
       throw new Error(`Card already registered: ${cardId}`);
     }
-    this.registry.set(cardId, cardObject);
+    this.factories.set(cardId, cardFactory);
   }
 
-  // get an entry
-  get(cardId: string): Card {
-    const cardObject = this.registry.get(cardId);
-    if (!cardObject) {
-      throw new Error(`Unknown cardId: ${cardId}`);
+  // creates a fresh Card instance from saved cardData
+  create(data: cardData): Card {
+    const factory = this.factories.get(data.cardId);
+    if (!factory) {
+      throw new Error(`Unknown cardId: ${data.cardId}`);
     }
-    return cardObject;
+    const card = factory();
+    card.currentCost = data.currentCost;
+    if (data.currentAttack !== undefined) card.currentAttack = data.currentAttack;
+    return card;
   }
 
 }
