@@ -2,10 +2,13 @@ import { Card } from './Card';
 import { motion } from 'framer-motion';
 import { SelectionPanel } from './SelectionPanel';
 import { SelectionHand } from 'imports/engine/card/SelectionHand';
+import { useState } from 'react';
 
 export function CardHandPanel({ cardHand }) {
   const cardArray = cardHand.returnAllCards();
   const numCards = cardArray.length;
+  let firstLoad = true;
+  const [selectionHand, setSelectionHand ] = useState(null);
 
   const cardWidth = 176;
   const containerWidth = window.innerWidth - 40;
@@ -15,16 +18,17 @@ export function CardHandPanel({ cardHand }) {
       : 0;
 
   const onHandCardClick = (card) => {
+    if (card.cardAmountToSelect !== null) {
+      const newSelectionHand = new SelectionHand(card);
+      newSelectionHand.addSelection(card)
+      setSelectionHand(newSelectionHand);
+    }
     cardHand.removeCard(card);
   };
 
   return (
     <div>
-      <p>hello</p>
-
-      {cardArray.length >= 1 && (
-        <SelectionPanel selectionHand={selectionHand} />
-      )}
+      {selectionHand && <SelectionPanel selectionHand={selectionHand} />}
       <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 w-full">
         <div className="flex flex-row justify-center w-full">
           {cardArray.map((card, idx) => (
