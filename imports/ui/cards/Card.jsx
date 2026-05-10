@@ -32,7 +32,7 @@ export function Card({ cardProps }) {
         onDragEnd={handleDragEnd}
         dragMomentum={false}
         style={{ x, y }}
-        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-40 min-h-50 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
+        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-45 min-h-65 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
       >
         <div
           className="flex flex-2/12 min-h-5 justify-center box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono 

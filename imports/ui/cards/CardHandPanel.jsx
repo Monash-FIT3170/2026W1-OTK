@@ -29,7 +29,7 @@ export function CardHandPanel({ cardHand }) {
   return (
     <div>
       {selectionHand && <SelectionPanel selectionHand={selectionHand} />}
-      <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 w-full">
+      <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 min-h-70 w-full">
         <div className="flex flex-row justify-center w-full">
           {cardArray.map((card, idx) => (
             <motion.div
