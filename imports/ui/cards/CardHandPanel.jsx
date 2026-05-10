@@ -44,7 +44,6 @@ export function CardHandPanel({ cardHand, setCardHand }) {
           {cardHand.cards.map((card, idx) => (
             <motion.div
               style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
-              key={card.cardId}
               onClick={() => onHandCardClick(card)}
             >
               <Card cardProps={card} />

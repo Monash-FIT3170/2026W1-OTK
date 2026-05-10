@@ -38,7 +38,6 @@ export function SelectionPanel({ selectionHand, setSelectionHand, cardHand, setC
               <div key={card.cardId} onClick={() => onSelectionCardClick(card)}>
                 <Card
                   style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
-                  key={card.cardId}
                   cardProps={card}
                 />
               </div>
