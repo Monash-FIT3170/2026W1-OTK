@@ -102,8 +102,7 @@ export const App = () => {
       description: 'hello!',
     },
   };
-  const cardHand = new CardHand([new FerociousClaw(), new Transcode()]);
-  const selectionHand = new SelectionHand(cardHand.cards[0]);
+  const [cardHand, setCardHand] = useState(new CardHand([new FerociousClaw(), new Transcode()]));
 
   // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
   const handleAttack = () => {
@@ -170,7 +169,7 @@ export const App = () => {
     //   </div>
     // );
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <CardHandPanel cardHand={cardHand} />
+      <CardHandPanel cardHand={cardHand} setCardHand={setCardHand} />
     </div>
   );
 };
