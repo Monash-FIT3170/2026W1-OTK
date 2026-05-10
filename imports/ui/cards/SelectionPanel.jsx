@@ -6,6 +6,16 @@ export function SelectionPanel({ selectionHand }) {
   const onSelectedCardClick = (card) => {
     selectionHand.removeSelection(card);
   };
+
+  var numCards = selectionHand.selections.length;
+
+  var cardWidth = 176;
+  var containerWidth = window.innerWidth * 8/10 - 40;
+  var marginLeft =
+    numCards > 1
+      ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
+      : 0;
+
   return (
     <div className="flex justify-center w-full">
       <div className="flex flex-col justify-center w-1/2">
@@ -17,7 +27,10 @@ export function SelectionPanel({ selectionHand }) {
           <div className="flex flex-col justify-center overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-gray-70 w-8/10">
             {selectionHand.selections.map((card) => (
               <div key={card.cardId} onClick={() => onSelectedCardClick(card)}>
-                <Card cardProps={card} />
+                <Card 
+                style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
+                key={card.cardId}
+                cardProps={card} />
               </div>
             ))}
           </div>

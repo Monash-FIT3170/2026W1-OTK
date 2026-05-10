@@ -42,11 +42,11 @@ export function Card({ cardProps }) {
         </div>
         <div className="flex flex-4/10 flex-row gap-3 grow-0">
           <div className="flex flex-1/6 flex flex-col gap-0.5 grow-0 min-w-0">
-            <div className="flex box-border border-1 border-blue-800 aspect-square bg-blue-300 rounded-xl justify-center-safe font-mono text-ellipsis z-2">
+            <div className="flex box-border border-1 border-blue-800 aspect-square bg-blue-300 rounded-xl justify-center-safe font-mono text-ellipsis">
               <p className={costFontColour}>{cardProps.currentCost} </p>
             </div>
             {cardProps.currentAttack !== null && (
-              <div className="flex box-border border-1 border-red-800 aspect-square bg-red-300 rounded-xl justify-center-safe font-mono text-ellipsis z-2">
+              <div className="flex box-border border-1 border-red-800 aspect-square bg-red-300 rounded-xl justify-center-safe font-mono text-ellipsis">
                 <p className={attackFontColour}>{cardProps.currentAttack}</p>
               </div>
             )}
