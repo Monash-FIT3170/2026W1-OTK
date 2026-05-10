@@ -5,8 +5,7 @@ import { SelectionHand } from 'imports/engine/card/SelectionHand';
 import { useState } from 'react';
 
 export function CardHandPanel({ cardHand, setCardHand }) {
-  const cardArray = cardHand.returnAllCards();
-  const numCards = cardArray.length;
+  const numCards = cardHand.cards.length;
   const [selectionHand, setSelectionHand] = useState(null);
 
   const cardWidth = 176;
@@ -23,8 +22,11 @@ export function CardHandPanel({ cardHand, setCardHand }) {
       if (!currentSelectionHand) {
         currentSelectionHand = new SelectionHand(card);
       }
-      currentSelectionHand.addSelection(card);
       currentCardHand.removeCard(card);
+
+      if (currentSelectionHand.selectedCard !== card) {
+        currentSelectionHand.addSelection(card);
+      }
       setCardHand(currentCardHand);
       setSelectionHand(currentSelectionHand);
     }
@@ -35,7 +37,7 @@ export function CardHandPanel({ cardHand, setCardHand }) {
       {selectionHand && <SelectionPanel selectionHand={selectionHand} />}
       <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 min-h-70 w-full">
         <div className="flex flex-row justify-center w-full">
-          {cardArray.map((card, idx) => (
+          {cardHand.cards.map((card, idx) => (
             <motion.div
               style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
               key={card.cardId}
