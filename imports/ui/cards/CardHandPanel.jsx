@@ -4,11 +4,10 @@ import { SelectionPanel } from './SelectionPanel';
 import { SelectionHand } from 'imports/engine/card/SelectionHand';
 import { useState } from 'react';
 
-export function CardHandPanel({ cardHand }) {
+export function CardHandPanel({ cardHand, setCardHand }) {
   const cardArray = cardHand.returnAllCards();
   const numCards = cardArray.length;
-  let firstLoad = true;
-  const [selectionHand, setSelectionHand ] = useState(null);
+  const [selectionHand, setSelectionHand] = useState(null);
 
   const cardWidth = 176;
   const containerWidth = window.innerWidth - 40;
@@ -18,12 +17,17 @@ export function CardHandPanel({ cardHand }) {
       : 0;
 
   const onHandCardClick = (card) => {
+    let currentCardHand = cardHand;
     if (card.cardAmountToSelect !== null) {
-      const newSelectionHand = new SelectionHand(card);
-      newSelectionHand.addSelection(card)
-      setSelectionHand(newSelectionHand);
+      let currentSelectionHand = selectionHand;
+      if (!currentSelectionHand) {
+        currentSelectionHand = new SelectionHand(card);
+      }
+      currentSelectionHand.addSelection(card);
+      currentCardHand.removeCard(card);
+      setCardHand(currentCardHand);
+      setSelectionHand(currentSelectionHand);
     }
-    cardHand.removeCard(card);
   };
 
   return (
