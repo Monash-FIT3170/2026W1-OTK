@@ -2,18 +2,8 @@
 
 // importing components
 import { GameEngine } from "../GameEngine";
-
-// defining card data types
-export type cardData = {
-  cardId: string;
-  name: string;
-  description: string;
-  baseCost: number;
-  currentCost: number;
-  baseAttack?: number;
-  currentAttack?: number;
-  cardAmountToSelect?: { min: number, max: number };
-};
+import { cardData } from "../types";
+export type { cardData };
 
 export abstract class Card {
 

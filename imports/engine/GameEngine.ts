@@ -2,15 +2,10 @@
 
 // importing components
 import { cardData, Card } from './card/Card';
-import { enemyData, Enemy } from './enemy/Enemy';
-import { cardRegistry, CardRegistry } from './card/CardRegistry';
-import { enemyRegistry } from './enemy/EnemyRegistry';
-
-export type GameState = {
-  hand: cardData[];
-  deck: cardData[];
-  enemy: enemyData;
-};
+import { Enemy } from './enemy/Enemy';
+import { cardRegistry } from './card/CardRegistry';
+import { enemyRegistry } from './enemy/index';
+import { UserData, HandCardData, EnemyData } from './types';
 
 export class GameEngine {
   // attributes
@@ -19,16 +14,12 @@ export class GameEngine {
   public enemy: Enemy;
   public stage: number;
 
-  // constructs game engine from game state
-  constructor(gameState: GameState) {
-    this.hand = gameState.hand.map((card) => cardRegistry.create(card));
-
-    this.deck = gameState.deck.map((card) => cardRegistry.create(card));
-
-    this.enemy = enemyRegistry.create(gameState.enemy);
-
-    // TODO: unsure what this is referring to
-    this.stage = 0;
+  // constructs game engine from the three separate data sources
+  constructor(userData: UserData, handCards: HandCardData[], enemy: EnemyData) {
+    this.hand = handCards.map((card) => cardRegistry.create(card));
+    this.deck = userData.deck.map((card) => cardRegistry.create(card));
+    this.enemy = enemyRegistry.create(enemy);
+    this.stage = userData.stage;
   }
 
   // checks if card selected requires other cards to be selected
@@ -77,5 +68,6 @@ export class GameEngine {
 
   removeFromHand(cardId: string): void {}
 
-  toJSON(): GameState {}
+  // TODO: return data so server methods can save each collection
+  toJSON(): { userData: UserData; hand: HandCardData[]; enemy: EnemyData } {}
 }
