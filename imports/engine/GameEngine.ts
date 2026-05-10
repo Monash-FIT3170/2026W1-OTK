@@ -1,12 +1,17 @@
 // GameEngine.ts
 
 // importing components
-import { cardData, Card } from './card/Card';
+import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
-import { enemyRegistry } from './enemy/index';
+import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, HandCardData, EnemyData } from './types';
+import { DeckBuilder } from './DeckBuilder';
+import { Goblin } from './enemy/enemies/Goblin';
 
+const BOSS_LOOKUP: { [stage: number]: new() => Enemy } = {
+  1: Goblin
+};
 export class GameEngine {
   // attributes
   public hand: Card[];
@@ -56,6 +61,17 @@ export class GameEngine {
     this.removeFromHand(cardId);
   }
 
+  static newGame(userId: string): { userData: UserData; hand: HandCardData[]; enemy: EnemyData } {
+    const deck = DeckBuilder.buildStartingDeck();
+    const stage = 1;
+    const BossClass = BOSS_LOOKUP[stage];
+    const bossData: EnemyData = { userId, ...new BossClass().toJSON() };
+    const userData: UserData = { userId, stage, deck };
+
+    const engine = new GameEngine(userData, [], bossData);
+    engine.initialDraw();
+    return engine.toJSON();
+  }
   
 
   // ------------------
@@ -63,7 +79,7 @@ export class GameEngine {
   // ------------------
   initialDraw(n: number = 5): void {
   }
-  
+
   getCard(cardId: string): Card {}
 
   getHand(): Card[] {}
