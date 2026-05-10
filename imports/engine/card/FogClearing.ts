@@ -1,14 +1,14 @@
 // FogClearing.ts
 
 // importing components
-import { Card } from './Card';
+import { Card, cardData } from './Card';
 import { GameEngine } from '../GameEngine';
 import { DamageEffect } from '../effect/DamageEffect';
 import { cardRegistry } from './CardRegistry';
 
 export class FogClearing extends Card {
-  // constructs card
-  constructor() {
+  // constructs card - defaults are base values; pass saved cardData to restore mutable stats
+  constructor(data?: Partial<cardData>) {
     super({
       cardId: 'fog-clearing',
       name: 'Fog Clearing',
@@ -17,6 +17,7 @@ export class FogClearing extends Card {
       currentCost: 2,
       baseAttack: 12,
       currentAttack: 12,
+      ...data,
     });
   }
 
@@ -26,4 +27,4 @@ export class FogClearing extends Card {
   }
 }
 
-cardRegistry.register('fog-clearing', () => new FogClearing());
+cardRegistry.register('fog-clearing', FogClearing);

@@ -1,15 +1,15 @@
 // FerociousClaw.ts
 
 // importing components
-import { Card } from './Card';
+import { Card, cardData } from './Card';
 import { GameEngine } from '../GameEngine';
 import { DiscardEffect } from '../effect/DiscardEffect';
 import { DamageEffect } from '../effect/DamageEffect';
 import { cardRegistry } from './CardRegistry';
 
 export class FerociousClaw extends Card {
-  // constructs card
-  constructor() {
+  // constructs card - defaults are base values; pass saved cardData to restore mutable stats
+  constructor(data?: Partial<cardData>) {
     super({
       cardId: 'ferocious-claw',
       name: 'Ferocious Claw',
@@ -19,6 +19,7 @@ export class FerociousClaw extends Card {
       baseAttack: 24,
       currentAttack: 24,
       cardAmountToSelect: { min: 1, max: 1 },
+      ...data,
     });
   }
 
@@ -29,4 +30,4 @@ export class FerociousClaw extends Card {
   }
 }
 
-cardRegistry.register('ferocious-claw', () => new FerociousClaw());
+cardRegistry.register('ferocious-claw', FerociousClaw);

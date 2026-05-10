@@ -25,7 +25,7 @@ export class GameEngine {
 
     this.deck = gameState.deck.map((card) => cardRegistry.create(card));
 
-    this.enemy = enemyRegistry.get(gameState.enemy.enemyId);
+    this.enemy = enemyRegistry.create(gameState.enemy);
 
     // TODO: unsure what this is referring to
     this.stage = 0;

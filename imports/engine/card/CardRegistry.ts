@@ -1,36 +1,32 @@
 // CardRegistry.ts
 
 // importing components
-import { Card, cardData } from "./Card";
+import { Card, cardData } from './Card';
 
 export class CardRegistry {
-
-  private factories: Map<string, () => Card>;
+  // stores the card class constructor per cardId
+  private registry: Map<string, new (data?: Partial<cardData>) => Card>;
 
   constructor() {
-    this.factories = new Map();
+    this.registry = new Map();
   }
 
-  // add an entry - cardFactory is a function that returns a fresh Card instance
-  register(cardId: string, cardFactory: () => Card): void {
-    if (this.factories.has(cardId)) {
+  // add an entry - CardClass is the card's class constructor
+  register(cardId: string, CardClass: new (data?: Partial<cardData>) => Card): void {
+    if (this.registry.has(cardId)) {
       throw new Error(`Card already registered: ${cardId}`);
     }
-    this.factories.set(cardId, cardFactory);
+    this.registry.set(cardId, CardClass);
   }
 
-  // creates a fresh Card instance from saved cardData
+  // constructs a card instance from saved cardData
   create(data: cardData): Card {
-    const factory = this.factories.get(data.cardId);
-    if (!factory) {
+    const CardClass = this.registry.get(data.cardId);
+    if (!CardClass) {
       throw new Error(`Unknown cardId: ${data.cardId}`);
     }
-    const card = factory();
-    card.currentCost = data.currentCost;
-    if (data.currentAttack !== undefined) card.currentAttack = data.currentAttack;
-    return card;
+    return new CardClass(data);
   }
-
 }
 
 export const cardRegistry = new CardRegistry();

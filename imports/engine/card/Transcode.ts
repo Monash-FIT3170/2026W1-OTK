@@ -1,14 +1,14 @@
 // Transcode.ts
 
 // importing components
-import { Card } from './Card';
+import { Card, cardData } from './Card';
 import { GameEngine } from '../GameEngine';
 import { ReturnToDeckEffect } from '../effect/ReturnToDeckEffect';
 import { cardRegistry } from './CardRegistry';
 
 export class Transcode extends Card {
-  // constructs card
-  constructor() {
+  // constructs card - defaults are base values; pass saved cardData to restore mutable stats
+  constructor(data?: Partial<cardData>) {
     super({
       cardId: 'transcode',
       name: 'Transcode',
@@ -16,6 +16,7 @@ export class Transcode extends Card {
       baseCost: 4,
       currentCost: 4,
       cardAmountToSelect: { min: 3, max: 3 },
+      ...data,
     });
   }
 
@@ -25,4 +26,4 @@ export class Transcode extends Card {
   }
 }
 
-cardRegistry.register('transcode', () => new Transcode());
+cardRegistry.register('transcode', Transcode);
