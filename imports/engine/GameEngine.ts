@@ -41,7 +41,7 @@ export class GameEngine {
   // checks if card selected requires other cards to be selected
   drawCost(cardId: string): {
     requiresSelection: boolean;
-    cardAmountToSelect?: number;
+    cardAmountToSelect?: {min: number, max: number};
   } {
 
     // gets card
@@ -51,7 +51,7 @@ export class GameEngine {
     if (card.cardAmountToSelect) {
       return {
         requiresSelection: true,
-        cardAmountToSelect: card.cardAmountToSelect.max
+        cardAmountToSelect: card.cardAmountToSelect
       };
     }
 
