@@ -21,6 +21,8 @@ export type EnemyData = {
   health: number;
   currentHealth: number;
   debuffs: string[];
+  entryAnimation: string;
+  hitAnimation: string;
 };
 
 // data shape stored in UserDataCollection
@@ -30,4 +32,5 @@ export type UserData = {
   deck: cardData[];
   hand: cardData[];
   enemy: EnemyData;
+  result?: 'win' | 'loss' | null;
 };
