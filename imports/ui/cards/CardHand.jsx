@@ -1,7 +1,10 @@
+import { useRef } from 'react';
 import Card from './Card';
 import { motion } from 'motion/react';
+import { usePlayCard } from '../hooks/usePlayCard';
 
 export default function CardHand({ cards }) {
+  const handRef = useRef(null);
   const cardArray = Object.values(cards);
   const numCards = cardArray.length;
 
@@ -13,14 +16,20 @@ export default function CardHand({ cards }) {
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
       : 0;
 
+  const { onPlay, pendingSelection, confirmSelection } = usePlayCard();
+
   return (
-    <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 w-full">
+    <div
+      ref={handRef}
+      className="flex flex-row border rounded-xl p-5 bg-amber-50 w-full"
+    >
+      {/* {pendingSelection && <SelectionUI onConfirm={confirmSelection} />} */}
       <div className="flex flex-row justify-center w-full">
         {cardArray.map((card, idx) => (
           <motion.div
             style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
           >
-            <Card cardProps={card} />
+            <Card cardProps={card} handRef={handRef} onPlay={onPlay} />
           </motion.div>
         ))}
       </div>
