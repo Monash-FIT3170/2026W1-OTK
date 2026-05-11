@@ -1,21 +1,31 @@
 import { Meteor } from "meteor/meteor";
 import React, { useState } from "react";
 
-export const AccountRegistrationForm = () => {
+export const AccountRegistrationForm = ({ onShowLogin }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  
+
   const submit = e => {
     e.preventDefault();
+    setError("");
+
     Meteor.call('auth.registerUser', { username, email, password }, (err, userId) => {
-      if (err && err.error !== 403) {
-        setError(err.reason)
-      } else {
-        Meteor.call('userData.registerUser', { userId });
-        setError("")
-      };
+      if (err) {
+        setError(err.reason || 'Registration failed.');
+        return;
+      }
+      // Auto-login after successful registration, then create game data
+      Meteor.loginWithPassword(username, password, (loginErr) => {
+        if (loginErr) {
+          setError('Account created! Please log in.');
+          return;
+        }
+        Meteor.call('userData.registerUser', { userId }, (dataErr) => {
+          if (dataErr) console.error('Failed to initialise game data:', dataErr);
+        });
+      });
     });
   };
 
@@ -63,8 +73,19 @@ export const AccountRegistrationForm = () => {
         >
           Sign Up
         </button>
+        {onShowLogin && (
+          <p className="text-center text-sm text-slate-500">
+            Already have an account?{' '}
+            <a
+              href="#"
+              className="text-blue-600 hover:text-blue-700 font-semibold"
+              onClick={(e) => { e.preventDefault(); onShowLogin(); }}
+            >
+              Sign In
+            </a>
+          </p>
+        )}
       </form>
     </div>
-  )
-
-}
+  );
+};

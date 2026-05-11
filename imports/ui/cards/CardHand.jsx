@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { usePlayCard } from '../hooks/usePlayCard';
 import { SelectionPanel } from './SelectionPanel';
 import { DraggableCard } from './DraggableCard';
@@ -7,10 +7,17 @@ export default function CardHand({ cards }) {
   const [hand, setHand] = useState(
     Array.isArray(cards) ? cards : Object.values(cards)
   );
+
+  // Sync local hand state whenever the server pushes updated card data (e.g. after draws).
+  // Skipped while a selection is pending to avoid clobbering the in-progress UI state.
+  const { onPlay, pendingSelection, confirmSelection } = usePlayCard();
+  useEffect(() => {
+    if (!pendingSelection) {
+      setHand(Array.isArray(cards) ? cards : Object.values(cards));
+    }
+  }, [JSON.stringify(cards)]);
   const [selectedTargets, setSelectedTargets] = useState([]);
   const handRef = useRef(null);
-
-  const { onPlay, pendingSelection, confirmSelection } = usePlayCard();
 
   const numCards = hand.length;
   const cardWidth = 176;

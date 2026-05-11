@@ -1,6 +1,6 @@
 // DraggableCard.jsx
 import { useRef } from 'react';
-import { motion, useMotionValue, animate } from 'framer-motion';
+import { motion, useMotionValue, animate } from 'motion/react';
 import  Card from './Card';
 
 export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay, draggable = true }) {
