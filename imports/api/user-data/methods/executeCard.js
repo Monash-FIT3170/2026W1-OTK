@@ -28,9 +28,18 @@ Meteor.methods({
     const engine = new GameEngine(userData.gameState);
     engine.executeCard(uniqueCardId, selectedCardIds ?? []);
 
+    // Build the updated state and attach win/loss result
+    const newState = engine.toJSON();
+    if (engine.isEnemyDefeated()) {
+      newState.result = 'win';
+    } else if (!engine.hasPlayableCards()) {
+      // Hand and deck both exhausted — player cannot continue
+      newState.result = 'loss';
+    }
+
     await UserDataCollection.updateAsync(
       { userId: this.userId },
-      { $set: { gameState: engine.toJSON() } }
+      { $set: { gameState: newState } }
     );
   },
 });

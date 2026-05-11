@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import { Goblin } from './enemies/Goblin.js';
-import { EnemyDamage, applyEnemyDamage } from './enemy_damage.js';
+import { Goblin } from './enemies/Goblin';
+import { EnemyDamage, applyEnemyDamage } from './enemy_damage';
 
 describe('EnemyDamage', function () {
   it('decrements the enemy current health by a damage value', function () {
@@ -39,7 +39,7 @@ describe('EnemyDamage', function () {
       'Damage value cannot be negative.'
     );
     assert.throws(
-      () => applyEnemyDamage(enemy, '5'),
+      () => applyEnemyDamage(enemy, '5' as unknown as number),
       'Damage value must be a finite number.'
     );
   });
