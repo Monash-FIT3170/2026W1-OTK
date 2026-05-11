@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { SelectionPanel } from './SelectionPanel';
 import { SelectionHand } from 'imports/engine/card/SelectionHand';
 import { useState } from 'react';
+import { DraggableCard } from './DraggableCard';
 
 export function CardHandPanel({ cardHand, setCardHand }) {
   const numCards = cardHand.cards.length;
@@ -13,8 +14,8 @@ export function CardHandPanel({ cardHand, setCardHand }) {
   const marginLeft =
     numCards > 1
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
-      : 0;
-
+      : 0; 
+    
   const onHandCardClick = (card) => {
     let currentCardHand = Object.assign(Object.create(Object.getPrototypeOf(cardHand)), cardHand);
     if (card.cardAmountToSelect !== null) {
@@ -39,15 +40,15 @@ export function CardHandPanel({ cardHand, setCardHand }) {
   return (
     <div>
       {selectionHand && <SelectionPanel selectionHand={selectionHand} setSelectionHand={setSelectionHand} cardHand={cardHand} setCardHand={setCardHand} />}
-      <div className="flex flex-row overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-amber-50 min-h-70 w-full">
+      <div className="flex flex-row border rounded-xl p-5 bg-amber-50 min-h-70 w-full">
         <div className="flex flex-row justify-center w-full">
           {cardHand.cards.map((card, idx) => (
-            <motion.div
-              style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
+            <DraggableCard
+              key={card.id}
+              card={card}
+              marginLeft={idx !== 0 ? `${marginLeft}px` : '0px'}
               onClick={() => onHandCardClick(card)}
-            >
-              <Card cardProps={card} />
-            </motion.div>
+            />
           ))}
         </div>
       </div>

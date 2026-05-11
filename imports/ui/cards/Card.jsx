@@ -11,14 +11,7 @@ export function Card({ cardProps }) {
       ? 'text-lime-700'
       : 'text-red-700';
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const handleDragEnd = () => {
-    // Animate back to origin
-    animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
-    animate(y, 0, { type: 'spring', stiffness: 300, damping: 20 });
-  };
+  
 
   return (
     <motion.div className="flex justify-center">
@@ -28,10 +21,6 @@ export function Card({ cardProps }) {
           backgroundColor: 'oklch(90.5% 0.233 277.117)',
         }}
         whileTap={{ scale: 0.95 }}
-        drag
-        onDragEnd={handleDragEnd}
-        dragMomentum={false}
-        style={{ x, y }}
         className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-45 min-h-65 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
       >
         <div
@@ -45,7 +34,7 @@ export function Card({ cardProps }) {
             <div className="flex box-border border-1 border-blue-800 aspect-square bg-blue-300 rounded-xl justify-center-safe font-mono text-ellipsis">
               <p className={costFontColour}>{cardProps.currentCost} </p>
             </div>
-            {cardProps.currentAttack !== null && (
+            {cardProps.currentAttack !== undefined && (
               <div className="flex box-border border-1 border-red-800 aspect-square bg-red-300 rounded-xl justify-center-safe font-mono text-ellipsis">
                 <p className={attackFontColour}>{cardProps.currentAttack}</p>
               </div>
