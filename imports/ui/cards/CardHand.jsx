@@ -1,23 +1,21 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { usePlayCard } from '../hooks/usePlayCard';
 import { SelectionPanel } from './SelectionPanel';
 import { DraggableCard } from './DraggableCard';
 
-export default function CardHand({ cards }) {
-  const [hand, setHand] = useState(
-    Array.isArray(cards) ? cards : Object.values(cards)
-  );
-
-  // Sync local hand state whenever the server pushes updated card data (e.g. after draws).
-  // Skipped while a selection is pending to avoid clobbering the in-progress UI state.
-  const { onPlay, pendingSelection, confirmSelection } = usePlayCard();
-  useEffect(() => {
-    if (!pendingSelection) {
-      setHand(Array.isArray(cards) ? cards : Object.values(cards));
-    }
-  }, [JSON.stringify(cards)]);
+export default function CardHand({ cards, deckSize }) {
   const [selectedTargets, setSelectedTargets] = useState([]);
   const handRef = useRef(null);
+
+  const { onPlay, pendingSelection, confirmSelection } = usePlayCard();
+
+  const hand = cards.filter(
+    (c) =>
+      !selectedTargets.some((s) => s.uniqueId === c.uniqueId) &&
+      // Remove cards being selected from hand display
+      c.uniqueId !== pendingSelection?.uniqueCardId
+    // Remove card being played during selection from hand display
+  );
 
   const numCards = hand.length;
   const cardWidth = 176;
@@ -29,7 +27,6 @@ export default function CardHand({ cards }) {
 
   const onDragPlay = (uniqueId) => {
     const card = hand.find((c) => c.uniqueId === uniqueId);
-    setHand((prev) => prev.filter((c) => c.uniqueId !== uniqueId));
     onPlay(card);
   };
 
@@ -37,19 +34,20 @@ export default function CardHand({ cards }) {
     if (!pendingSelection) return;
     // Selection mode: toggle card as a target
     const { max } = pendingSelection.cardAmountToSelect;
-    const alreadySelected = selectedTargets.some((c) => c.uniqueId === card.uniqueId);
+    const alreadySelected = selectedTargets.some(
+      (c) => c.uniqueId === card.uniqueId
+    );
     if (alreadySelected) {
-      setSelectedTargets((prev) => prev.filter((c) => c.uniqueId !== card.uniqueId));
-      setHand((prev) => [...prev, card]);
+      setSelectedTargets((prev) =>
+        prev.filter((c) => c.uniqueId !== card.uniqueId)
+      );
     } else if (selectedTargets.length < max) {
       setSelectedTargets((prev) => [...prev, card]);
-      setHand((prev) => prev.filter((c) => c.uniqueId !== card.uniqueId));
     }
   };
 
   const onConfirm = () => {
     confirmSelection(selectedTargets.map((c) => c.uniqueId));
-    setHand((prev) => [...prev, ...selectedTargets]);
     setSelectedTargets([]);
   };
 
@@ -60,8 +58,9 @@ export default function CardHand({ cards }) {
           pendingSelection={pendingSelection}
           selectedTargets={selectedTargets}
           onDeselectCard={(card) => {
-            setSelectedTargets((prev) => prev.filter((c) => c.uniqueId !== card.uniqueId));
-            setHand((prev) => [...prev, card]);
+            setSelectedTargets((prev) =>
+              prev.filter((c) => c.uniqueId !== card.uniqueId)
+            );
           }}
           onConfirm={onConfirm}
         />
@@ -80,6 +79,7 @@ export default function CardHand({ cards }) {
               handRef={handRef}
               onPlay={onDragPlay}
               draggable={!pendingSelection}
+              affordable={card.currentCost <= deckSize}
             />
           ))}
         </div>

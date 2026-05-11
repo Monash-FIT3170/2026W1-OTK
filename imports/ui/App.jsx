@@ -161,7 +161,7 @@ export const App = () => {
 
       {/* Card hand at the bottom */}
       <div className="p-4">
-        <CardHand cards={hand} />
+        <CardHand cards={hand} deckSize={deck.length} />
       </div>
 
     </div>

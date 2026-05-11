@@ -1,10 +1,10 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 
-const CARD_WIDTH = 160;  // px
+const CARD_WIDTH = 160; // px
 const CARD_HEIGHT = 224; // px
 
-const Card = forwardRef(function Card({ cardProps }, ref) {
+function Card({ cardProps }) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'
@@ -22,7 +22,6 @@ const Card = forwardRef(function Card({ cardProps }, ref) {
           backgroundColor: 'oklch(90.5% 0.233 277.117)',
         }}
         whileTap={{ scale: 0.95 }}
-        ref={ref}
         style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
         className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 box-border border-slate-600 border-1"
       >
@@ -60,6 +59,6 @@ const Card = forwardRef(function Card({ cardProps }, ref) {
       </motion.div>
     </motion.div>
   );
-});
+}
 
 export default Card;

@@ -11,7 +11,7 @@ Meteor.methods({
     if (!this.userId) {
       throw new Meteor.Error(
         'game.executeCard.notLoggedIn',
-        'Must be logged in to execute a card.'
+        'Must be logged in.'
       );
     }
 
@@ -28,13 +28,9 @@ Meteor.methods({
     const engine = new GameEngine(userData.gameState);
     engine.executeCard(uniqueCardId, selectedCardIds ?? []);
 
-    // Build the updated state and attach win/loss result
     const newState = engine.toJSON();
     if (engine.isEnemyDefeated()) {
       newState.result = 'win';
-    } else if (!engine.hasPlayableCards()) {
-      // Hand and deck both exhausted — player cannot continue
-      newState.result = 'loss';
     }
 
     await UserDataCollection.updateAsync(
