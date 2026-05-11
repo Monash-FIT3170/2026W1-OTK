@@ -25,6 +25,8 @@ export default function CardHand({ cards, deckSize }) {
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
       : 0;
 
+  const inSelectionMode = pendingSelection !== null;
+
   const onDragPlay = (uniqueId) => {
     const card = hand.find((c) => c.uniqueId === uniqueId);
     onPlay(card);
@@ -78,7 +80,7 @@ export default function CardHand({ cards, deckSize }) {
               onClick={() => onHandCardClick(card)}
               handRef={handRef}
               onPlay={onDragPlay}
-              draggable={!pendingSelection}
+              isInSelectionMode={inSelectionMode}
               affordable={card.currentCost <= deckSize}
             />
           ))}

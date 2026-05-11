@@ -9,7 +9,7 @@ export function DraggableCard({
   onClick,
   handRef,
   onPlay,
-  draggable = true,
+  isInSelectionMode = false,
   affordable = true,
 }) {
   const x = useMotionValue(0);
@@ -36,9 +36,14 @@ export function DraggableCard({
   return (
     <motion.div
       ref={cardRef}
-      style={{ marginLeft, x, y, opacity: affordable ? 1 : 0.4 }}
+      style={{
+        marginLeft,
+        x,
+        y,
+        opacity: !affordable && !isInSelectionMode ? 0.4 : 1,
+      }}
       onClick={onClick}
-      drag={draggable}
+      drag={!isInSelectionMode}
       onDragEnd={handleDragEnd}
       dragMomentum={false}
     >
