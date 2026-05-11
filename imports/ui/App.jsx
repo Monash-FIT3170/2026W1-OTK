@@ -1,101 +1,40 @@
-import React, { useState } from 'react';
-import { EnemyList } from './components';
-import { EnemyDisplay } from './components/EnemyDisplay';
-import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
-import { HealthBar } from './components/HealthBar';
-import { CardHandPanel } from './cards/CardHandPanel';
-import { CardHand } from 'imports/engine/card/CardHand';
-import { SelectionHand } from 'imports/engine/card/SelectionHand';
-import { useTracker } from 'meteor/react-meteor-data';
-import { Meteor } from 'meteor/meteor';
-import { LoginForm } from './auth/LoginForm';
-import { AccountRegistrationForm } from './AccountRegistrationForm';
-import { FerociousClaw } from 'imports/engine/card/FerociousClaw';
-import { Transcode } from 'imports/engine/card/Transcode';
+import React from 'react';
+import CardHand from './cards/CardHand';
+
+const dummyCards = {
+  card1: {
+    uniqueId: 1,
+    name: 'Ferocious Claw',
+    baseCost: 2,
+    currentCost: 2,
+    baseAttack: 5,
+    currentAttack: 5,
+    description: 'Deal 5 damage to the enemy. Gain 1 extra attack for each wound on the target.',
+  },
+  card2: {
+    uniqueId: 2,
+    name: 'Fog Clearing',
+    baseCost: 1,
+    currentCost: 1,
+    baseAttack: null,
+    currentAttack: null,
+    description: 'Draw 2 cards. Reduce the cost of the next card played by 1.',
+  },
+  card3: {
+    uniqueId: 3,
+    name: 'Transcode',
+    baseCost: 3,
+    currentCost: 2,
+    baseAttack: 8,
+    currentAttack: 10,
+    description: 'Convert all shield into attack damage. Deals bonus damage equal to shields consumed.',
+  }
+};
 
 export const App = () => {
-  debugger;
-  const [enemy, setEnemy] = useState(new Goblin());
-  const [isTakingDamage, setIsTakingDamage] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [showRegister, setShowRegister] = useState(false);
-  const user = useTracker(() => Meteor.user());
-  const [cardHand, setCardHand] = useState(
-    new CardHand([
-      new FerociousClaw(),
-      new Transcode(),
-      new Transcode(),
-      new FerociousClaw(),
-    ])
-  );
-
-
-  // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
-  const handleAttack = () => {
-    setEnemy((prev) => {
-      const newHealth = prev.currentHealth - 5;
-      newHealth <= 0 ? setIsVisible(false) : setIsVisible(true);
-      const updated = new Goblin({ ...prev, currentHealth: newHealth });
-      return updated;
-    });
-
-    setIsTakingDamage(true);
-    setTimeout(() => setIsTakingDamage(false), 400);
-  };
-
-  /*
   return (
-    <div className="page">
-                  <HealthBar
-                    current={enemy.currentHealth}
-                    max={enemy.health}
-                    name={enemy.name}
-                  />
-      <EnemyDisplay enemy={enemy} isVisible={isVisible} isTakingDamage={isTakingDamage} />
-      <button onClick={handleAttack}>Attack</button>
-      <CardHand cards={cards} />
-  );
-  */
-
-  // if (!user) {
-  //   return (
-  //     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-  //       {showRegister ? <AccountRegistrationForm /> : <LoginForm />}
-
-  //       <button
-  //         onClick={() => setShowRegister(!showRegister)}
-  //         className="mt-6 text-slate-600 underline hover:text-slate-900"
-  //       >
-  //         {showRegister
-  //           ? 'Already have an account? Login'
-  //           : 'Need an account? Register'}
-  //       </button>
-  //     </div>
-  //   );
-  // }
-
-  return (
-    //   <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-    //     <div className="bg-white p-10 rounded-[2rem] shadow-xl text-center max-w-md w-full">
-    //       <h1 className="text-3xl font-bold text-slate-800 mb-4">
-    //         Welcome back, {user.username}!
-    //       </h1>
-
-    //       <p className="text-slate-600 mb-8">
-    //         You are successfully logged in.
-    //       </p>
-
-    //       <button
-    //         onClick={() => Meteor.logout()}
-    //         className="px-8 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-900 transition-all active:scale-95"
-    //       >
-    //         Logout
-    //       </button>
-    //     </div>
-    //   </div>
-    // );
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <CardHandPanel cardHand={cardHand} setCardHand={setCardHand} />
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-end p-4">
+      <CardHand cards={dummyCards} />
     </div>
   );
 };

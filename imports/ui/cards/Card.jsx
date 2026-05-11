@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
+import { Meteor } from 'meteor/meteor';
 
-export function Card({ cardProps }) {
+export default function Card({ cardProps }) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'
@@ -11,8 +12,6 @@ export function Card({ cardProps }) {
       ? 'text-lime-700'
       : 'text-red-700';
 
-  
-
   return (
     <motion.div className="flex justify-center">
       <motion.div
@@ -21,7 +20,12 @@ export function Card({ cardProps }) {
           backgroundColor: 'oklch(90.5% 0.233 277.117)',
         }}
         whileTap={{ scale: 0.95 }}
-        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-45 min-h-65 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
+        ref={cardRef}
+        drag
+        onDragEnd={handleDragEnd}
+        dragMomentum={false}
+        style={{ x, y }}
+        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-40 min-h-50 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
       >
         <div
           className="flex flex-2/12 min-h-5 justify-center box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono 
