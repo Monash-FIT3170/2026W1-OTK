@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
-import { motion, useMotionValue, animate } from 'framer-motion';
-import { Meteor } from 'meteor/meteor';
+import React, { forwardRef } from 'react';
+import { motion } from 'framer-motion';
 
-export default function Card({ cardProps, handRef, onPlay }) {
+const CARD_WIDTH = 160;  // px
+const CARD_HEIGHT = 224; // px
+
+const Card = forwardRef(function Card({ cardProps }, ref) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'
@@ -12,27 +14,6 @@ export default function Card({ cardProps, handRef, onPlay }) {
       ? 'text-lime-700'
       : 'text-red-700';
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const cardRef = useRef(null);
-
-  const isOutsideHand = () => {
-    if (!handRef?.current || !cardRef?.current) return false;
-    const hand = handRef.current.getBoundingClientRect();
-    const card = cardRef.current.getBoundingClientRect();
-    return card.bottom < hand.top;
-  };
-
-  const handleDragEnd = () => {
-    if (isOutsideHand()) {
-      console.log('Playing card:', cardProps.name);
-      // onPlay(cardProps.uniqueCardId);
-    }
-    // Animate back to origin
-    animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
-    animate(y, 0, { type: 'spring', stiffness: 300, damping: 20 });
-  };
-
   return (
     <motion.div className="flex justify-center">
       <motion.div
@@ -41,12 +22,9 @@ export default function Card({ cardProps, handRef, onPlay }) {
           backgroundColor: 'oklch(90.5% 0.233 277.117)',
         }}
         whileTap={{ scale: 0.95 }}
-        ref={cardRef}
-        drag
-        onDragEnd={handleDragEnd}
-        dragMomentum={false}
-        style={{ x, y }}
-        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-40 min-h-50 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
+        ref={ref}
+        style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
+        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 box-border border-slate-600 border-1"
       >
         <div
           className="flex flex-2/12 min-h-5 justify-center box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono 
@@ -56,11 +34,11 @@ export default function Card({ cardProps, handRef, onPlay }) {
         </div>
         <div className="flex flex-4/10 flex-row gap-3 grow-0">
           <div className="flex flex-1/6 flex flex-col gap-0.5 grow-0 min-w-0">
-            <div className="flex box-border border-1 border-blue-800 aspect-square bg-blue-300 rounded-xl justify-center-safe font-mono text-ellipsis z-2">
+            <div className="flex box-border border-1 border-blue-800 aspect-square bg-blue-300 rounded-xl justify-center-safe font-mono text-ellipsis">
               <p className={costFontColour}>{cardProps.currentCost} </p>
             </div>
-            {cardProps.currentAttack !== null && (
-              <div className="flex box-border border-1 border-red-800 aspect-square bg-red-300 rounded-xl justify-center-safe font-mono text-ellipsis z-2">
+            {cardProps.currentAttack !== undefined && (
+              <div className="flex box-border border-1 border-red-800 aspect-square bg-red-300 rounded-xl justify-center-safe font-mono text-ellipsis">
                 <p className={attackFontColour}>{cardProps.currentAttack}</p>
               </div>
             )}
@@ -82,4 +60,6 @@ export default function Card({ cardProps, handRef, onPlay }) {
       </motion.div>
     </motion.div>
   );
-}
+});
+
+export default Card;
