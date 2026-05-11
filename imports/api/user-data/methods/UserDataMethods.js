@@ -1,7 +1,8 @@
 import { Meteor } from "meteor/meteor";
 import { UserDataCollection } from "../collections/UserDataCollection";
 import { check } from 'meteor/check';
- 
+import { GameEngine } from '../../../engine/GameEngine';
+
 Meteor.methods({
   "userData.registerUser": async function ({ userId }) {
     check(userId, String);
@@ -12,8 +13,11 @@ Meteor.methods({
       throw new Meteor.Error('userData.userIdExists', 'There already exists user data for this user.');
     }
 
+    // Initialise a fresh game state for the new user
+    const gameState = GameEngine.newGame(userId);
     return UserDataCollection.insertAsync({
       userId: userId,
+      gameState,
     });
   },
   /*
