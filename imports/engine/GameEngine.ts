@@ -77,16 +77,40 @@ export class GameEngine {
   // ------------------
   //  helper functions
   // ------------------
-  initialDraw(n: number = 5): void {}
+  initialDraw(n: number = 5): void {
+    const drawn = this.deck.splice(0, n);
+    this.hand.push(...drawn);
+  }
 
-  getCard(uniqueId: string): Card {}
+  getCard(uniqueId: string): Card {
+    const card = this.hand.find((c) => c.uniqueId === uniqueId);
+    if (!card) throw new Error(`Card with uniqueId "${uniqueId}" not found in hand`);
+    return card;
+  }
 
-  getHand(): Card[] {}
+  getHand(): Card[] {
+    return this.hand;
+  }
 
-  getDeck(): Card[] {}
+  getDeck(): Card[] {
+    return this.deck;
+  }
 
-  removeFromHand(uniqueId: string): void {}
+  removeFromHand(uniqueId: string): void {
+    const index = this.hand.findIndex((c) => c.uniqueId === uniqueId);
+    if (index !== -1) {
+      this.hand.splice(index, 1);
+    }
+  }
 
   // TODO: return data so server methods can save each collection
-  toJSON(): UserData {}
+  toJSON(): UserData {
+    return {
+      userId: this.userId,
+      stage: this.stage,
+      deck: this.deck.map((card) => card.toJSON()),
+      hand: this.hand.map((card) => card.toJSON()),
+      enemy: this.enemy.toJSON(),
+    };
+  }
 }
