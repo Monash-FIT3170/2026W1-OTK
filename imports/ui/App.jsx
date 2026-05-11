@@ -1,83 +1,73 @@
-import React, { useState } from 'react';
-import { EnemyList } from './components';
-import { EnemyDisplay } from './components/EnemyDisplay';
-import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
-import { HealthBar } from './components/HealthBar';
+import React from 'react';
 import CardHand from './cards/CardHand';
-import { useTracker } from 'meteor/react-meteor-data';
-import { Meteor } from 'meteor/meteor';
-import { LoginForm } from './auth/LoginForm';
-import { AccountRegistrationForm } from './AccountRegistrationForm';
+
+const dummyCards = [
+  {
+    uniqueId: '1',
+    cardId: 'ferocious-claw',
+    name: 'Ferocious Claw',
+    description: 'Discard 1 card from hand.',
+    baseCost: 3,
+    currentCost: 3,
+    baseAttack: 24,
+    currentAttack: 24,
+    cardAmountToSelect: { min: 1, max: 1 },
+  },
+  {
+    uniqueId: '2',
+    cardId: 'ferocious-claw',
+    name: 'Ferocious Claw',
+    description: 'Discard 1 card from hand.',
+    baseCost: 3,
+    currentCost: 3,
+    baseAttack: 24,
+    currentAttack: 24,
+    cardAmountToSelect: { min: 1, max: 1 },
+  },
+  {
+    uniqueId: '3',
+    cardId: 'fog-clearing',
+    name: 'Fog Clearing',
+    description: '',
+    baseCost: 2,
+    currentCost: 2,
+    baseAttack: 12,
+    currentAttack: 12,
+  },
+  {
+    uniqueId: '4',
+    cardId: 'fog-clearing',
+    name: 'Fog Clearing',
+    description: '',
+    baseCost: 2,
+    currentCost: 2,
+    baseAttack: 12,
+    currentAttack: 12,
+  },
+  {
+    uniqueId: '5',
+    cardId: 'transcode',
+    name: 'Transcode',
+    description: 'Return 3 cards from hand to deck.',
+    baseCost: 4,
+    currentCost: 4,
+    cardAmountToSelect: { min: 3, max: 3 },
+  },
+  {
+    uniqueId: '6',
+    cardId: 'transcode',
+    name: 'Transcode',
+    description: 'Return 3 cards from hand to deck.',
+    baseCost: 4,
+    currentCost: 4,
+    cardAmountToSelect: { min: 3, max: 3 },
+  },
+];
 
 export const App = () => {
-  const [enemy, setEnemy] = useState(new Goblin());
-  const [isTakingDamage, setIsTakingDamage] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [showRegister, setShowRegister] = useState(false);
-  const user = useTracker(() => Meteor.user());
-
-  // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
-  const handleAttack = () => {
-    setEnemy(prev => {
-      const newHealth = prev.currentHealth - 5;
-      newHealth <= 0 ? setIsVisible(false) : setIsVisible(true);
-      const updated = new Goblin({ ...prev, currentHealth: newHealth });
-      return updated;
-    });
-
-    setIsTakingDamage(true);
-    setTimeout(() => setIsTakingDamage(false), 400);
-  };
-
-  /*
   return (
-    <div className="page">
-                  <HealthBar
-                    current={enemy.currentHealth}
-                    max={enemy.health}
-                    name={enemy.name}
-                  />
-      <EnemyDisplay enemy={enemy} isVisible={isVisible} isTakingDamage={isTakingDamage} />
-      <button onClick={handleAttack}>Attack</button>
-      <CardHand cards={cards} />
-  );
-  */
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        {showRegister ? <AccountRegistrationForm /> : <LoginForm />}
-
-        <button
-          onClick={() => setShowRegister(!showRegister)}
-          className="mt-6 text-slate-600 underline hover:text-slate-900"
-        >
-          {showRegister
-            ? 'Already have an account? Login'
-            : 'Need an account? Register'}
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <div className="bg-white p-10 rounded-[2rem] shadow-xl text-center max-w-md w-full">
-        <h1 className="text-3xl font-bold text-slate-800 mb-4">
-          Welcome back, {user.username}!
-        </h1>
-
-        <p className="text-slate-600 mb-8">
-          You are successfully logged in.
-        </p>
-
-        <button
-          onClick={() => Meteor.logout()}
-          className="px-8 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-900 transition-all active:scale-95"
-        >
-          Logout
-        </button>
-      </div>
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-end p-4 -z-2">
+      <CardHand cards={dummyCards} />
     </div>
   );
 };

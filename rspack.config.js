@@ -14,6 +14,20 @@ module.exports = defineConfig((_Meteor) => {
   return {
     module: {
       rules: [
+          {
+          test: /\.tsx?$/,
+          use: {
+            loader: 'builtin:swc-loader',
+            options: {
+              jsc: {
+                parser: {
+                  syntax: 'typescript',
+                  tsx: false,
+                },
+              },
+            },
+          },
+        },
         // Add support for importing SVGs as React components
         {
           test: /\.svg$/i,
