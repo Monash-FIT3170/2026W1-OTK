@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
 import { Meteor } from 'meteor/meteor';
 
-export default function Card({ cardProps, handRef, onplay }) {
+export default function Card({ cardProps, handRef, onPlay }) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'
@@ -26,7 +26,7 @@ export default function Card({ cardProps, handRef, onplay }) {
   const handleDragEnd = () => {
     if (isOutsideHand()) {
       console.log('Playing card:', cardProps.name);
-      // onPlay(cardProps.cardId);
+      // onPlay(cardProps.uniqueCardId);
     }
     // Animate back to origin
     animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });

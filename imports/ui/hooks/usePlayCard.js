@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 
 export function usePlayCard() {
-  // Set during the selection step: { cardId, cardAmountToSelect: { min, max } }
+  // Set during the selection step: { uniqueCardId, cardAmountToSelect: { min, max } }
   // null when no card is waiting for selection
   const [pendingSelection, setPendingSelection] = useState(null);
 
   // Called when a card is dragged out of the hand.
   // Triggers the draw step, then either proceeds to execute or waits for selection.
-  const onPlay = (cardId) => {
-    Meteor.call('game.drawCards', { cardId }, (err, result) => {
+  const onPlay = (uniqueCardId) => {
+    Meteor.call('game.drawCards', { uniqueCardId }, (err, result) => {
       if (err) {
         console.error('game.drawCards failed:', err);
         return;
@@ -17,13 +17,13 @@ export function usePlayCard() {
 
       if (result.requiresSelection) {
         setPendingSelection({
-          cardId,
+          uniqueCardId,
           cardAmountToSelect: result.cardAmountToSelect,
         });
       } else {
         Meteor.call(
           'game.executeCard',
-          { cardId, selectedCardIds: [] },
+          { uniqueCardId, selectedCardIds: [] },
           (execErr) => {
             if (execErr) console.error('game.executeCard failed:', execErr);
           }
@@ -38,7 +38,7 @@ export function usePlayCard() {
 
     Meteor.call(
       'game.executeCard',
-      { cardId: pendingSelection.cardId, selectedCardIds },
+      { uniqueCardId: pendingSelection.uniqueCardId, selectedCardIds },
       (err) => {
         if (err) console.error('game.executeCard failed:', err);
       }

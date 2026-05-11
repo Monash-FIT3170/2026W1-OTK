@@ -4,8 +4,8 @@ import { check, Match } from 'meteor/check';
 import { GameEngine } from '../../../engine/GameEngine';
 
 Meteor.methods({
-  'game.executeCard': async function ({ cardId, selectedCardIds }) {
-    check(cardId, String);
+  'game.executeCard': async function ({ uniqueCardId, selectedCardIds }) {
+    check(uniqueCardId, String);
     check(selectedCardIds, Match.Optional([String]));
 
     if (!this.userId) {
@@ -26,7 +26,7 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
-    engine.executeCard(cardId, selectedCardIds ?? []);
+    engine.executeCard(uniqueCardId, selectedCardIds ?? []);
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },
