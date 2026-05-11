@@ -1,83 +1,169 @@
-import React, { useState } from 'react';
-import { EnemyList } from './components';
-import { EnemyDisplay } from './components/EnemyDisplay';
-import { Goblin } from 'imports/engine/enemy/enemies/Goblin';
-import { HealthBar } from './components/HealthBar';
-import CardHand from './cards/CardHand';
-import { useTracker } from 'meteor/react-meteor-data';
+import React, { useState, useEffect, useRef } from 'react';
 import { Meteor } from 'meteor/meteor';
+import { useTracker } from 'meteor/react-meteor-data';
+import { UserDataCollection } from '../api/user-data/collections/UserDataCollection';
+import CardHand from './cards/CardHand';
+import { EnemyDisplay } from './components/EnemyDisplay';
+import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 
 export const App = () => {
-  const [enemy, setEnemy] = useState(new Goblin());
-  const [isTakingDamage, setIsTakingDamage] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
-  const user = useTracker(() => Meteor.user());
 
-  // NOTE: do not use this handle attack method in the game, use the enemy.damage method to apply damage
-  const handleAttack = () => {
-    setEnemy(prev => {
-      const newHealth = prev.currentHealth - 5;
-      newHealth <= 0 ? setIsVisible(false) : setIsVisible(true);
-      const updated = new Goblin({ ...prev, currentHealth: newHealth });
-      return updated;
-    });
+  // Track whether the enemy sprite should play its hit animation.
+  // Toggled on whenever the server reports a drop in enemy HP.
+  const [isTakingDamage, setIsTakingDamage] = useState(false);
+  const prevHealthRef = useRef(null);
 
-    setIsTakingDamage(true);
-    setTimeout(() => setIsTakingDamage(false), 400);
-  };
+  // Subscribe to auth and game data reactively
+  const { user, gameState, loading } = useTracker(() => {
+    const userSub = Meteor.subscribe('auth.currentUser');
+    const dataSub = Meteor.subscribe('userData');
+    const loading = !userSub.ready() || !dataSub.ready();
+    const user = Meteor.user();
+    const userData = user ? UserDataCollection.findOne({ userId: user._id }) : null;
+    return { user, gameState: userData?.gameState ?? null, loading };
+  });
 
-  /*
-  return (
-    <div className="page">
-                  <HealthBar
-                    current={enemy.currentHealth}
-                    max={enemy.health}
-                    name={enemy.name}
-                  />
-      <EnemyDisplay enemy={enemy} isVisible={isVisible} isTakingDamage={isTakingDamage} />
-      <button onClick={handleAttack}>Attack</button>
-      <CardHand cards={cards} />
-  );
-  */
+  // Trigger hit animation whenever enemy HP decreases
+  useEffect(() => {
+    if (!gameState) return;
+    const hp = gameState.enemy.currentHealth;
+    if (prevHealthRef.current !== null && hp < prevHealthRef.current) {
+      setIsTakingDamage(true);
+      setTimeout(() => setIsTakingDamage(false), 400);
+    }
+    prevHealthRef.current = hp;
+  }, [gameState?.enemy?.currentHealth]);
 
+  // If logged in but no game state exists yet, start a new game automatically
+  useEffect(() => {
+    if (!loading && user && !gameState) {
+      Meteor.call('game.newGame', (err) => {
+        if (err) console.error('game.newGame failed:', err);
+      });
+    }
+  }, [loading, user, gameState]);
+
+  // --- Loading state ---
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <p className="text-white text-xl">Loading...</p>
+      </div>
+    );
+  }
+
+  // --- Auth gate: show login or registration ---
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        {showRegister ? <AccountRegistrationForm /> : <LoginForm />}
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        {showRegister ? (
+          <AccountRegistrationForm onShowLogin={() => setShowRegister(false)} />
+        ) : (
+          <LoginForm onShowRegister={() => setShowRegister(true)} />
+        )}
+      </div>
+    );
+  }
 
+  // --- Waiting for game state to be created ---
+  if (!gameState) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <p className="text-white text-xl">Starting game...</p>
+      </div>
+    );
+  }
+
+  const { hand, deck, enemy, result } = gameState;
+
+  // --- Victory screen ---
+  if (result === 'win') {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-6">
+        <h1 className="text-5xl font-bold text-yellow-400">Victory!</h1>
+        <p className="text-slate-300 text-lg">You defeated {enemy.name}!</p>
         <button
-          onClick={() => setShowRegister(!showRegister)}
-          className="mt-6 text-slate-600 underline hover:text-slate-900"
+          className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-lg transition-colors"
+          onClick={() => Meteor.call('game.newGame')}
         >
-          {showRegister
-            ? 'Already have an account? Login'
-            : 'Need an account? Register'}
+          Play Again
+        </button>
+        <button
+          className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
+          onClick={() => Meteor.logout()}
+        >
+          Log Out
         </button>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <div className="bg-white p-10 rounded-[2rem] shadow-xl text-center max-w-md w-full">
-        <h1 className="text-3xl font-bold text-slate-800 mb-4">
-          Welcome back, {user.username}!
-        </h1>
-
-        <p className="text-slate-600 mb-8">
-          You are successfully logged in.
-        </p>
-
+  // --- Defeat screen ---
+  if (result === 'loss') {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-6">
+        <h1 className="text-5xl font-bold text-red-500">Defeated!</h1>
+        <p className="text-slate-300 text-lg">{enemy.name} survived your assault.</p>
         <button
-          onClick={() => Meteor.logout()}
-          className="px-8 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-900 transition-all active:scale-95"
+          className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-lg transition-colors"
+          onClick={() => Meteor.call('game.newGame')}
         >
-          Logout
+          Try Again
+        </button>
+        <button
+          className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
+          onClick={() => Meteor.logout()}
+        >
+          Log Out
         </button>
       </div>
+    );
+  }
+
+  // --- Main game screen ---
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+
+      {/* Top bar: deck count, player name, end turn */}
+      <div className="flex justify-between items-center px-6 py-3 bg-slate-800 border-b border-slate-700">
+        <span className="text-slate-300 text-sm font-medium">
+          Deck: <span className="text-white font-bold">{deck.length}</span> cards remaining
+        </span>
+        <span className="text-slate-500 text-sm">{user.username}</span>
+        <button
+          className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
+          onClick={() => Meteor.call('game.endTurn')}
+        >
+          End Turn
+        </button>
+      </div>
+
+      <div className="px-6 py-10">
+        <HealthBar
+          current={enemy.currentHealth}
+          max={enemy.health}
+          name={enemy.name}
+        />
+      </div>
+
+
+      {/* Battle area: health bar + enemy sprite */}
+      <div className="flex-1 relative flex flex-col justify-center px-8 py-6">
+        <EnemyDisplay
+          enemy={enemy}
+          isVisible={true}
+          isTakingDamage={isTakingDamage}
+        />
+      </div>
+
+      {/* Card hand at the bottom */}
+      <div className="p-4">
+        <CardHand cards={hand} />
+      </div>
+
     </div>
   );
 };

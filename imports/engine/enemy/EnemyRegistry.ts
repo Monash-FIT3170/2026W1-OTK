@@ -1,28 +1,24 @@
 // EnemyRegistry.ts
 
-// importing components
-import { enemyData } from "./Enemy";
+import { Enemy, enemyData } from './Enemy';
 
 export class EnemyRegistry {
 
-  // defining attributes
-  public registry: Record<string, enemyData> = {};
+  private registry: Map<string, new (data?: any) => Enemy> = new Map();
 
-  // constructs registry
-  constructor(initialData: Record<string, enemyData> = {}) {
-    this.registry = initialData;
+  register(enemyId: string, EnemyClass: new (data?: any) => Enemy): void {
+    this.registry.set(enemyId, EnemyClass);
   }
 
-  // add an entry
-  register(enemyId: string, value: enemyData): void {
-    this.registry[enemyId] = value;
+  create(data: enemyData): Enemy {
+    const EnemyClass = this.registry.get(data.enemyId);
+    if (!EnemyClass) throw new Error(`Unknown enemyId: ${data.enemyId}`);
+    return new EnemyClass(data);
   }
 
-  // get an entry
-  get(enemyId: string): enemyData | undefined {
-    return this.registry[enemyId];
+  get(enemyId: string): (new (data?: any) => Enemy) | undefined {
+    return this.registry.get(enemyId);
   }
-
 }
 
 export const enemyRegistry = new EnemyRegistry();

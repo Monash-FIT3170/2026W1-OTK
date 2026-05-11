@@ -1,27 +1,31 @@
 // Goblin.ts
 
-// importing components
-import { Enemy } from "../Enemy";
-import { enemyRegistry } from "../EnemyRegistry";
+import { Enemy } from '../Enemy';
+import { enemyRegistry } from '../EnemyRegistry';
 
 export class Goblin extends Enemy {
 
   static enemyId = 'goblin';
-  static entryAnimation = 'drop';
-  static hitAnimation = 'squish';
 
-  // constructs enemy
-  constructor(data: { name?: string; health?: number; currentHealth?: number; debuffs?: string[] } = {}) {
-    const health = data.health ?? 20;
+  constructor(data: {
+    name?: string;
+    health?: number;
+    currentHealth?: number;
+    debuffs?: string[];
+    entryAnimation?: string;
+    hitAnimation?: string;
+  } = {}) {
+    const health = data.health ?? 120;
     super({
       enemyId: Goblin.enemyId,
       name: data.name ?? 'Goblin',
       health,
       currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],
+      entryAnimation: data.entryAnimation ?? 'drop',
+      hitAnimation: data.hitAnimation ?? 'squish',
     });
   }
-
 }
 
-enemyRegistry.register('goblin', new Goblin().toJSON());
+enemyRegistry.register('goblin', Goblin);
