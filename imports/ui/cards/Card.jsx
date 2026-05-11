@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
-import { motion, useMotionValue, animate } from 'framer-motion';
-import { Meteor } from 'meteor/meteor';
+import React, { forwardRef } from 'react';
+import { motion } from 'framer-motion';
 
-export default function Card({ cardProps }) {
+const CARD_WIDTH = 160;  // px
+const CARD_HEIGHT = 224; // px
+
+const Card = forwardRef(function Card({ cardProps }, ref) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'
@@ -20,12 +22,9 @@ export default function Card({ cardProps }) {
           backgroundColor: 'oklch(90.5% 0.233 277.117)',
         }}
         whileTap={{ scale: 0.95 }}
-        ref={cardRef}
-        drag
-        onDragEnd={handleDragEnd}
-        dragMomentum={false}
-        style={{ x, y }}
-        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 aspect-5/7 min-w-40 min-h-50 max-h-1/7 max-w-1/8 box-border border-slate-600 border-1"
+        ref={ref}
+        style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
+        className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 box-border border-slate-600 border-1"
       >
         <div
           className="flex flex-2/12 min-h-5 justify-center box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono 
@@ -61,4 +60,6 @@ export default function Card({ cardProps }) {
       </motion.div>
     </motion.div>
   );
-}
+});
+
+export default Card;

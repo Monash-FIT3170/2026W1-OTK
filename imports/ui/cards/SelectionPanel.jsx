@@ -1,41 +1,30 @@
-import { Card } from './Card';
-import { motion } from 'framer-motion';
+import Card from './Card';
 
-export function SelectionPanel({ selectionHand, setSelectionHand, cardHand, setCardHand }) {
-  const selections = Object.entries(selectionHand);
+export function SelectionPanel({ pendingSelection, selectedTargets, onDeselectCard, onConfirm }) {
+  const { min, max } = pendingSelection.cardAmountToSelect;
+  const playedCard = pendingSelection.card;
+  const numCards = selectedTargets.length;
 
-  var numCards = selectionHand.selections.length;
-
-  var cardWidth = 176;
-  var containerWidth = (window.innerWidth * 8) / 10 - 40;
-  var marginLeft =
+  const cardWidth = 176;
+  const containerWidth = (window.innerWidth * 8) / 10 - 40;
+  const marginLeft =
     numCards > 1
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
       : 0;
 
-  const onSelectionCardClick = (card) => {
-    let currentSelectionHand = Object.assign(
-      Object.create(Object.getPrototypeOf(selectionHand)),
-      selectionHand
-    );
-    let currentCardHand = cardHand;
-    currentCardHand.addCard(card);
-    currentSelectionHand.removeSelection(card);
-    setCardHand(currentCardHand);
-    setSelectionHand(currentSelectionHand);
-  };
+  const isValidSelection = numCards >= min && numCards <= max;
 
   return (
     <div className="flex justify-center w-full">
       <div className="flex flex-col justify-center w-1/2">
         <p className="flex justify-center mb-1">Select cards</p>
-        <div className="flex flex-row ">
-          <div className="flex min-h-70 justify-center p-5 w-4/10 ">
-            <Card cardProps={selectionHand.selectedCard} />
+        <div className="flex flex-row">
+          <div className="flex min-h-70 justify-center p-5 w-4/10">
+            <Card cardProps={playedCard} />
           </div>
           <div className="flex flex-row justify-center overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-gray-70 w-8/10">
-            {selectionHand.selections.map((card, idx) => (
-              <div onClick={() => onSelectionCardClick(card)}>
+            {selectedTargets.map((card, idx) => (
+              <div key={card.uniqueId} onClick={() => onDeselectCard(card)}>
                 <Card
                   style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
                   cardProps={card}
@@ -46,10 +35,7 @@ export function SelectionPanel({ selectionHand, setSelectionHand, cardHand, setC
         </div>
         <div className="flex flex-row justify-center m-2">
           <div className="flex mt-1">
-            <p>
-              Select {selectionHand.minSelectAmount} to{' '}
-              {selectionHand.maxSelectAmount} cards
-            </p>
+            <p>Select {min} to {max} cards</p>
           </div>
           <div className="flex ml-5">
             <button
@@ -57,10 +43,10 @@ export function SelectionPanel({ selectionHand, setSelectionHand, cardHand, setC
               className="text-body bg-neutral-secondary-medium box-border border border-default-medium 
             hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium 
             leading-5 rounded-full text-sm px-4 py-1.5 focus:outline-none disabled:bg-gray-400"
-              disabled={!selectionHand.isSelectableAmount()}
+              disabled={!isValidSelection}
+              onClick={onConfirm}
             >
-              {' '}
-              ok{' '}
+              ok
             </button>
           </div>
         </div>

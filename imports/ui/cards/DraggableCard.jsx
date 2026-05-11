@@ -1,15 +1,15 @@
 // DraggableCard.jsx
+import { useRef } from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
 import  Card from './Card';
 
-export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay }) {
+export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay, draggable = true }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
   const handleDragEnd = () => {
       if (isOutsideHand()) {
-        console.log('Playing card:', cardProps.name);
-        // onPlay(cardProps.uniqueCardId);
+        onPlay(cardProps.uniqueId);
       }
       // Animate back to origin
       animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
@@ -27,9 +27,10 @@ export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay 
 
   return (
     <motion.div
+      ref={cardRef}
       style={{ marginLeft, x, y }}
       onClick={onClick}
-      drag
+      drag={draggable}
       onDragEnd={handleDragEnd}
       dragMomentum={false}
     >

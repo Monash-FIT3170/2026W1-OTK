@@ -7,29 +7,23 @@ export function usePlayCard() {
   const [pendingSelection, setPendingSelection] = useState(null);
 
   // Called when a card is dragged out of the hand.
-  // Triggers the draw step, then either proceeds to execute or waits for selection.
-  const onPlay = (uniqueCardId) => {
-    Meteor.call('game.drawCards', { uniqueCardId }, (err, result) => {
-      if (err) {
-        console.error('game.drawCards failed:', err);
-        return;
-      }
-
-      if (result.requiresSelection) {
-        setPendingSelection({
-          uniqueCardId,
-          cardAmountToSelect: result.cardAmountToSelect,
-        });
-      } else {
-        Meteor.call(
-          'game.executeCard',
-          { uniqueCardId, selectedCardIds: [] },
-          (execErr) => {
-            if (execErr) console.error('game.executeCard failed:', execErr);
-          }
-        );
-      }
-    });
+  // Uses card.cardAmountToSelect to decide whether to prompt for selection or execute immediately.
+  const onPlay = (card) => {
+    if (card.cardAmountToSelect) {
+      setPendingSelection({
+        uniqueCardId: card.uniqueId,
+        card,
+        cardAmountToSelect: card.cardAmountToSelect,
+      });
+    } else {
+      Meteor.call(
+        'game.executeCard',
+        { uniqueCardId: card.uniqueId, selectedCardIds: [] },
+        (execErr) => {
+          if (execErr) console.error('game.executeCard failed:', execErr);
+        }
+      );
+    }
   };
 
   // Called when the player confirms their card selection.
