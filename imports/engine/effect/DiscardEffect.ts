@@ -7,25 +7,20 @@ import { Card } from "../card/Card";
 
 export class DiscardEffect implements Effect {
 
-    resolve(engine: GameEngine, targetCardIds?: string[]) {        
+    resolve(engine: GameEngine, targetCardIds?: string[]) {
         if (!targetCardIds) return;
- 
-        // collect the matching card instances
+
         const cardsToDiscard: Card[] = [];
         targetCardIds.forEach((id: string) => {
-            // look up the card in the current hand by its cardId
-            const card = engine.hand.find((card: Card) => card.cardId === id);
-            // check if card exists in hand
+            const card = engine.hand.find((card: Card) => card.uniqueId === id);
             if (card) {
                 cardsToDiscard.push(card);
             }
         });
- 
-        // now discard each collected card
+
         cardsToDiscard.forEach(card => {
             card.onDiscard();
-            engine.removeFromHand(card.cardId);
+            engine.removeFromHand(card.uniqueId);
         });
     }
 }
-

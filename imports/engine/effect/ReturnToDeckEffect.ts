@@ -7,21 +7,20 @@ import { Effect } from "./Effect";
  */
 export class ReturnToDeckEffect implements Effect {
     resolve(engine: GameEngine, targetCardIndexes?: string[]): void {
-        if (!targetCardIndexes) return;       
-        // collects all cards that need to be returned first
+        if (!targetCardIndexes) return;
+
         const cardsToReturn: Card[] = [];
         targetCardIndexes.forEach(id => {
-            const card = engine.hand.find(card => card.cardId === id);
+            const card = engine.hand.find(card => card.uniqueId === id);
             if (card) {
                 cardsToReturn.push(card);
             }
         });
 
-        //move collected cards now to the deck
         cardsToReturn.forEach(card => {
             card.resetStats();
             engine.deck.push(card);
-            engine.removeFromHand(card.cardId);
+            engine.removeFromHand(card.uniqueId);
         });
     }
 }

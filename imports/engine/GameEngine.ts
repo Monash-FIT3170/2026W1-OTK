@@ -1,6 +1,5 @@
 // GameEngine.ts
 
-// importing components
 import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
@@ -9,11 +8,11 @@ import { UserData, EnemyData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { Goblin } from './enemy/enemies/Goblin';
 
-const BOSS_LOOKUP: { [stage: number]: new () => Enemy } = {
+const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
   1: Goblin,
 };
+
 export class GameEngine {
-  // attributes
   public hand: Card[];
   public deck: Card[];
   public enemy: Enemy;
@@ -33,33 +32,31 @@ export class GameEngine {
     requiresSelection: boolean;
     cardAmountToSelect?: { min: number; max: number };
   } {
-    // gets card
     const card = this.getCard(uniqueId);
-
-    // card has a card amount to select, returns true with max amount
     if (card.cardAmountToSelect) {
-      return {
-        requiresSelection: true,
-        cardAmountToSelect: card.cardAmountToSelect,
-      };
+      return { requiresSelection: true, cardAmountToSelect: card.cardAmountToSelect };
     }
-
-    // card does not have a card amount to select, returns false
-    return {
-      requiresSelection: false,
-    };
+    return { requiresSelection: false };
   }
 
-  // executes card
+  // executes card: runs its effects, removes it from hand, then draws cost cards from deck
   executeCard(uniqueId: string, selectedCardIds: string[] = []): void {
-    // gets card by its unique id
     const card = this.getCard(uniqueId);
+    const drawCount = card.currentCost;
 
-    // executes card
     card.execute(this, selectedCardIds);
-
-    // removes card from hand
     this.removeFromHand(uniqueId);
+
+    const drawn = this.deck.splice(0, drawCount);
+    this.hand.push(...drawn);
+  }
+
+  isEnemyDefeated(): boolean {
+    return this.enemy.currentHealth <= 0;
+  }
+
+  hasPlayableCards(): boolean {
+    return this.hand.length > 0;
   }
 
   static newGame(userId: string): UserData {
@@ -103,7 +100,6 @@ export class GameEngine {
     }
   }
 
-  // TODO: return data so server methods can save each collection
   toJSON(): UserData {
     return {
       userId: this.userId,

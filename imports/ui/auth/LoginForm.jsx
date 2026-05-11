@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { motion } from 'motion/react';
 
-export const LoginForm = () => {
+export const LoginForm = ({ onShowRegister }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +22,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -121,6 +121,7 @@ export const LoginForm = () => {
           <a
             href="#"
             className="text-[#4b6bff] hover:text-[#3b5beb] font-bold transition-colors"
+            onClick={(e) => { e.preventDefault(); onShowRegister?.(); }}
           >
             Sign Up
           </a>
