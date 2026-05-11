@@ -4,9 +4,27 @@ import { check } from 'meteor/check';
 import { GameEngine } from '../../../engine/GameEngine';
 
 Meteor.methods({
-  // TODO: load game state, call engine.drawCost(cardId), save updated state to UserDataCollection,
-  // return { requiresSelection, cardAmountToSelect } to client
   'game.drawCards': async function ({ uniqueCardId }) {
-    // TODO: implement draw logic
+    check(uniqueCardId, String);
+
+    if (!this.userId) {
+      throw new Meteor.Error(
+        'game.drawCards.notLoggedIn',
+        'Must be logged in to draw cards.'
+      );
+    }
+
+    const userData = await UserDataCollection.findOneAsync({
+      userId: this.userId,
+    });
+    if (!userData) {
+      throw new Meteor.Error(
+        'game.drawCards.noUserData',
+        'No user data found.'
+      );
+    }
+
+    const engine = new GameEngine(userData.gameState);
+    return engine.drawCost(uniqueCardId);
   },
 });
