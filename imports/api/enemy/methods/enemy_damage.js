@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { EnemiesCollection } from '../collections/Enemies.js';
-import { applyEnemyDamage } from '../../../engine/enemy/enemy_damage.js';
+import { applyEnemyDamage } from '../../../engine/enemy/enemy_damage';
 
 Meteor.methods({
 
