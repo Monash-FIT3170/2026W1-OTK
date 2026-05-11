@@ -5,12 +5,12 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, HandCardData, EnemyData } from './types';
+import { UserData, EnemyData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { Goblin } from './enemy/enemies/Goblin';
 
-const BOSS_LOOKUP: { [stage: number]: new() => Enemy } = {
-  1: Goblin
+const BOSS_LOOKUP: { [stage: number]: new () => Enemy } = {
+  1: Goblin,
 };
 export class GameEngine {
   // attributes
@@ -18,22 +18,23 @@ export class GameEngine {
   public deck: Card[];
   public enemy: Enemy;
   public stage: number;
+  public userId: string;
 
-  // constructs game engine from the three separate data sources
-  constructor(userData: UserData, handCards: HandCardData[], enemy: EnemyData) {
-    this.hand = handCards.map((card) => cardRegistry.create(card));
+  constructor(userData: UserData) {
+    this.userId = userData.userId;
+    this.hand = userData.hand.map((card) => cardRegistry.create(card));
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
-    this.enemy = enemyRegistry.create(enemy);
+    this.enemy = enemyRegistry.create(userData.enemy);
     this.stage = userData.stage;
   }
 
   // checks if card selected requires other cards to be selected
-  drawCost(cardId: string): {
+  drawCost(uniqueId: string): {
     requiresSelection: boolean;
     cardAmountToSelect?: { min: number; max: number };
   } {
     // gets card
-    const card = this.getCard(cardId);
+    const card = this.getCard(uniqueId);
 
     // card has a card amount to select, returns true with max amount
     if (card.cardAmountToSelect) {
@@ -50,44 +51,42 @@ export class GameEngine {
   }
 
   // executes card
-  executeCard(cardId: string, selectedCardIds: string[] = []): void {
-    // gets card
-    const card = this.getCard(cardId);
+  executeCard(uniqueId: string, selectedCardIds: string[] = []): void {
+    // gets card by its unique id
+    const card = this.getCard(uniqueId);
 
     // executes card
     card.execute(this, selectedCardIds);
 
     // removes card from hand
-    this.removeFromHand(cardId);
+    this.removeFromHand(uniqueId);
   }
 
-  static newGame(userId: string): { userData: UserData; hand: HandCardData[]; enemy: EnemyData } {
+  static newGame(userId: string): UserData {
     const deck = DeckBuilder.buildStartingDeck();
     const stage = 1;
     const BossClass = BOSS_LOOKUP[stage];
-    const bossData: EnemyData = { userId, ...new BossClass().toJSON() };
-    const userData: UserData = { userId, stage, deck };
+    const enemy: EnemyData = new BossClass().toJSON();
+    const userData: UserData = { userId, stage, deck, hand: [], enemy };
 
-    const engine = new GameEngine(userData, [], bossData);
+    const engine = new GameEngine(userData);
     engine.initialDraw();
     return engine.toJSON();
   }
-  
 
   // ------------------
   //  helper functions
   // ------------------
-  initialDraw(n: number = 5): void {
-  }
+  initialDraw(n: number = 5): void {}
 
-  getCard(cardId: string): Card {}
+  getCard(uniqueId: string): Card {}
 
   getHand(): Card[] {}
 
   getDeck(): Card[] {}
 
-  removeFromHand(cardId: string): void {}
+  removeFromHand(uniqueId: string): void {}
 
   // TODO: return data so server methods can save each collection
-  toJSON(): { userData: UserData; hand: HandCardData[]; enemy: EnemyData } {}
+  toJSON(): UserData {}
 }
