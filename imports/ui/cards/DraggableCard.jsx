@@ -1,5 +1,5 @@
 // DraggableCard.jsx
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useMotionValue, animate } from 'motion/react';
 import Card from './Card';
 
@@ -14,14 +14,22 @@ export function DraggableCard({
 }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragStart = () => setIsDragging(true);
 
   const handleDragEnd = () => {
     if (isOutsideHand() && affordable) {
       onPlay(cardProps.uniqueId);
     }
-    // Animate back to origin
+    // Animate back to origin, then re-enable card hover/tap animations
     animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
-    animate(y, 0, { type: 'spring', stiffness: 300, damping: 20 });
+    animate(y, 0, {
+      type: 'spring',
+      stiffness: 300,
+      damping: 20,
+      onComplete: () => setIsDragging(false),
+    });
   };
 
   const cardRef = useRef(null);
@@ -44,10 +52,11 @@ export function DraggableCard({
       }}
       onClick={onClick}
       drag={!isInSelectionMode}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       dragMomentum={false}
     >
-      <Card cardProps={cardProps} />
+      <Card cardProps={cardProps} isDragging={isDragging} />
     </motion.div>
   );
 }
