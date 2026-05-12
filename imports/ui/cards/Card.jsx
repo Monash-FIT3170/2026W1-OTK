@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 const CARD_WIDTH = 160; // px
 const CARD_HEIGHT = 224; // px
 
-function Card({ cardProps }) {
+function Card({ cardProps, isDragging = false }) {
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-700'
@@ -14,14 +14,12 @@ function Card({ cardProps }) {
       ? 'text-lime-700'
       : 'text-red-700';
 
+  const hoverAnimation = isDragging? {}: { scale: 1.1, backgroundColor: 'oklch(90.5% 0.233 277.117)' };
+
   return (
     <motion.div className="flex justify-center">
       <motion.div
-        whileHover={{
-          scale: 1.1,
-          backgroundColor: 'oklch(90.5% 0.233 277.117)',
-        }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={hoverAnimation}
         style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
         className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 box-border border-slate-600 border-1"
       >
