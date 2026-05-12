@@ -68,6 +68,7 @@ export class GameEngine {
     const userData: UserData = { userId, stage, deck, hand: [], enemy };
 
     const engine = new GameEngine(userData);
+    engine.shuffle();
     engine.draw();
     return engine.toJSON();
   }
@@ -75,6 +76,13 @@ export class GameEngine {
   // ------------------
   //  helper functions
   // ------------------
+  shuffle(): void {
+    for (let i = this.deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+    }
+  }
+
   draw(n: number = 5): void {
     const drawn = this.deck.splice(0, n);
     this.hand.push(...drawn);
