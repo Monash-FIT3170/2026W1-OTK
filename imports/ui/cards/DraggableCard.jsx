@@ -34,6 +34,12 @@ export function DraggableCard({
 
   const cardRef = useRef(null);
 
+  const drawAnimation = {
+    initial: { y: 80, opacity: 0 },
+    animate: { y: 0, opacity: !affordable && !isInSelectionMode ? 0.4 : 1 },
+    transition: { type: 'spring', stiffness: 300, damping: 20 },
+  };
+
   const isOutsideHand = () => {
     if (!handRef?.current || !cardRef?.current) return false;
     const hand = handRef.current.getBoundingClientRect();
@@ -44,11 +50,11 @@ export function DraggableCard({
   return (
     <motion.div
       ref={cardRef}
+      {...drawAnimation}
       style={{
         marginLeft,
         x,
         y,
-        opacity: !affordable && !isInSelectionMode ? 0.4 : 1,
       }}
       onClick={onClick}
       drag={!isInSelectionMode}

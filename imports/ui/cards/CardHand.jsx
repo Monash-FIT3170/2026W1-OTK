@@ -72,7 +72,7 @@ export default function CardHand({ cards, deckSize }) {
         className="flex flex-row border rounded-xl p-5 bg-amber-50 min-h-70 w-full"
       >
         <div className="flex flex-row justify-center w-full">
-          {hand.map((card, idx) => (
+          {[...hand].reverse().map((card, idx) => (
             <DraggableCard
               key={card.uniqueId}
               cardProps={card}
