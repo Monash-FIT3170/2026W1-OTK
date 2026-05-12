@@ -1,20 +1,28 @@
 // DraggableCard.jsx
 import { useRef } from 'react';
 import { motion, useMotionValue, animate } from 'motion/react';
-import  Card from './Card';
+import Card from './Card';
 
-export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay, draggable = true }) {
+export function DraggableCard({
+  cardProps,
+  marginLeft,
+  onClick,
+  handRef,
+  onPlay,
+  isInSelectionMode = false,
+  affordable = true,
+}) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
   const handleDragEnd = () => {
-      if (isOutsideHand()) {
-        onPlay(cardProps.uniqueId);
-      }
-      // Animate back to origin
-      animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
-      animate(y, 0, { type: 'spring', stiffness: 300, damping: 20 });
-    };
+    if (isOutsideHand() && affordable) {
+      onPlay(cardProps.uniqueId);
+    }
+    // Animate back to origin
+    animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
+    animate(y, 0, { type: 'spring', stiffness: 300, damping: 20 });
+  };
 
   const cardRef = useRef(null);
 
@@ -28,9 +36,14 @@ export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay,
   return (
     <motion.div
       ref={cardRef}
-      style={{ marginLeft, x, y }}
+      style={{
+        marginLeft,
+        x,
+        y,
+        opacity: !affordable && !isInSelectionMode ? 0.4 : 1,
+      }}
       onClick={onClick}
-      drag={draggable}
+      drag={!isInSelectionMode}
       onDragEnd={handleDragEnd}
       dragMomentum={false}
     >
