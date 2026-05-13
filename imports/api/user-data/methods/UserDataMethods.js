@@ -70,7 +70,17 @@ Meteor.methods({
     const gameState = GameEngine.newGame(userId);
     return UserDataCollection.insertAsync({
       userId: userId,
-      gameState,
+
+      gameState: {
+        currentStage: 1,
+        currentHand: [],
+        currentEnemy: null,
+        currentDrawDeck: [],
+        currentDiscardedCardPile: [],
+        runTime: 0,
+        runStatus: 'ACTIVE',
+        updatedAt: new Date(),
+      },
     });
   },
 
