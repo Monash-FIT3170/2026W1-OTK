@@ -1,41 +1,47 @@
+// enemy_damage.ts
+
+// importing components
+import { enemyData } from "./Enemy";
+
 export class EnemyDamage {
-  constructor(enemy) {
+
+  // defining attributes
+  private enemy: enemyData;
+
+  // constructs enemy damage handler
+  constructor(enemy: enemyData) {
     if (!enemy || !Number.isFinite(enemy.currentHealth)) {
       throw new Error('Enemy must have a numeric currentHealth value.');
     }
-
     this.enemy = enemy;
   }
 
-  //Getter method to return current health
-  get currentHealth() {
+  // getter for current health
+  get currentHealth(): number {
     return this.enemy.currentHealth;
   }
 
-  // Helper method to update enemy current health
-  getDamage(damageValues) {
+  // applies damage and returns remaining health
+  getDamage(damageValues: number | number[]): number {
     const damage = EnemyDamage.totalDamage(damageValues);
     this.enemy.currentHealth = Math.max(0, this.enemy.currentHealth - damage);
     return this.enemy.currentHealth;
   }
 
-  //Finds total damage value from a single card or an array of multiple cards
-  static totalDamage(damageValues) {
+  // totals damage from a single value or array of values
+  static totalDamage(damageValues: number | number[]): number {
     const values = Array.isArray(damageValues) ? damageValues : [damageValues];
     return values.reduce((total, damageValue) => {
       if (typeof damageValue !== 'number' || !Number.isFinite(damageValue)) {
         throw new Error('Damage value must be a finite number.');
       }
-
       if (damageValue < 0) {
         throw new Error('Damage value cannot be negative.');
       }
-
       return total + damageValue;
     }, 0);
   }
 }
 
-// Helper method to apply final damage to any enemy 
-export const applyEnemyDamage = (enemy, damageValues) =>
+export const applyEnemyDamage = (enemy: enemyData, damageValues: number | number[]): number =>
   new EnemyDamage(enemy).getDamage(damageValues);

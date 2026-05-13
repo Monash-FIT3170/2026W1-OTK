@@ -24,12 +24,13 @@ export function EnemyDisplay({ enemy, isVisible, isTakingDamage, _useAnimate = u
   useEffect(() => {
     if (isTakingDamage) {
       setIsHit(true);
-      const { keyframes, options } = HitAnimations[enemy.constructor.hitAnimation];
+      // Read animation name from plain data property (set by Enemy subclass constructor)
+      const { keyframes, options } = HitAnimations[enemy.hitAnimation] ?? HitAnimations.shake;
       animate(scope.current, keyframes, options).then(() => setIsHit(false)); // Reset hit state after animation completes
     }
   }, [isTakingDamage]);
 
-  const { initial, animate: animateProps, exit, transition } = EntryAnimations[enemy.constructor.entryAnimation];
+  const { initial, animate: animateProps, exit, transition } = EntryAnimations[enemy.entryAnimation] ?? EntryAnimations.fade;
 
   return (
     <AnimatePresence>
