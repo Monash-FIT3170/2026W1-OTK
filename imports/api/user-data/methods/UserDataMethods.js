@@ -109,13 +109,24 @@ Meteor.methods({
    *
    * @see UserDataCollection
    */
-  'userData.updateGameState': async function ({ gameState }) {
+  'userData.saveGameState': async function ({ gameState }) {
     check(gameState, Object);
 
     if (!this.userId) {
       throw new Meteor.Error(
         'userData.notAuthorized',
-        'You must be logged in to update game state.'
+        'You must be logged in to save game state.'
+      );
+    }
+
+    const existingUserData = await UserDataCollection.findOneAsync({
+      userId: this.userId,
+    });
+
+    if (!existingUserData) {
+      throw new Meteor.Error(
+        'userData.notFound',
+        'No user data exists for this user.'
       );
     }
 
@@ -125,6 +136,8 @@ Meteor.methods({
         $set: {
           gameState: {
             ...gameState,
+            runStatus: gameState.runStatus || "ACTIVE",
+            saveType: "MANUAL",
             updatedAt: new Date(),
           },
         },
