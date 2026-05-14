@@ -7,6 +7,7 @@ import { EnemyDisplay } from './components/EnemyDisplay';
 import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
+import { SaveGameButton } from './components/SaveGameButton';
 
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
@@ -148,13 +149,7 @@ export const App = () => {
         </span>
         <span className="text-slate-500 text-sm">{user.username}</span>
         <div className="flex gap-2">
-          <button
-            className="px-4 py-1.5 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg text-sm transition-colors"
-            onClick={handleSaveGame}
-          >
-            Save Game
-          </button>
-
+          <SaveGameButton gameState={gameState} />
           <button
             className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
             onClick={() => Meteor.call('game.endTurn')}
