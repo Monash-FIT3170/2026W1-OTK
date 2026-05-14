@@ -11,3 +11,6 @@ import '/imports/ui/AccountRegistrationForm.tests.jsx';
 
 // USER DATA TESTS
 import '../imports/api/user-data/userData.tests.js'
+
+// SAVE GAME TESTS
+import '/imports/ui/components/SaveGameButton.app-tests.jsx';
