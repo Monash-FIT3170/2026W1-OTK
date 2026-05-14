@@ -14,7 +14,9 @@ function Card({ cardProps, isDragging = false }) {
       ? 'text-lime-700'
       : 'text-red-700';
 
-  const hoverAnimation = isDragging? {}: { scale: 1.1, backgroundColor: 'oklch(90.5% 0.233 277.117)' };
+  const hoverAnimation = isDragging
+    ? {}
+    : { scale: 1.1, backgroundColor: 'oklch(90.5% 0.233 277.117)' };
 
   return (
     <motion.div className="flex justify-center">

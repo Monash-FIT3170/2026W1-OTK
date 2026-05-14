@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import { motion, useMotionValue, animate } from 'motion/react';
 import Card from './Card';
+import { soundManager } from '../soundManager';
 
 export function DraggableCard({
   cardProps,
@@ -20,6 +21,7 @@ export function DraggableCard({
 
   const handleDragEnd = () => {
     if (isOutsideHand() && affordable) {
+      soundManager.playCardSound(cardProps.cardId);
       onPlay(cardProps.uniqueId);
     }
     // Animate back to origin, then re-enable card hover/tap animations
@@ -57,6 +59,7 @@ export function DraggableCard({
         y,
       }}
       onClick={onClick}
+      onHoverStart={() => !isDragging && soundManager.playCardHover()}
       drag={!isInSelectionMode}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
