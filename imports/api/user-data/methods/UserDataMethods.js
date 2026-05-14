@@ -71,16 +71,7 @@ Meteor.methods({
     return UserDataCollection.insertAsync({
       userId: userId,
 
-      gameState: {
-        currentStage: 1,
-        currentHand: [],
-        currentEnemy: null,
-        currentDrawDeck: [],
-        currentDiscardedCardPile: [],
-        runTime: 0,
-        runStatus: 'ACTIVE',
-        updatedAt: new Date(),
-      },
+      gameState,
     });
   },
 
@@ -136,8 +127,8 @@ Meteor.methods({
         $set: {
           gameState: {
             ...gameState,
-            runStatus: gameState.runStatus || "ACTIVE",
-            saveType: "MANUAL",
+            runStatus: gameState.runStatus || 'ACTIVE',
+            saveType: 'MANUAL',
             updatedAt: new Date(),
           },
         },
