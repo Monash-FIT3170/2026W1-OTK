@@ -70,7 +70,6 @@ Meteor.methods({
     const gameState = GameEngine.newGame(userId);
     return UserDataCollection.insertAsync({
       userId: userId,
-
       gameState,
     });
   },

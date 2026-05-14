@@ -78,6 +78,20 @@ export const App = () => {
   }
 
   const { hand, deck, enemy, result } = gameState;
+  /**
+   * Saves the current GameState to the database.
+   */
+  const handleSaveGame = () => {
+    Meteor.call('userData.saveGameState', { gameState }, (error) => {
+      if (error) {
+        console.error('Save game failed:', error);
+        alert(error.reason || 'Failed to save game.');
+        return;
+      }
+
+      alert('Game saved successfully.');
+    });
+  };
 
   // --- Victory screen ---
   if (result === 'win') {
@@ -133,12 +147,21 @@ export const App = () => {
           Deck: <span className="text-white font-bold">{deck.length}</span> cards remaining
         </span>
         <span className="text-slate-500 text-sm">{user.username}</span>
-        <button
-          className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
-          onClick={() => Meteor.call('game.endTurn')}
-        >
-          End Turn
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="px-4 py-1.5 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg text-sm transition-colors"
+            onClick={handleSaveGame}
+          >
+            Save Game
+          </button>
+
+          <button
+            className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
+            onClick={() => Meteor.call('game.endTurn')}
+          >
+            End Turn
+          </button>
+        </div>
       </div>
 
       <div className="px-6 py-10">
