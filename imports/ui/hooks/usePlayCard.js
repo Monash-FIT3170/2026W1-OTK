@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
+import { soundManager } from '../soundManager';
 
 export function usePlayCard() {
   // Set during the selection step: { uniqueCardId, cardAmountToSelect: { min, max } }
@@ -21,6 +22,7 @@ export function usePlayCard() {
           cardAmountToSelect: result.cardAmountToSelect,
         });
       } else {
+        soundManager.playCardSound(card.cardId);
         Meteor.call(
           'game.executeCard',
           { uniqueCardId: card.uniqueId, selectedCardIds: [] },
@@ -34,6 +36,7 @@ export function usePlayCard() {
 
   const confirmSelection = (selectedCardIds) => {
     if (!pendingSelection) return;
+    soundManager.playCardSound(pendingSelection.card.cardId);
     Meteor.call(
       'game.executeCard',
       { uniqueCardId: pendingSelection.uniqueCardId, selectedCardIds },

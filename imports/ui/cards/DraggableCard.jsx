@@ -21,7 +21,6 @@ export function DraggableCard({
 
   const handleDragEnd = () => {
     if (isOutsideHand() && affordable) {
-      soundManager.playCardSound(cardProps.cardId);
       onPlay(cardProps.uniqueId);
     }
     // Animate back to origin, then re-enable card hover/tap animations
