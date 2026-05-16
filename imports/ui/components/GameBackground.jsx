@@ -5,7 +5,7 @@ export function GameBackground({backgroundScene, children}){
     <div
       className="min-h-screen flex flex-col"
       style={{
-        backgroundImage: `url(${backgroundScene})`,
+        backgroundImage: `url(/assets/environments/${backgroundScene}-background.png)`,
         imageRendering: 'pixelated',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center center',

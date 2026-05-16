@@ -12,6 +12,10 @@ const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
   1: Goblin,
 };
 
+const SCENE_LOOKUP: { [stage: number]: string } = {
+  1: 'underpass',
+};
+
 export class GameEngine {
   public hand: Card[];
   public deck: Card[];
@@ -64,7 +68,8 @@ export class GameEngine {
     const stage = 1;
     const BossClass = BOSS_LOOKUP[stage];
     const enemy: EnemyData = new BossClass().toJSON();
-    const userData: UserData = { userId, stage, deck, hand: [], enemy };
+    const scene = SCENE_LOOKUP[stage]
+    const userData: UserData = { userId, stage, deck, hand: [], enemy, scene };
 
     const engine = new GameEngine(userData);
     engine.initialDraw();
@@ -107,6 +112,7 @@ export class GameEngine {
       deck: this.deck.map((card) => card.toJSON()),
       hand: this.hand.map((card) => card.toJSON()),
       enemy: this.enemy.toJSON(),
+      scene: SCENE_LOOKUP[this.stage],
     };
   }
 }

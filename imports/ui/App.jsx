@@ -79,7 +79,7 @@ export const App = () => {
     );
   }
 
-  const { hand, deck, enemy, result } = gameState;
+  const { hand, deck, enemy, result, scene } = gameState;
   /**
    * Saves the current GameState to the database.
    */
@@ -141,9 +141,8 @@ export const App = () => {
 
   // --- Main game screen ---
   return (
-    //<div className="min-h-screen flex flex-col game-background">
     //TODO: refactor to grab the bg from gamestate
-    <GameBackground backgroundScene="/assets/environments/underpass-background.png"> 
+    <GameBackground backgroundScene={scene}> 
 
       {/* Top bar: deck count, player name, end turn */}
       <div className="flex justify-between items-center px-6 py-3 bg-slate-800 border-b border-slate-700">
@@ -186,6 +185,5 @@ export const App = () => {
       </div>
 
     </GameBackground>
-    //</div>
   );
 };
