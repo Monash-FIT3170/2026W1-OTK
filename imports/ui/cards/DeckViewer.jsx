@@ -3,7 +3,13 @@ import Card from './Card';
 
 export function DeckViewer({ cards }) {
   const [isOpen, setIsOpen] = useState(false);    //This ensures that the View Deck button is only visible if it's not already currently open
-  const deckCards = Array.isArray(cards) ? cards : Object.values(cards ?? {});
+  
+  // There are two arrays which contain the Deck cards. One that has the original order
+  // which is rawDeckCards, and deckCards takes the original array of cards and sorts it alphabetically.
+  // This way the sort is not mutating the real deck array used in the game but just the array used
+  // to visually display the Deck Viewer.
+  const rawDeckCards = Array.isArray(cards) ? cards : Object.values(cards ?? {});
+  const deckCards = [...rawDeckCards].sort((a,b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
 
   useEffect(() => {
     if (!isOpen) return undefined;
