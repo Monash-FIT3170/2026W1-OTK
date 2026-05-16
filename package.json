@@ -16,6 +16,7 @@
     "@swc/helpers": "^0.5.17",
     "@tailwindcss/postcss": "^4.2.2",
     "bcrypt": "^6.0.0",
+    "daisyui": "^5.5.19",
     "meteor-node-stubs": "^1.2.12",
     "motion": "^12.38.0",
     "postcss": "^8.5.9",
