@@ -8,6 +8,7 @@ import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { SaveGameButton } from './components/SaveGameButton';
+import { GameBackground } from './components/GameBackground';
 
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
@@ -140,7 +141,9 @@ export const App = () => {
 
   // --- Main game screen ---
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    //<div className="min-h-screen flex flex-col game-background">
+    //TODO: refactor to grab the bg from gamestate
+    <GameBackground backgroundScene="/assets/environments/underpass-background.png"> 
 
       {/* Top bar: deck count, player name, end turn */}
       <div className="flex justify-between items-center px-6 py-3 bg-slate-800 border-b border-slate-700">
@@ -182,6 +185,7 @@ export const App = () => {
         <CardHand cards={hand} />
       </div>
 
-    </div>
+    </GameBackground>
+    //</div>
   );
 };
