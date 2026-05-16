@@ -35,7 +35,8 @@ export default function CardHand({ cards, deckSize }) {
   const onHandCardClick = (card) => {
     if (!pendingSelection) return;
     // Selection mode: toggle card as a target
-    const { max } = pendingSelection.cardAmountToSelect;
+    const { max: rawMax } = pendingSelection.cardAmountToSelect;
+    const max = Math.min(rawMax, hand.length);
     const alreadySelected = selectedTargets.some(
       (c) => c.uniqueId === card.uniqueId
     );
@@ -59,6 +60,7 @@ export default function CardHand({ cards, deckSize }) {
         <SelectionPanel
           pendingSelection={pendingSelection}
           selectedTargets={selectedTargets}
+          availableCount={hand.length}
           onDeselectCard={(card) => {
             setSelectedTargets((prev) =>
               prev.filter((c) => c.uniqueId !== card.uniqueId)
