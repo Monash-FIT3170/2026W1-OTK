@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 import { UserDataCollection } from '../api/user-data/collections/UserDataCollection';
 import CardHand from './cards/CardHand';
+import { DeckViewer } from './cards/DeckViewer';
 import { EnemyDisplay } from './components/EnemyDisplay';
 import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
@@ -129,9 +130,12 @@ export const App = () => {
 
       {/* Top bar: deck count, player name, end turn */}
       <div className="flex justify-between items-center px-6 py-3 bg-slate-800 border-b border-slate-700">
-        <span className="text-slate-300 text-sm font-medium">
-          Deck: <span className="text-white font-bold">{deck.length}</span> cards remaining
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-slate-300 text-sm font-medium">
+            Deck: <span className="text-white font-bold">{deck.length}</span> cards remaining
+          </span>
+          <DeckViewer cards={deck} />
+        </div>
         <span className="text-slate-500 text-sm">{user.username}</span>
         <button
           className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
