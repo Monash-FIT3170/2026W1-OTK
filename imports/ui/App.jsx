@@ -8,6 +8,7 @@ import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { soundManager } from './soundManager';
+import Settings from './components/Settings';
 
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
@@ -152,6 +153,7 @@ export const App = () => {
         >
           End Turn
         </button>
+        <Settings />
       </div>
 
       <div className="px-6 py-10">
