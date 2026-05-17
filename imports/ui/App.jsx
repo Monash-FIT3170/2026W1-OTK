@@ -3,8 +3,12 @@ import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 import { UserDataCollection } from '../api/user-data/collections/UserDataCollection';
 import CardHand from './cards/CardHand';
-import { EnemyDisplay } from './components/EnemyDisplay';
-import { HealthBar } from './components/HealthBar';
+import { EnemyDisplay } from './components/enemy/EnemyDisplay';
+import { HealthBar } from './components/enemy/HealthBar';
+import { EndTurnButton } from './components/EndTurnButton';
+import { DeckViewer } from './components/DeckViewer';
+import { GameBackground } from './components/GameBackground';
+import { ResultScreen } from './components/ResultScreen';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { soundManager } from './soundManager';
@@ -24,7 +28,9 @@ export const App = () => {
     const dataSub = Meteor.subscribe('userData');
     const loading = !userSub.ready() || !dataSub.ready();
     const user = Meteor.user();
-    const userData = user ? UserDataCollection.findOne({ userId: user._id }) : null;
+    const userData = user
+      ? UserDataCollection.findOne({ userId: user._id })
+      : null;
     return { user, gameState: userData?.gameState ?? null, loading };
   });
 
@@ -93,70 +99,20 @@ export const App = () => {
 
   const { hand, deck, enemy, result } = gameState;
 
-  // --- Victory screen ---
-  if (result === 'win') {
-    return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-6">
-        <h1 className="text-5xl font-bold text-yellow-400">Victory!</h1>
-        <p className="text-slate-300 text-lg">You defeated {enemy.name}!</p>
-        <button
-          className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-lg transition-colors"
-          onClick={() => Meteor.call('game.newGame')}
-        >
-          Play Again
-        </button>
-        <button
-          className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
-          onClick={() => Meteor.logout()}
-        >
-          Log Out
-        </button>
-      </div>
-    );
-  }
-
-  // --- Defeat screen ---
-  if (result === 'loss') {
-    return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-6">
-        <h1 className="text-5xl font-bold text-red-500">Defeated!</h1>
-        <p className="text-slate-300 text-lg">{enemy.name} survived your assault.</p>
-        <button
-          className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-lg transition-colors"
-          onClick={() => Meteor.call('game.newGame')}
-        >
-          Try Again
-        </button>
-        <button
-          className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
-          onClick={() => Meteor.logout()}
-        >
-          Log Out
-        </button>
-      </div>
-    );
+  // --- Victory / Defeat screens ---
+  if (result === 'win' || result === 'loss') {
+    return <ResultScreen result={result} enemyName={enemy.name} />;
   }
 
   // --- Main game screen ---
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-
-      {/* Top bar: deck count, player name, end turn */}
-      <div className="flex justify-between items-center px-6 py-3 bg-slate-800 border-b border-slate-700">
-        <span className="text-slate-300 text-sm font-medium">
-          Deck: <span className="text-white font-bold">{deck.length}</span> cards remaining
-        </span>
-        <span className="text-slate-500 text-sm">{user.username}</span>
-        <button
-          className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
-          onClick={() => Meteor.call('game.endTurn')}
-        >
-          End Turn
-        </button>
+    <GameBackground>
+      {/* Settings pinned to top-right corner */}
+      <div className="absolute top-3 right-4">
         <Settings />
       </div>
 
-      <div className="px-6 py-10">
+      <div className="px-6 py-4 mx-auto w-350">
         <HealthBar
           current={enemy.currentHealth}
           max={enemy.health}
@@ -164,8 +120,7 @@ export const App = () => {
         />
       </div>
 
-
-      {/* Battle area: health bar + enemy sprite */}
+      {/* Enemy display */}
       <div className="flex-1 relative flex flex-col justify-center px-8 py-6">
         <EnemyDisplay
           enemy={enemy}
@@ -174,11 +129,16 @@ export const App = () => {
         />
       </div>
 
-      {/* Card hand at the bottom */}
-      <div className="p-4">
-        <CardHand cards={hand} deckSize={deck.length} />
+      {/* End turn button above card hand, right-aligned */}
+      <div className="flex justify-end px-4 pb-1">
+        <EndTurnButton />
       </div>
 
-    </div>
+      {/* Card hand row: DeckViewer on left, hand on right */}
+      <div className="flex items-end gap-2 p-4 pt-0">
+        <DeckViewer count={deck.length} />
+        <CardHand cards={hand} deckSize={deck.length} />
+      </div>
+    </GameBackground>
   );
 };
