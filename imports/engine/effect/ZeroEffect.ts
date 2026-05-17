@@ -10,3 +10,11 @@ export class ZeroEffect implements Effect {
         if (targetCardIndexes) return;
 
         targetCardIndexes.forEach((id: string) => {
+            const card = engine.hand.find((card) => card.uniqueId === id);
+            if (card) {
+                card.currentCost = 0;
+            }
+        });
+    }
+}
+
