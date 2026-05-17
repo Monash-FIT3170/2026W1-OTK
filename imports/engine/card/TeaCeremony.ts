@@ -7,7 +7,7 @@ export class TeaCeremony extends Card {
     constructor(data?: Partial<cardData>) {
         super({
             cardId: 'tea-ceremony',
-            name: 'tea ceremony+',
+            name: 'Tea Ceremony',
             description: 'Turn two cards in hand to 0.',
             baseCost: 1,
             currentCost: 1,

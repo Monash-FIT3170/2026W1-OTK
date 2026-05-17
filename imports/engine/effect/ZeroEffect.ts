@@ -3,11 +3,11 @@
  */
 
 import { GameEngine } from "../GameEngine";
-import { Effect } from "./effect";
+import { Effect } from "./Effect";
 
 export class ZeroEffect implements Effect {
     resolve(engine: GameEngine, targetCardIndexes?: string[]): void {
-        if (targetCardIndexes) return;
+        if (!targetCardIndexes) return;
 
         targetCardIndexes.forEach((id: string) => {
             const card = engine.hand.find((card) => card.uniqueId === id);
