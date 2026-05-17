@@ -7,8 +7,9 @@ export function SelectionPanel({
   onDeselectCard,
   onConfirm,
 }) {
-  const { min, max: rawMax } = pendingSelection.cardAmountToSelect;
+  const { min: rawMin, max: rawMax } = pendingSelection.cardAmountToSelect;
   const max = Math.min(rawMax, availableCount);
+  const min = Math.min(rawMin, availableCount);
   const playedCard = pendingSelection.card;
   const numCards = selectedTargets.length;
 
