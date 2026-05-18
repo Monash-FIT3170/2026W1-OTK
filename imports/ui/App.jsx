@@ -9,10 +9,10 @@ import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
+import { SaveGameButton } from './components/SaveGameButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
-import { SaveGameButton } from './components/SaveGameButton';
-import { GameBackground } from './components/GameBackground';
+
 import { soundManager } from './soundManager';
 import Settings from './components/Settings';
 
@@ -100,20 +100,6 @@ export const App = () => {
   }
 
   const { hand, deck, enemy, result, scene } = gameState;
-  /**
-   * Saves the current GameState to the database.
-   */
-  const handleSaveGame = () => {
-    Meteor.call('userData.saveGameState', { gameState }, (error) => {
-      if (error) {
-        console.error('Save game failed:', error);
-        alert(error.reason || 'Failed to save game.');
-        return;
-      }
-
-      alert('Game saved successfully.');
-    });
-  };
 
   // --- Victory / Defeat screens ---
   if (result === 'win' || result === 'loss') {
@@ -125,7 +111,7 @@ export const App = () => {
     <GameBackground>
       {/* Settings pinned to top-right corner */}
       <div className="absolute top-3 right-4">
-        <Settings />
+        <Settings saveButton={<SaveGameButton gameState={gameState} />} />
       </div>
 
       <div className="px-6 py-4 mx-auto w-350">

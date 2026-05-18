@@ -51,9 +51,9 @@ export function SelectionPanel({
           <div className="flex ml-5">
             <button
               type="button"
-              className="text-body bg-neutral-secondary-medium box-border border border-default-medium 
-            hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium 
-            leading-5 rounded-full text-sm px-4 py-1.5 focus:outline-none disabled:bg-gray-400"
+              className="bg-white text-gray-900 box-border border border-gray-400
+            hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 shadow-xs font-semibold
+            leading-5 rounded-full text-sm px-4 py-1.5 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
               disabled={!isValidSelection}
               onClick={onConfirm}
             >

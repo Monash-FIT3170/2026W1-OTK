@@ -18,7 +18,7 @@ export function SaveGameButton({ gameState }) {
     return (
         <div>
             <button
-                className="px-4 py-1.5 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg text-sm transition-colors"
+                className="px-6 py-2.5 bg-green-800 hover:bg-green-700 text-white font-semibold rounded-lg text-lg transition-colors"
                 onClick={handleSaveGame}
             >
                 Save Game
