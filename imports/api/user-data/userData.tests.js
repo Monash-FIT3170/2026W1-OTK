@@ -159,6 +159,8 @@ if (Meteor.isServer) {
 
     assert.equal(userData.gameState.runStatus, 'ACTIVE');
 
+    assert.equal(userData.gameState.scene, "underpass")
+
     assert.exists(userData.gameState.updatedAt);
   });
 
@@ -190,6 +192,8 @@ if (Meteor.isServer) {
 
       runTime: 120,
 
+      scene: "red-underpass",
+
       runStatus: 'ACTIVE',
     };
 
@@ -218,6 +222,8 @@ if (Meteor.isServer) {
       userData.gameState.currentDiscardedCardPile[0].cardId,
       'block'
     );
+
+    assert.equal(userData.gameState.scene, "red-underpass")
 
     assert.exists(userData.gameState.updatedAt);
   });

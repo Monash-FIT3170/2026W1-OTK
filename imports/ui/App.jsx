@@ -8,6 +8,8 @@ import { EnemyDisplay } from './components/EnemyDisplay';
 import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
+import { SaveGameButton } from './components/SaveGameButton';
+import { GameBackground } from './components/GameBackground';
 import { soundManager } from './soundManager';
 import Settings from './components/Settings';
 
@@ -92,7 +94,21 @@ export const App = () => {
     );
   }
 
-  const { hand, deck, enemy, result } = gameState;
+  const { hand, deck, enemy, result, scene } = gameState;
+  /**
+   * Saves the current GameState to the database.
+   */
+  const handleSaveGame = () => {
+    Meteor.call('userData.saveGameState', { gameState }, (error) => {
+      if (error) {
+        console.error('Save game failed:', error);
+        alert(error.reason || 'Failed to save game.');
+        return;
+      }
+
+      alert('Game saved successfully.');
+    });
+  };
 
   // --- Victory screen ---
   if (result === 'win') {
@@ -140,7 +156,8 @@ export const App = () => {
 
   // --- Main game screen ---
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    //TODO: refactor to grab the bg from gamestate
+    <GameBackground backgroundScene={scene}> 
 
       {/* Top bar: deck count, player name, end turn */}
       <div className="flex justify-between items-center px-6 py-3 bg-slate-800 border-b border-slate-700">
@@ -151,13 +168,16 @@ export const App = () => {
           <DeckViewer cards={deck} />
         </div>
         <span className="text-slate-500 text-sm">{user.username}</span>
-        <button
-          className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
-          onClick={() => Meteor.call('game.endTurn')}
-        >
-          End Turn
-        </button>
-        <Settings />
+        <div className="flex gap-2">
+          <SaveGameButton gameState={gameState} />
+          <button
+            className="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-sm transition-colors"
+            onClick={() => Meteor.call('game.endTurn')}
+          >
+            End Turn
+          </button>
+          <Settings />
+        </div>
       </div>
 
       <div className="px-6 py-10">
@@ -183,6 +203,6 @@ export const App = () => {
         <CardHand cards={hand} deckSize={deck.length} />
       </div>
 
-    </div>
+    </GameBackground>
   );
 };
