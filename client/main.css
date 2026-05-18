@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@plugin "daisyui" {
+  themes: light --default;
+}
 
 body {
   font-family: 'Inter', sans-serif;

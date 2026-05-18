@@ -1,22 +1,45 @@
 // DraggableCard.jsx
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useMotionValue, animate } from 'motion/react';
-import  Card from './Card';
+import Card from './Card';
+import { soundManager } from '../soundManager';
 
-export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay, draggable = true }) {
+export function DraggableCard({
+  cardProps,
+  marginLeft,
+  onClick,
+  handRef,
+  onPlay,
+  isInSelectionMode = false,
+  affordable = true,
+}) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragStart = () => setIsDragging(true);
 
   const handleDragEnd = () => {
-      if (isOutsideHand()) {
-        onPlay(cardProps.uniqueId);
-      }
-      // Animate back to origin
-      animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
-      animate(y, 0, { type: 'spring', stiffness: 300, damping: 20 });
-    };
+    if (isOutsideHand() && affordable) {
+      onPlay(cardProps.uniqueId);
+    }
+    // Animate back to origin, then re-enable card hover/tap animations
+    animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
+    animate(y, 0, {
+      type: 'spring',
+      stiffness: 300,
+      damping: 20,
+      onComplete: () => setIsDragging(false),
+    });
+  };
 
   const cardRef = useRef(null);
+
+  const drawAnimation = {
+    initial: { y: 80, opacity: 0 },
+    animate: { y: 0, opacity: !affordable && !isInSelectionMode ? 0.4 : 1 },
+    transition: { type: 'spring', stiffness: 300, damping: 20 },
+  };
 
   const isOutsideHand = () => {
     if (!handRef?.current || !cardRef?.current) return false;
@@ -28,13 +51,20 @@ export function DraggableCard({ cardProps, marginLeft, onClick, handRef, onPlay,
   return (
     <motion.div
       ref={cardRef}
-      style={{ marginLeft, x, y }}
+      {...drawAnimation}
+      style={{
+        marginLeft,
+        x,
+        y,
+      }}
       onClick={onClick}
-      drag={draggable}
+      onHoverStart={() => !isDragging && soundManager.playCardHover()}
+      drag={!isInSelectionMode}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       dragMomentum={false}
     >
-      <Card cardProps={cardProps} />
+      <Card cardProps={cardProps} isDragging={isDragging} />
     </motion.div>
   );
 }

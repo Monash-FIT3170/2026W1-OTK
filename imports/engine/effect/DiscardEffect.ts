@@ -7,11 +7,11 @@ import { Card } from "../card/Card";
 
 export class DiscardEffect implements Effect {
 
-    resolve(engine: GameEngine, targetCardIds?: string[]) {
-        if (!targetCardIds) return;
+    resolve(engine: GameEngine, targetCardIndexes?: string[]) {
+        if (!targetCardIndexes) return;
 
         const cardsToDiscard: Card[] = [];
-        targetCardIds.forEach((id: string) => {
+        targetCardIndexes.forEach((id: string) => {
             const card = engine.hand.find((card: Card) => card.uniqueId === id);
             if (card) {
                 cardsToDiscard.push(card);

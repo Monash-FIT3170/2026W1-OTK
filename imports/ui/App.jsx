@@ -8,6 +8,8 @@ import { EnemyDisplay } from './components/EnemyDisplay';
 import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
+import { soundManager } from './soundManager';
+import Settings from './components/Settings';
 
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
@@ -46,6 +48,18 @@ export const App = () => {
       });
     }
   }, [loading, user, gameState]);
+
+  // Start background music when the game is active; stop on result
+  useEffect(() => {
+    if (!gameState) return;
+    if (!gameState.result) {
+      soundManager.playBackgroundMusic('spark-mandrill');
+    } else {
+      soundManager.stopMusic();
+      if (gameState.result === 'win') soundManager.playStageClear();
+      if (gameState.result === 'loss') soundManager.playGameOver();
+    }
+  }, [gameState?.result]);
 
   // --- Loading state ---
   if (loading) {
@@ -143,6 +157,7 @@ export const App = () => {
         >
           End Turn
         </button>
+        <Settings />
       </div>
 
       <div className="px-6 py-10">
@@ -165,7 +180,7 @@ export const App = () => {
 
       {/* Card hand at the bottom */}
       <div className="p-4">
-        <CardHand cards={hand} />
+        <CardHand cards={hand} deckSize={deck.length} />
       </div>
 
     </div>
