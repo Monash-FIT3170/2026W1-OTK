@@ -20,20 +20,8 @@ export const EntryAnimations = {
 }
 
 export const HitAnimations = {
-  shake: {
-    keyframes: { x: [0, -20, 20, -20, 20, 0] },
-    options: { duration: 0.4, ease: 'easeInOut' }
-  },
-  flash: {
-    keyframes: { opacity: [1, 0, 1, 0, 1] },
-    options: { duration: 0.4, ease: 'easeInOut' }
-  },
-  bounce: {
-    keyframes: { y: [0, -30, 0, -15, 0] },
-    options: { duration: 0.5, ease: 'easeInOut' }
-  },
-  squish: {
-  keyframes: { scaleY: [1, 0.7, 1], y: [0, 30, 0] },
-  options: { duration: 0.25, ease: 'easeInOut' }
+  knockback: {
+    keyframes: { x: [0, 30, 0] }, 
+    options: { duration: 0.8, ease: 'easeOut' }
   }
 }
