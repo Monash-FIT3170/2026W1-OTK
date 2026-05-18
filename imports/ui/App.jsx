@@ -3,12 +3,15 @@ import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 import { UserDataCollection } from '../api/user-data/collections/UserDataCollection';
 import CardHand from './cards/CardHand';
+import { DeckViewer } from './cards/DeckViewer';
 import { EnemyDisplay } from './components/EnemyDisplay';
 import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { SaveGameButton } from './components/SaveGameButton';
 import { GameBackground } from './components/GameBackground';
+import { soundManager } from './soundManager';
+import Settings from './components/Settings';
 
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
@@ -47,6 +50,18 @@ export const App = () => {
       });
     }
   }, [loading, user, gameState]);
+
+  // Start background music when the game is active; stop on result
+  useEffect(() => {
+    if (!gameState) return;
+    if (!gameState.result) {
+      soundManager.playBackgroundMusic('spark-mandrill');
+    } else {
+      soundManager.stopMusic();
+      if (gameState.result === 'win') soundManager.playStageClear();
+      if (gameState.result === 'loss') soundManager.playGameOver();
+    }
+  }, [gameState?.result]);
 
   // --- Loading state ---
   if (loading) {
@@ -146,9 +161,12 @@ export const App = () => {
 
       {/* Top bar: deck count, player name, end turn */}
       <div className="flex justify-between items-center px-6 py-3 bg-slate-800 border-b border-slate-700">
-        <span className="text-slate-300 text-sm font-medium">
-          Deck: <span className="text-white font-bold">{deck.length}</span> cards remaining
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-slate-300 text-sm font-medium">
+            Deck: <span className="text-white font-bold">{deck.length}</span> cards remaining
+          </span>
+          <DeckViewer cards={deck} />
+        </div>
         <span className="text-slate-500 text-sm">{user.username}</span>
         <div className="flex gap-2">
           <SaveGameButton gameState={gameState} />
@@ -158,6 +176,7 @@ export const App = () => {
           >
             End Turn
           </button>
+          <Settings />
         </div>
       </div>
 
@@ -181,7 +200,7 @@ export const App = () => {
 
       {/* Card hand at the bottom */}
       <div className="p-4">
-        <CardHand cards={hand} />
+        <CardHand cards={hand} deckSize={deck.length} />
       </div>
 
     </GameBackground>

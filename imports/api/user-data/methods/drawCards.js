@@ -25,6 +25,19 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
-    return engine.drawCost(uniqueCardId);
+
+    const card = engine.getCard(uniqueCardId);
+    if (card.currentCost > engine.deck.length) {
+      throw new Meteor.Error('game.drawCards.notEnoughCards', 'Not enough cards in deck to play this card.');
+    }
+
+    const result = engine.drawCost(uniqueCardId);
+
+    await UserDataCollection.updateAsync(
+      { userId: this.userId },
+      { $set: { gameState: engine.toJSON() } }
+    );
+
+    return result;
   },
 });

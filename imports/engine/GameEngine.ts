@@ -31,28 +31,29 @@ export class GameEngine {
     this.stage = userData.stage;
   }
 
-  // checks if card selected requires other cards to be selected
+  // draws cards equal to the card's cost into hand, returns selection info
   drawCost(uniqueId: string): {
     requiresSelection: boolean;
     cardAmountToSelect?: { min: number; max: number };
   } {
     const card = this.getCard(uniqueId);
+
+    this.draw(card.currentCost);
+
     if (card.cardAmountToSelect) {
-      return { requiresSelection: true, cardAmountToSelect: card.cardAmountToSelect };
+      return {
+        requiresSelection: true,
+        cardAmountToSelect: card.cardAmountToSelect,
+      };
     }
     return { requiresSelection: false };
   }
 
-  // executes card: runs its effects, removes it from hand, then draws cost cards from deck
+  // removes card from hand and executes its effect
   executeCard(uniqueId: string, selectedCardIds: string[] = []): void {
     const card = this.getCard(uniqueId);
-    const drawCount = card.currentCost;
-
-    card.execute(this, selectedCardIds);
     this.removeFromHand(uniqueId);
-
-    const drawn = this.deck.splice(0, drawCount);
-    this.hand.push(...drawn);
+    card.execute(this, selectedCardIds);
   }
 
   isEnemyDefeated(): boolean {
@@ -60,7 +61,7 @@ export class GameEngine {
   }
 
   hasPlayableCards(): boolean {
-    return this.hand.length > 0;
+    return this.hand.some((card) => card.currentCost <= this.deck.length);
   }
 
   static newGame(userId: string): UserData {
@@ -72,21 +73,30 @@ export class GameEngine {
     const userData: UserData = { userId, stage, deck, hand: [], enemy, scene };
 
     const engine = new GameEngine(userData);
-    engine.initialDraw();
+    engine.shuffle();
+    engine.draw();
     return engine.toJSON();
   }
 
   // ------------------
   //  helper functions
   // ------------------
-  initialDraw(n: number = 5): void {
+  shuffle(): void {
+    for (let i = this.deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+    }
+  }
+
+  draw(n: number = 5): void {
     const drawn = this.deck.splice(0, n);
     this.hand.push(...drawn);
   }
 
   getCard(uniqueId: string): Card {
     const card = this.hand.find((c) => c.uniqueId === uniqueId);
-    if (!card) throw new Error(`Card with uniqueId "${uniqueId}" not found in hand`);
+    if (!card)
+      throw new Error(`Card with uniqueId "${uniqueId}" not found in hand`);
     return card;
   }
 

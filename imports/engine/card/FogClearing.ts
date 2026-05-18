@@ -12,7 +12,7 @@ export class FogClearing extends Card {
     super({
       cardId: 'fog-clearing',
       name: 'Fog Clearing',
-      description: '',
+      description: 'Deal 12 damage.',
       baseCost: 2,
       currentCost: 2,
       baseAttack: 12,

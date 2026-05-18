@@ -1,7 +1,15 @@
 import Card from './Card';
 
-export function SelectionPanel({ pendingSelection, selectedTargets, onDeselectCard, onConfirm }) {
-  const { min, max } = pendingSelection.cardAmountToSelect;
+export function SelectionPanel({
+  pendingSelection,
+  selectedTargets,
+  availableCount,
+  onDeselectCard,
+  onConfirm,
+}) {
+  const { min: rawMin, max: rawMax } = pendingSelection.cardAmountToSelect;
+  const max = Math.min(rawMax, availableCount);
+  const min = Math.min(rawMin, availableCount);
   const playedCard = pendingSelection.card;
   const numCards = selectedTargets.length;
 
@@ -35,7 +43,10 @@ export function SelectionPanel({ pendingSelection, selectedTargets, onDeselectCa
         </div>
         <div className="flex flex-row justify-center m-2">
           <div className="flex mt-1">
-            <p>Select {min} to {max} cards</p>
+            <p>
+              Select {min === max ? min : `${min} to ${max}`} card
+              {max !== 1 ? 's' : ''}
+            </p>
           </div>
           <div className="flex ml-5">
             <button
