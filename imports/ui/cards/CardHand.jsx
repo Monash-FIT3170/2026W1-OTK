@@ -18,8 +18,8 @@ export default function CardHand({ cards, deckSize }) {
   );
 
   const numCards = hand.length;
-  const cardWidth = 176;
-  const containerWidth = 1880; // design canvas width (1920) minus padding
+  const cardWidth = 300;
+  const containerWidth = 1800; // design canvas width (1920) minus padding
   const marginLeft =
     numCards > 1
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
@@ -57,17 +57,21 @@ export default function CardHand({ cards, deckSize }) {
   return (
     <div className="flex flex-col w-full">
       {pendingSelection && (
-        <SelectionPanel
-          pendingSelection={pendingSelection}
-          selectedTargets={selectedTargets}
-          availableCount={hand.length + selectedTargets.length}
-          onDeselectCard={(card) => {
-            setSelectedTargets((prev) =>
-              prev.filter((c) => c.uniqueId !== card.uniqueId)
-            );
-          }}
-          onConfirm={onConfirm}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center pb-90 pointer-events-none">
+          <div className="pointer-events-auto">
+          <SelectionPanel
+            pendingSelection={pendingSelection}
+            selectedTargets={selectedTargets}
+            availableCount={hand.length + selectedTargets.length}
+            onDeselectCard={(card) => {
+              setSelectedTargets((prev) =>
+                prev.filter((c) => c.uniqueId !== card.uniqueId)
+              );
+            }}
+            onConfirm={onConfirm}
+          />
+          </div>
+        </div>
       )}
       <div
         ref={handRef}

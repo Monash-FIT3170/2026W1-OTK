@@ -1,5 +1,7 @@
 import Card from './Card';
 
+const CARD_SCALE = 0.85;
+
 export function SelectionPanel({
   pendingSelection,
   selectedTargets,
@@ -11,56 +13,56 @@ export function SelectionPanel({
   const max = Math.min(rawMax, availableCount);
   const min = Math.min(rawMin, availableCount);
   const playedCard = pendingSelection.card;
-  const numCards = selectedTargets.length;
 
-  const cardWidth = 176;
-  const containerWidth = (window.innerWidth * 8) / 10 - 40;
-  const marginLeft =
-    numCards > 1
-      ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
-      : 0;
-
-  const isValidSelection = numCards >= min && numCards <= max;
+  const isValidSelection =
+    selectedTargets.length >= min && selectedTargets.length <= max;
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="flex flex-col justify-center w-1/2">
-        <p className="flex justify-center mb-1">Select cards</p>
-        <div className="flex flex-row">
-          <div className="flex min-h-70 justify-center p-5 w-4/10">
-            <Card cardProps={playedCard} />
-          </div>
-          <div className="flex flex-row justify-center overflow-x-hidden overflow-y-hidden border rounded-xl p-5 bg-gray-70 w-8/10">
-            {selectedTargets.map((card, idx) => (
-              <div key={card.uniqueId} onClick={() => onDeselectCard(card)}>
-                <Card
-                  style={{ marginLeft: idx !== 0 ? `${marginLeft}px` : '0px' }}
-                  cardProps={card}
-                />
+    <div className="flex flex-row gap-0 items-center justify-center w-full h-full">
+      {/* Left: played card, fixed position */}
+      
+        <Card cardProps={playedCard} scale={CARD_SCALE} />
+
+      {/* Right: selection slots + confirm */}
+      <div className="flex flex-col items-center justify-center gap-4 pl-6">
+        <p className="text-white text-sm">
+          Select {min === max ? min : `${min}–${max}`} card
+          {max !== 1 ? 's' : ''}
+        </p>
+        <div className="flex flex-row gap-4">
+          {Array.from({ length: max }).map((_, idx) => {
+            const card = selectedTargets[idx];
+            return (
+              <div key={card?.uniqueId ?? idx} className="relative inline-block">
+                {/* Invisible card establishes the natural slot size */}
+                <div className="invisible">
+                  <Card cardProps={playedCard} scale={CARD_SCALE} />
+                </div>
+                {/* Overlay: card on top, or empty slot styling */}
+                {card ? (
+                  <div
+                    className="absolute inset-0 cursor-pointer overflow-hidden"
+                    onClick={() => onDeselectCard(card)}
+                  >
+                    <Card cardProps={card} scale={CARD_SCALE} />
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 rounded-xl border-2 border-dashed border-white/40 bg-white/10" />
+                )}
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
-        <div className="flex flex-row justify-center m-2">
-          <div className="flex mt-1">
-            <p>
-              Select {min === max ? min : `${min} to ${max}`} card
-              {max !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <div className="flex ml-5">
-            <button
-              type="button"
-              className="bg-white text-gray-900 box-border border border-gray-400
-            hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 shadow-xs font-semibold
-            leading-5 rounded-full text-sm px-4 py-1.5 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
-              disabled={!isValidSelection}
-              onClick={onConfirm}
-            >
-              ok
-            </button>
-          </div>
-        </div>
+        <button
+          type="button"
+          className="bg-white text-gray-900 border border-gray-400 hover:bg-gray-100
+            focus:ring-4 focus:ring-gray-300 font-semibold rounded-full text-sm
+            px-6 py-2 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={!isValidSelection}
+          onClick={onConfirm}
+        >
+          ok
+        </button>
       </div>
     </div>
   );
