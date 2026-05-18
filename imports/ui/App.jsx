@@ -108,7 +108,7 @@ export const App = () => {
 
   // --- Main game screen ---
   return (
-    <GameBackground>
+    <GameBackground backgroundScene={scene}>
       {/* Settings pinned to top-right corner */}
       <div className="absolute top-3 right-4">
         <Settings saveButton={<SaveGameButton gameState={gameState} />} />
