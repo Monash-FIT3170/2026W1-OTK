@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Card from './Card';
+import Card from '../cards/Card';
 
 export function DeckViewer({ cards }) {
   const [isOpen, setIsOpen] = useState(false);    //This ensures that the View Deck button is only visible if it's not already currently open
