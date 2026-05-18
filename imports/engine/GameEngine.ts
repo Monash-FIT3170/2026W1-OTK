@@ -13,7 +13,7 @@ const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
 };
 
 const SCENE_LOOKUP: { [stage: number]: string } = {
-  1: 'underpass',
+  1: 'underpass-overlaid',
 };
 
 export class GameEngine {
