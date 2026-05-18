@@ -5,7 +5,7 @@ import { useRef, useEffect, useState } from 'react';
 const DESIGN_WIDTH = 1920;
 const DESIGN_HEIGHT = 1080;
 
-export function GameBackground({ children }) {
+export function GameBackground({backgroundScene, children }) {
   const containerRef = useRef(null);
   const [scale, setScale] = useState(1);
 
@@ -29,7 +29,7 @@ export function GameBackground({ children }) {
         style={{ width: 'min(100vw, 177.78vh)', height: 'min(100vh, 56.25vw)' }}
       >
         <img
-          src="/assets/environments/underpass-background.png"
+          src={`/assets/environments/${backgroundScene}-background.png`}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
