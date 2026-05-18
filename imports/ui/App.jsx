@@ -9,6 +9,7 @@ import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
+import { PlayerDisplay } from './components/PlayerDisplay';
 import { SaveGameButton } from './components/SaveGameButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
@@ -124,6 +125,7 @@ export const App = () => {
 
       {/* Enemy display */}
       <div className="flex-1 relative flex flex-col justify-center px-8 py-6">
+        <PlayerDisplay />
         <EnemyDisplay
           enemy={enemy}
           isVisible={true}
