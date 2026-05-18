@@ -1,22 +1,43 @@
 import React from 'react';
-import { motion } from 'motion/react';
 
-
-function Card({ cardProps, isDragging = false }) {
-
-
+function Card({ cardProps, scale = 1 }) {
   return (
-    <img
-      draggable={false}
-      src={`/assets/sprites/cards/${cardProps.cardId}.png`}
-      alt={cardProps.name}
-      onError={(e) => { e.target.src = '/assets/sprites/cards/placeholder-card.png'; }}
-    />
+    <div style={{ zoom: scale, display: 'inline-block' }}>
+      <div
+        style={{ fontFamily: '"Micro 5", monospace' }}
+        className="relative inline-block"
+      >
+        <img
+          draggable={false}
+          src={`/assets/sprites/cards/${cardProps.cardId}.png`}
+          alt={cardProps.name}
+          width={300}
+          onError={(e) => {
+            e.target.src = '/assets/sprites/cards/placeholder-card.png';
+          }}
+        />
+
+        {/*Cost + Attack*/}
+        <div className="absolute top-9 left-11.5 -translate-x-1/2 text-[2.1rem] text-white">
+          {cardProps.currentCost}
+        </div>
+        <div className="absolute top-31 left-11.5 -translate-x-1/2 text-[2.1rem] text-white">
+          {cardProps.currentAttack}
+        </div>
+        {/*Name*/}
+        <div className="absolute top-4 left-12 right-2 text-center text-[2.3rem] text-white">
+          {cardProps.name}
+        </div>
+        {/*Description*/}
+        <div className="absolute top-66 left-20 right-10 text-center text-[1.7rem] text-white leading-none">
+          {cardProps.description}
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default Card;
-
 
 // import React from 'react';
 // import { motion } from 'motion/react';
@@ -46,7 +67,7 @@ export default Card;
 //         className="flex flex-col gap-2 bg-slate-400 rounded-xl shadow-md p-2 box-border border-slate-600 border-1"
 //       >
 //         <div
-//           className="flex flex-2/12 min-h-5 justify-center box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono 
+//           className="flex flex-2/12 min-h-5 justify-center box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono
 //         font-semibold tracking-wide text-ellipsis overflow-y-clip min-w-0"
 //         >
 //           {cardProps.name}
@@ -71,7 +92,7 @@ export default Card;
 //           </div>
 //         </div>
 //         <div
-//           className="flex flex-7/10 min-h-20 box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono 
+//           className="flex flex-7/10 min-h-20 box-border border-1 bg-slate-300 box-border border-slate-600 border-1 font-mono
 //         tracking-tighter text-ellipsis overflow-y-clip text-sm grow-3"
 //         >
 //           <p className="ml-1 mt-1">{cardProps.description}</p>

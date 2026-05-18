@@ -43,11 +43,12 @@ export function DraggableCard({
       initial={{ y: 80, opacity: 0 }}
       animate={{ y: 0, opacity: !affordable && !isInSelectionMode ? 0.4 : 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      style={{ marginLeft }}
+      style={{ marginLeft, flexShrink: 0 }}
     >
       <motion.div
         ref={cardRef}
         style={{ x, y }}
+        whileHover={!isDragging ? { scale: 1.1 } : {}}
         onClick={onClick}
         onHoverStart={() => !isDragging && soundManager.playCardHover()}
         drag={!isInSelectionMode}
@@ -56,7 +57,7 @@ export function DraggableCard({
         dragMomentum={false}
         dragElastic={0}
       >
-        <Card cardProps={cardProps} isDragging={isDragging} />
+        <Card cardProps={cardProps} />
       </motion.div>
     </motion.div>
   );
