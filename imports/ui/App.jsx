@@ -5,6 +5,7 @@ import { UserDataCollection } from '../api/user-data/collections/UserDataCollect
 import CardHand from './cards/CardHand';
 import { DeckViewer } from './cards/DeckViewer';
 import { EnemyDisplay } from './components/EnemyDisplay';
+import { PlayerDisplay } from './components/PlayerDisplay';
 import { HealthBar } from './components/HealthBar';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
@@ -191,6 +192,7 @@ export const App = () => {
 
       {/* Battle area: health bar + enemy sprite */}
       <div className="flex-1 relative flex flex-col justify-center px-8 py-6">
+        <PlayerDisplay />
         <EnemyDisplay
           enemy={enemy}
           isVisible={true}
