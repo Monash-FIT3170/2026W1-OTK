@@ -1,4 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
+import { motion, useMotionValue } from 'motion/react';
 
 // All game components are authored against this resolution.
 // Child components use fixed px values; the scale transform handles the rest.
@@ -7,13 +8,13 @@ const DESIGN_HEIGHT = 1080;
 
 export function GameBackground({ children }) {
   const containerRef = useRef(null);
-  const [scale, setScale] = useState(1);
+  const scale = useMotionValue(1);
 
   // Recompute scale whenever the window resizes (aspect ratio stays at 16:9)
   useEffect(() => {
     const updateScale = () => {
       if (containerRef.current) {
-        setScale(containerRef.current.offsetWidth / DESIGN_WIDTH);
+        scale.set(containerRef.current.offsetWidth / DESIGN_WIDTH);
       }
     };
     updateScale();
@@ -36,17 +37,17 @@ export function GameBackground({ children }) {
           style={{ imageRendering: 'pixelated' }}
         />
         {/* Content canvas: authored at 1920x1080, scaled down to fit the container */}
-        <div
+        <motion.div
           className="relative flex flex-col"
           style={{
             width: DESIGN_WIDTH,
             height: DESIGN_HEIGHT,
-            transform: `scale(${scale})`,
+            scale,
             transformOrigin: 'top left',
           }}
         >
           {children}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
