@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 
-const CARD_WIDTH = 160; // px
-const CARD_HEIGHT = 224; // px
+const CARD_WIDTH = 160;
+const CARD_HEIGHT = 224;
 
 function Card({ cardProps, isDragging = false }) {
   const costFontColour =

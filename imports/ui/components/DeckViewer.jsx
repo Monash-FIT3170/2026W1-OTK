@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Card from './Card';
+import Card from '../cards/Card';
 
 export function DeckViewer({ cards }) {
   const [isOpen, setIsOpen] = useState(false);    //This ensures that the View Deck button is only visible if it's not already currently open
@@ -33,7 +33,7 @@ export function DeckViewer({ cards }) {
         className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-sm transition-colors border border-slate-600"
         onClick={() => setIsOpen(true)}
       >
-        View Deck
+        Deck: {rawDeckCards.length}
       </button>
 
       {isOpen && (

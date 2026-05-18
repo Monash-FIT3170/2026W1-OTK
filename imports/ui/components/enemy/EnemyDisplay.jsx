@@ -2,7 +2,6 @@ import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 
-
 /**
  * Displays an enemy with entrance, exit, and damage animations.
  * The image used must be named in the format: [enemy-name]-enemy.png and placed in the /assets/sprites/enemies/ directory.
@@ -14,7 +13,12 @@ import { EntryAnimations, HitAnimations } from './EnemyAnimations';
  * @param {boolean} isTakingDamage - When toggled to true, triggers a shake animation
  *
  */
-export function EnemyDisplay({ enemy, isVisible, isTakingDamage, _useAnimate = useAnimate }) {
+export function EnemyDisplay({
+  enemy,
+  isVisible,
+  isTakingDamage,
+  _useAnimate = useAnimate,
+}) {
   const [scope, animate] = _useAnimate();
 
   // Used to swap out the hit sprite when taking damage. Resets to normal sprite after animation completes.
@@ -25,18 +29,31 @@ export function EnemyDisplay({ enemy, isVisible, isTakingDamage, _useAnimate = u
     if (isTakingDamage) {
       setIsHit(true);
       // Read animation name from plain data property (set by Enemy subclass constructor)
-      const { keyframes, options } = HitAnimations[enemy.hitAnimation] ?? HitAnimations.shake;
+      const { keyframes, options } =
+        HitAnimations[enemy.hitAnimation] ?? HitAnimations.shake;
       animate(scope.current, keyframes, options).then(() => setIsHit(false)); // Reset hit state after animation completes
     }
   }, [isTakingDamage]);
 
-  const { initial, animate: animateProps, exit, transition } = EntryAnimations[enemy.entryAnimation] ?? EntryAnimations.fade;
+  const {
+    initial,
+    animate: animateProps,
+    exit,
+    transition,
+  } = EntryAnimations[enemy.entryAnimation] ?? EntryAnimations.fade;
 
   return (
     <AnimatePresence>
       {isVisible && (
         // Renders the Enemy on the right side of the screen, centered vertically
-        <div style={{ position: 'absolute', left: '75%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+        <div
+          style={{
+            position: 'absolute',
+            left: '75%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
           <motion.div
             ref={scope}
             key={enemy.enemyId}
@@ -45,11 +62,10 @@ export function EnemyDisplay({ enemy, isVisible, isTakingDamage, _useAnimate = u
             exit={exit}
             transition={transition}
           >
-            <img 
+            <img
               src={`/assets/sprites/enemies/${enemy.name.toLowerCase()}-enemy${isHit ? '-hit' : ''}.png`}
               alt={enemy.name}
               style={{ width: '150px', height: '150px' }}
-
               // Triggers when the hit sprite fails to load (e.g. missing file), falls back to normal sprite
               onError={(e) => {
                 e.target.src = `/assets/sprites/enemies/${enemy.name.toLowerCase()}-enemy.png`;

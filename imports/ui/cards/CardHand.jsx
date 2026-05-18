@@ -19,7 +19,7 @@ export default function CardHand({ cards, deckSize }) {
 
   const numCards = hand.length;
   const cardWidth = 176;
-  const containerWidth = window.innerWidth - 40;
+  const containerWidth = 1880; // design canvas width (1920) minus padding
   const marginLeft =
     numCards > 1
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
@@ -71,7 +71,7 @@ export default function CardHand({ cards, deckSize }) {
       )}
       <div
         ref={handRef}
-        className="flex flex-row border rounded-xl p-5 bg-amber-50 min-h-70 w-full"
+        className="flex flex-row border rounded-xl p-5 bg-amber-50/80 min-h-70 w-full"
       >
         <div className="flex flex-row justify-center w-full">
           {[...hand].reverse().map((card, idx) => (

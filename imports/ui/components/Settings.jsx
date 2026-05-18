@@ -46,7 +46,7 @@ const VolumeRow = ({
   );
 };
 
-const Settings = () => {
+const Settings = ({ saveButton }) => {
   return (
     <>
       {/* Settings gear button — opens the modal */}
@@ -107,6 +107,8 @@ const Settings = () => {
               onMuteChange={(muted) => soundManager.setSfxMuted(muted)}
             />
           </div>
+
+          {saveButton && <div className="mt-6">{saveButton}</div>}
         </div>
 
         {/* Click outside to close */}
