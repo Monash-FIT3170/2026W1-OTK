@@ -30,7 +30,7 @@ export function EnemyDisplay({
       setIsHit(true);
       // Read animation name from plain data property (set by Enemy subclass constructor)
       const { keyframes, options } =
-        HitAnimations[enemy.hitAnimation] ?? HitAnimations.shake;
+        HitAnimations[enemy.hitAnimation] ?? HitAnimations.knockback;
       animate(scope.current, keyframes, options).then(() => setIsHit(false)); // Reset hit state after animation completes
     }
   }, [isTakingDamage]);
@@ -63,7 +63,7 @@ export function EnemyDisplay({
             transition={transition}
           >
             <img
-              src={`/assets/sprites/enemies/${enemy.name.toLowerCase()}-enemy${isHit ? '-hit' : ''}.png`}
+              src={`/assets/sprites/enemies/${enemy.name.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
               alt={enemy.name}
               style={{ width: '150px', height: '150px' }}
               // Triggers when the hit sprite fails to load (e.g. missing file), falls back to normal sprite
