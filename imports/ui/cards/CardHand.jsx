@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { usePlayCard } from '../hooks/usePlayCard';
 import { SelectionPanel } from './SelectionPanel';
 import { DraggableCard } from './DraggableCard';
+import Card from './Card';
 
 export default function CardHand({ cards, deckSize }) {
   const [selectedTargets, setSelectedTargets] = useState([]);
@@ -59,17 +60,17 @@ export default function CardHand({ cards, deckSize }) {
       {pendingSelection && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pb-90 pointer-events-none">
           <div className="pointer-events-auto">
-          <SelectionPanel
-            pendingSelection={pendingSelection}
-            selectedTargets={selectedTargets}
-            availableCount={hand.length + selectedTargets.length}
-            onDeselectCard={(card) => {
-              setSelectedTargets((prev) =>
-                prev.filter((c) => c.uniqueId !== card.uniqueId)
-              );
-            }}
-            onConfirm={onConfirm}
-          />
+            <SelectionPanel
+              pendingSelection={pendingSelection}
+              selectedTargets={selectedTargets}
+              availableCount={hand.length + selectedTargets.length}
+              onDeselectCard={(card) => {
+                setSelectedTargets((prev) =>
+                  prev.filter((c) => c.uniqueId !== card.uniqueId)
+                );
+              }}
+              onConfirm={onConfirm}
+            />
           </div>
         </div>
       )}
@@ -78,6 +79,21 @@ export default function CardHand({ cards, deckSize }) {
         className="flex flex-row border rounded-xl p-5 bg-amber-50/80 min-h-70 w-full"
       >
         <div className="flex flex-row justify-center w-full">
+          {hand.length === 0 && (
+            <div className="invisible">
+              <Card
+                cardProps={{
+                  cardId: 'placeholder-card',
+                  name: '',
+                  description: '',
+                  currentCost: 0,
+                  baseCost: 0,
+                  currentAttack: 0,
+                  baseAttack: 0,
+                }}
+              />
+            </div>
+          )}
           {[...hand].reverse().map((card, idx) => (
             <DraggableCard
               key={card.uniqueId}
