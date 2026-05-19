@@ -1,6 +1,6 @@
 import Card from './Card';
 
-const CARD_SCALE = 0.85;
+const CARD_WIDTH = 255;
 
 export function SelectionPanel({
   pendingSelection,
@@ -20,8 +20,8 @@ export function SelectionPanel({
   return (
     <div className="flex flex-row gap-0 items-center justify-center w-full h-full">
       {/* Left: played card, fixed position */}
-      
-        <Card cardProps={playedCard} scale={CARD_SCALE} />
+
+      <Card cardProps={playedCard} width={CARD_WIDTH} />
 
       {/* Right: selection slots + confirm */}
       <div className="flex flex-col items-center justify-center gap-4 pl-6">
@@ -33,10 +33,13 @@ export function SelectionPanel({
           {Array.from({ length: max }).map((_, idx) => {
             const card = selectedTargets[idx];
             return (
-              <div key={card?.uniqueId ?? idx} className="relative inline-block">
+              <div
+                key={card?.uniqueId ?? idx}
+                className="relative inline-block"
+              >
                 {/* Invisible card establishes the natural slot size */}
                 <div className="invisible">
-                  <Card cardProps={playedCard} scale={CARD_SCALE} />
+                  <Card cardProps={playedCard} width={CARD_WIDTH} />
                 </div>
                 {/* Overlay: card on top, or empty slot styling */}
                 {card ? (
@@ -44,7 +47,7 @@ export function SelectionPanel({
                     className="absolute inset-0 cursor-pointer overflow-hidden"
                     onClick={() => onDeselectCard(card)}
                   >
-                    <Card cardProps={card} scale={CARD_SCALE} />
+                    <Card cardProps={card} width={CARD_WIDTH} />
                   </div>
                 ) : (
                   <div className="absolute inset-0 rounded-xl border-2 border-dashed border-white/40 bg-white/10" />

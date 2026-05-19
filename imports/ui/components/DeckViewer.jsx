@@ -69,13 +69,13 @@ export function DeckViewer({ cards }) {
 
             <div className="overflow-y-auto px-5 py-5">
               {deckCards.length > 0 ? (
-                <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-5 p-0">
+                <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-5 p-0">
                   {deckCards.map((card, index) => (
                     <li
                       key={card.uniqueId ?? `${card.cardId}-${index}`}
                       className="flex justify-center"
                     >
-                      <Card cardProps={card} />
+                      <Card cardProps={card} width={220} />
                     </li>
                   ))}
                 </ul>
