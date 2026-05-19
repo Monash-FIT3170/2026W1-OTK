@@ -1,6 +1,14 @@
 import React from 'react';
 
 function Card({ cardProps, scale = 1 }) {
+  const costFontColour =
+    cardProps.currentCost != cardProps.baseCost
+      ? 'text-lime-400'
+      : 'text-white';
+  const attackFontColour =
+    cardProps.currentAttack != cardProps.baseAttack
+      ? 'text-lime-400'
+      : 'text-red-400';
   return (
     <div style={{ zoom: scale, display: 'inline-block' }}>
       <div
@@ -18,14 +26,14 @@ function Card({ cardProps, scale = 1 }) {
         />
 
         {/*Cost + Attack*/}
-        <div className="absolute top-9 left-11.5 -translate-x-1/2 text-[2.1rem] text-white">
+        <div className={`absolute top-8 left-11.5 -translate-x-1/2 text-[2.4rem] ${costFontColour}`}>
           {cardProps.currentCost}
         </div>
-        <div className="absolute top-31 left-11.5 -translate-x-1/2 text-[2.1rem] text-white">
+        <div className={`absolute top-30 left-11.5 -translate-x-1/2 text-[2.4rem] ${attackFontColour}`}>
           {cardProps.currentAttack}
         </div>
         {/*Name*/}
-        <div className="absolute top-4 left-12 right-2 text-center text-[2.3rem] text-white">
+        <div className="absolute top-4 left-12 right-2 text-center text-[2.2rem] text-white">
           {cardProps.name}
         </div>
         {/*Description*/}
