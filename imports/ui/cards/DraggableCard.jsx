@@ -41,13 +41,13 @@ export function DraggableCard({
   return (
     <motion.div
       initial={{ y: 80, opacity: 0 }}
-      animate={{ y: 0, opacity: !affordable && !isInSelectionMode ? 0.4 : 1 }}
+      animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       style={{ marginLeft, flexShrink: 0 }}
     >
       <motion.div
         ref={cardRef}
-        style={{ x, y }}
+        style={{ x, y, position: 'relative' }}
         whileHover={!isDragging ? { scale: 1.1 } : {}}
         onClick={onClick}
         onHoverStart={() => !isDragging && soundManager.playCardHover()}
@@ -58,6 +58,20 @@ export function DraggableCard({
         dragElastic={0}
       >
         <Card cardProps={cardProps} />
+        {!affordable && !isInSelectionMode && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.55)',
+            pointerEvents: 'none',
+            maskImage: `url(/assets/sprites/cards/${cardProps.cardId}.png)`,
+            maskSize: '100% 100%',
+            maskRepeat: 'no-repeat',
+            WebkitMaskImage: `url(/assets/sprites/cards/${cardProps.cardId}.png)`,
+            WebkitMaskSize: '100% 100%',
+            WebkitMaskRepeat: 'no-repeat',
+          }} />
+        )}
       </motion.div>
     </motion.div>
   );
