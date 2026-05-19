@@ -1,6 +1,7 @@
 import React from 'react';
 
-function Card({ cardProps, scale = 1 }) {
+function Card({ cardProps, width = 300 }) {
+  const scale = width / 300;
   const costFontColour =
     cardProps.currentCost != cardProps.baseCost
       ? 'text-lime-400'
