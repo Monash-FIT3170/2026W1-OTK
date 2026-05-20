@@ -51,7 +51,7 @@ const Settings = ({ saveButton }) => {
     <>
       {/* Settings gear button — opens the modal */}
       <button
-        className="btn btn-ghost btn-circle"
+        className="btn btn-circle"
         onClick={() => document.getElementById('settings-modal').showModal()}
         aria-label="Open settings"
       >

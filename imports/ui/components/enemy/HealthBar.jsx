@@ -13,20 +13,19 @@ export const HealthBar = ({ current, max, name }) => {
     <div className="health-bar-container mb-4">
       <div className="flex justify-between items-center mb-1">
         <span className="text-sm font-semibold text-gray-800">{name}</span>
-        <span className="text-xs text-gray-600">
-          {current}/{max}
-        </span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-md">
+      <div className="relative w-full bg-red-900 rounded-none h-10 overflow-hidden shadow-md">
         <div
-          className={`h-full ${getHealthColor()} transition-all duration-300 flex items-center justify-center`}
+          className={`h-full ${getHealthColor()} transition-all duration-300`}
           style={{ width: `${healthPercentage}%` }}
-        >
-          {healthPercentage > 15 && (
-            <span className="text-xs font-bold text-white">
-              {Math.round(healthPercentage)}%
-            </span>
-          )}
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span
+            style={{ fontFamily: '"Micro 5", monospace' }}
+            className="text-white text-3xl leading-none"
+          >
+            {current}/{max}
+          </span>
         </div>
       </div>
     </div>

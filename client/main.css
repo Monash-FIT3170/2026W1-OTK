@@ -9,3 +9,7 @@ body {
   padding: 0;
   background-color: #f8fafc;
 }
+
+@theme {
+  --color-led: #1a2e28;
+}
