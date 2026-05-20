@@ -139,8 +139,10 @@ export const App = () => {
       </div>
 
       {/* Card hand row: DeckViewer on left, hand on right */}
-      <div className="flex items-end gap-2 p-4 pt-0">
-        <DeckViewer cards={deck} />
+      <div
+        className="absolute flex items-end"
+        style={{ left: 370, right: 140, bottom: 20 }}
+      >
         <CardHand cards={hand} deckSize={deck.length} />
       </div>
     </GameBackground>
