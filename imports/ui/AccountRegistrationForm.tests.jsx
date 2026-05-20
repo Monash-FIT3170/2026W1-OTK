@@ -5,6 +5,16 @@ import { AccountRegistrationForm } from './AccountRegistrationForm';
 
 if (Meteor.isClient) {
   describe('AccountRegistrationForm', function() {
+    let originalCall;
+
+    beforeEach(function() {
+      originalCall = Meteor.call;
+    });
+
+    afterEach(function() {
+      Meteor.call = originalCall;
+    });
+
     it('renders all fields', function() {
       render(<AccountRegistrationForm />);
       screen.getByLabelText('Username');
@@ -19,7 +29,7 @@ if (Meteor.isClient) {
 
     it('shows error when server returns one', async function() {
       Meteor.call = (method, args, cb) => cb({ error: 'auth.usernameTaken', reason: 'Username is already taken.' });
-      
+
       render(<AccountRegistrationForm />);
       fireEvent.submit(screen.getByRole('button', { name: /sign up/i }).closest('form'));
       await screen.findByText('Username is already taken.');
