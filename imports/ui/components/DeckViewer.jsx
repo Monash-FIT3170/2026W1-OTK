@@ -35,7 +35,7 @@ export function DeckViewer({ cards }) {
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         style={{ fontFamily: '"Micro 5", monospace' }}
-        className="bg-transparent border-0 p-0 cursor-pointer text-white text-[5.5rem]"
+        className="bg-transparent border-0 p-0 cursor-pointer text-white text-[5.5rem] pointer-events-auto"
         onClick={() => setIsOpen(true)}
       >
         {rawDeckCards.length}
