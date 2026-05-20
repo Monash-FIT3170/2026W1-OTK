@@ -33,7 +33,7 @@ if (Meteor.isClient) {
 
       expect(screen.getByRole('img')).to.exist;
       expect(screen.getByRole('img').getAttribute('src')).to.equal(
-        `/assets/sprites/enemies/${goblin.name.toLowerCase()}-enemy.png`
+        `/assets/sprites/enemies/${goblin.name.toLowerCase()}-enemy.gif`
       );
     });
 
@@ -71,7 +71,7 @@ if (Meteor.isClient) {
         />
       );
 
-      expect(screen.getByRole('img').getAttribute('src')).to.include('-hit');
+      expect(screen.getByRole('img').getAttribute('src')).to.include('-attack');
     });
 
     // 4. Resets back to the normal sprite after the animation promise resolves

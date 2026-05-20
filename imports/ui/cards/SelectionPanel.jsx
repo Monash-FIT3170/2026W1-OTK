@@ -25,7 +25,7 @@ export function SelectionPanel({
 
       {/* Right: selection slots + confirm */}
       <div className="flex flex-col items-center justify-center gap-4 pl-6">
-        <p className="text-white text-sm">
+        <p className="text-led text-sm">
           Select {min === max ? min : `${min}–${max}`} card
           {max !== 1 ? 's' : ''}
         </p>
@@ -50,7 +50,7 @@ export function SelectionPanel({
                     <Card cardProps={card} width={CARD_WIDTH} />
                   </div>
                 ) : (
-                  <div className="absolute inset-0 rounded-xl border-2 border-dashed border-white/40 bg-white/10" />
+                  <div className="absolute inset-0 rounded-xl border-2 border-dashed border-led bg-led/20" />
                 )}
               </div>
             );
@@ -58,7 +58,7 @@ export function SelectionPanel({
         </div>
         <button
           type="button"
-          className="bg-white text-gray-900 border border-gray-400 hover:bg-gray-100
+          className="bg-white text-led hover:bg-gray-100
             focus:ring-4 focus:ring-gray-300 font-semibold rounded-full text-sm
             px-6 py-2 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
           disabled={!isValidSelection}

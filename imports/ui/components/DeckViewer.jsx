@@ -2,14 +2,18 @@ import React, { useEffect, useState } from 'react';
 import Card from '../cards/Card';
 
 export function DeckViewer({ cards }) {
-  const [isOpen, setIsOpen] = useState(false);    //This ensures that the View Deck button is only visible if it's not already currently open
-  
+  const [isOpen, setIsOpen] = useState(false); //This ensures that the View Deck button is only visible if it's not already currently open
+
   // There are two arrays which contain the Deck cards. One that has the original order
   // which is rawDeckCards, and deckCards takes the original array of cards and sorts it alphabetically.
   // This way the sort is not mutating the real deck array used in the game but just the array used
   // to visually display the Deck Viewer.
-  const rawDeckCards = Array.isArray(cards) ? cards : Object.values(cards ?? {});
-  const deckCards = [...rawDeckCards].sort((a,b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
+  const rawDeckCards = Array.isArray(cards)
+    ? cards
+    : Object.values(cards ?? {});
+  const deckCards = [...rawDeckCards].sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+  );
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -30,15 +34,16 @@ export function DeckViewer({ cards }) {
         type="button"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-sm transition-colors border border-slate-600"
+        style={{ fontFamily: '"Micro 5", monospace', width: '2ch', textAlign: 'center' }}
+        className="bg-transparent border-0 p-0 cursor-pointer text-white text-[5.5rem] pointer-events-auto"
         onClick={() => setIsOpen(true)}
       >
-        Deck: {rawDeckCards.length}
+        {rawDeckCards.length}
       </button>
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 pointer-events-auto"
           role="presentation"
           onClick={() => setIsOpen(false)}
         >
@@ -51,11 +56,15 @@ export function DeckViewer({ cards }) {
           >
             <div className="flex items-center justify-between gap-4 border-b border-slate-700 px-5 py-4">
               <div>
-                <h2 id="deck-viewer-title" className="text-lg font-bold text-white">
+                <h2
+                  id="deck-viewer-title"
+                  className="text-lg font-bold text-white"
+                >
                   Current Deck
                 </h2>
                 <p className="text-sm text-slate-300">
-                  {deckCards.length} {deckCards.length === 1 ? 'card' : 'cards'} remaining
+                  {deckCards.length} {deckCards.length === 1 ? 'card' : 'cards'}{' '}
+                  remaining
                 </p>
               </div>
               <button
@@ -80,7 +89,9 @@ export function DeckViewer({ cards }) {
                   ))}
                 </ul>
               ) : (
-                <p className="py-12 text-center text-slate-300">Deck is empty.</p>
+                <p className="py-12 text-center text-slate-300">
+                  Deck is empty.
+                </p>
               )}
             </div>
           </section>
