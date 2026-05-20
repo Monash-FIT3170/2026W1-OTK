@@ -15,8 +15,8 @@ if (Meteor.isServer) {
         const goblin = await EnemiesCollection.findOneAsync({ enemyId: 'goblin' });
         assert.isOk(goblin, 'goblin document should exist');
         assert.equal(goblin.name, 'Goblin');
-        assert.equal(goblin.health, 20);
-        assert.equal(goblin.currentHealth, 20);
+        assert.equal(goblin.health, 100);
+        assert.equal(goblin.currentHealth, 100);
         assert.isArray(goblin.debuffs);
       });
     });
@@ -32,8 +32,8 @@ if (Meteor.isServer) {
         );
 
         const enemy = await EnemiesCollection.findOneAsync(enemyDocumentId);
-        assert.equal(currentHealth, 13);
-        assert.equal(enemy.currentHealth, 13);
+        assert.equal(currentHealth, 93);
+        assert.equal(enemy.currentHealth, 93);
       });
 
       it('adds multiple card damage values before applying damage', async function () {
@@ -46,8 +46,8 @@ if (Meteor.isServer) {
         );
 
         const enemy = await EnemiesCollection.findOneAsync(enemyDocumentId);
-        assert.equal(currentHealth, 8);
-        assert.equal(enemy.currentHealth, 8);
+        assert.equal(currentHealth, 88);
+        assert.equal(enemy.currentHealth, 88);
       });
 
       it('does not reduce enemy current health below zero', async function () {
@@ -56,7 +56,7 @@ if (Meteor.isServer) {
         const currentHealth = await Meteor.callAsync(
           'enemy.damage',
           enemyDocumentId,
-          99
+          999
         );
 
         const enemy = await EnemiesCollection.findOneAsync(enemyDocumentId);
