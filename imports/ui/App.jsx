@@ -113,7 +113,7 @@ export const App = () => {
   return (
     <GameBackground backgroundScene={scene}>
       {/* Settings pinned to top-right corner */}
-      <div className="absolute top-3 right-4">
+      <div className="absolute" style={{ right: 20, top: 30 }}>
         <Settings saveButton={<SaveGameButton gameState={gameState} />} />
       </div>
 
@@ -140,7 +140,7 @@ export const App = () => {
       </div>
 
       {/* End turn button — absolute to match its former flex-flow position */}
-      <div className="absolute" style={{ top: 96, right: 16 }}>
+      <div className="absolute" style={{ top: 530, right: 30 }}>
         <EndTurnButton />
       </div>
 
