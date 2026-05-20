@@ -34,7 +34,7 @@ export function DeckViewer({ cards }) {
         type="button"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        style={{ fontFamily: '"Micro 5", monospace' }}
+        style={{ fontFamily: '"Micro 5", monospace', width: '2ch', textAlign: 'center' }}
         className="bg-transparent border-0 p-0 cursor-pointer text-white text-[5.5rem] pointer-events-auto"
         onClick={() => setIsOpen(true)}
       >
@@ -43,7 +43,7 @@ export function DeckViewer({ cards }) {
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 pointer-events-auto"
           role="presentation"
           onClick={() => setIsOpen(false)}
         >
