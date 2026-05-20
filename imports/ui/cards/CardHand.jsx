@@ -20,7 +20,7 @@ export default function CardHand({ cards, deckSize }) {
 
   const numCards = hand.length;
   const cardWidth = 300;
-  const containerWidth = 1800; // design canvas width (1920) minus padding
+  const containerWidth = 1410; // design canvas width (1920) minus padding
   const marginLeft =
     numCards > 1
       ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
@@ -74,10 +74,7 @@ export default function CardHand({ cards, deckSize }) {
           </div>
         </div>
       )}
-      <div
-        ref={handRef}
-        className="flex flex-row border rounded-xl p-5 bg-amber-50/80 min-h-70 w-full"
-      >
+      <div ref={handRef} className="flex flex-row min-h-70 w-full">
         <div className="flex flex-row justify-center w-full">
           {hand.length === 0 && (
             <div className="invisible">
