@@ -147,21 +147,17 @@ if (Meteor.isServer) {
 
     assert.exists(userData.gameState);
 
-    assert.equal(userData.gameState.currentStage, 1);
+    assert.equal(userData.gameState.stage, 1);
 
-    assert.deepEqual(userData.gameState.currentHand, []);
-    assert.deepEqual(userData.gameState.currentDrawDeck, []);
-    assert.deepEqual(userData.gameState.currentDiscardedCardPile, []);
+    assert.isArray(userData.gameState.hand);
+    assert.isArray(userData.gameState.deck);
 
-    assert.equal(userData.gameState.currentEnemy, null);
+    assert.exists(userData.gameState.enemy);
+    assert.equal(userData.gameState.enemy.enemyId, 'goblin');
 
-    assert.equal(userData.gameState.runTime, 0);
+    assert.equal(userData.gameState.scene, 'underpass-overlaid');
 
-    assert.equal(userData.gameState.runStatus, 'ACTIVE');
-
-    assert.equal(userData.gameState.scene, "underpass")
-
-    assert.exists(userData.gameState.updatedAt);
+    assert.equal(userData.gameState.userId, validUserId);
   });
 
   /**
@@ -197,7 +193,7 @@ if (Meteor.isServer) {
       runStatus: 'ACTIVE',
     };
 
-    await Meteor.server.method_handlers['userData.updateGameState'].apply(
+    await Meteor.server.method_handlers['userData.saveGameState'].apply(
       { userId: validUserId },
       [{ gameState: updatedGameState }]
     );
@@ -241,7 +237,7 @@ if (Meteor.isServer) {
     };
 
     try {
-      await Meteor.server.method_handlers['userData.updateGameState'].apply(
+      await Meteor.server.method_handlers['userData.saveGameState'].apply(
         {},
         [{ gameState: updatedGameState }]
       );
