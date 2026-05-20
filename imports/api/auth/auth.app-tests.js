@@ -21,6 +21,7 @@ import { assert } from 'chai';
  * @author Hydar Rabiaa
  * @version 1.0
  */
+if (Meteor.isClient) {
 describe('auth login and current user retrieval', function () {
   /**
    * Known test credentials used for login and retrieval tests.
@@ -29,8 +30,7 @@ describe('auth login and current user retrieval', function () {
   const email = 'loginuser@example.com';
   const password = 'secure123';
 
-  if (Meteor.isClient) {
-    /**
+  /**
      * Creates a clean test user before each test.
      *
      * The database is cleared first to prevent test state from leaking
@@ -38,21 +38,13 @@ describe('auth login and current user retrieval', function () {
      * have predictable credentials.
      */
     beforeEach(function (done) {
-      Meteor.call('auth.clearTestUsers', (clearError) => {
-        assert.isUndefined(clearError);
-
+      Meteor.call('auth.clearTestUsers', function (clearError) {
+        if (clearError) return done(clearError);
         Meteor.call(
           'auth.createTestUser',
-          {
-            username,
-            email,
-            password,
-            profile: {
-              favouriteCard: 'Slash',
-            },
-          },
-          (createError) => {
-            assert.isUndefined(createError);
+          { username, email, password, profile: { favouriteCard: 'Slash' } },
+          function (createError) {
+            if (createError) return done(createError);
             done();
           }
         );
@@ -66,7 +58,7 @@ describe('auth login and current user retrieval', function () {
      * the next test case.
      */
     afterEach(function (done) {
-      Meteor.logout(() => done());
+      Meteor.logout(done);
     });
 
     /**
@@ -78,7 +70,7 @@ describe('auth login and current user retrieval', function () {
      */
     it('logs in with the correct username and password', function (done) {
       Meteor.loginWithPassword(username, password, function (error) {
-        assert.isUndefined(error);
+        if (error) return done(error);
         assert.isTrue(!!Meteor.userId());
         done();
       });
@@ -126,20 +118,14 @@ describe('auth login and current user retrieval', function () {
      */
     it('retrieves the correct user data after login', function (done) {
       Meteor.loginWithPassword(username, password, function (loginError) {
-        assert.isUndefined(loginError);
+        if (loginError) return done(loginError);
 
         const subHandle = Meteor.subscribe('auth.currentUser');
 
         const computation = Tracker.autorun(() => {
-          if (!subHandle.ready()) {
-            return;
-          }
-
+          if (!subHandle.ready()) return;
           const user = Meteor.user();
-
-          if (!user) {
-            return;
-          }
+          if (!user) return;
 
           assert.equal(user.username, username);
           assert.equal(user.emails[0].address, email);
@@ -151,5 +137,5 @@ describe('auth login and current user retrieval', function () {
         });
       });
     });
-  }
 });
+}
