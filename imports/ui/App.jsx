@@ -41,11 +41,13 @@ export const App = () => {
   useEffect(() => {
     if (!gameState) return;
     const hp = gameState.enemy.currentHealth;
+    let timer;
     if (prevHealthRef.current !== null && hp < prevHealthRef.current) {
       setIsTakingDamage(true);
-      setTimeout(() => setIsTakingDamage(false), 400);
+      timer = setTimeout(() => setIsTakingDamage(false), 400);
     }
     prevHealthRef.current = hp;
+    return () => clearTimeout(timer);
   }, [gameState?.enemy?.currentHealth]);
 
   // If logged in but no game state exists yet, start a new game automatically
@@ -123,9 +125,13 @@ export const App = () => {
         />
       </div>
 
-      {/* Enemy display */}
-      <div className="flex-1 relative flex flex-col justify-center px-8 py-6">
+      {/* Player display — positioned to match canvas coordinates derived from previous layout */}
+      <div className="absolute z-10" style={{ left: 400, bottom: 540 }}>
         <PlayerDisplay />
+      </div>
+
+      {/* Enemy display */}
+      <div className="absolute" style={{ right: 400, bottom: 540 }}>
         <EnemyDisplay
           enemy={enemy}
           isVisible={true}
@@ -133,8 +139,8 @@ export const App = () => {
         />
       </div>
 
-      {/* End turn button above card hand, right-aligned */}
-      <div className="flex justify-end px-4 pb-1">
+      {/* End turn button — absolute to match its former flex-flow position */}
+      <div className="absolute" style={{ top: 96, right: 16 }}>
         <EndTurnButton />
       </div>
 
@@ -144,6 +150,17 @@ export const App = () => {
         style={{ left: 370, right: 140, bottom: 20 }}
       >
         <CardHand cards={hand} deckSize={deck.length} />
+      </div>
+
+      <div
+        className="absolute flex items-end"
+        style={{
+          left: 87,
+          right: 140,
+          bottom: 163,
+        }}
+      >
+        <DeckViewer cards={deck} />
       </div>
     </GameBackground>
   );

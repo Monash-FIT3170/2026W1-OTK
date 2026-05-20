@@ -20,6 +20,7 @@ function Card({ cardProps, width = 300 }) {
           draggable={false}
           src={`/assets/sprites/cards/${cardProps.cardId}.png`}
           alt={cardProps.name}
+          style={{ imageRendering: 'pixelated' }}
           width={300}
           onError={(e) => {
             e.target.src = '/assets/sprites/cards/placeholder-card.png';
@@ -27,10 +28,14 @@ function Card({ cardProps, width = 300 }) {
         />
 
         {/*Cost + Attack*/}
-        <div className={`absolute top-8 left-11.5 -translate-x-1/2 text-[2.4rem] ${costFontColour}`}>
+        <div
+          className={`absolute top-8 left-11.5 -translate-x-1/2 text-[2.4rem] ${costFontColour}`}
+        >
           {cardProps.currentCost}
         </div>
-        <div className={`absolute top-30 left-11.5 -translate-x-1/2 text-[2.4rem] ${attackFontColour}`}>
+        <div
+          className={`absolute top-30 left-11.5 -translate-x-1/2 text-[2.4rem] ${attackFontColour}`}
+        >
           {cardProps.currentAttack}
         </div>
         {/*Name*/}

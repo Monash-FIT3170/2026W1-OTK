@@ -33,7 +33,7 @@ export function EnemyDisplay({
         HitAnimations[enemy.hitAnimation] ?? HitAnimations.knockback;
       animate(scope.current, keyframes, options).then(() => setIsHit(false)); // Reset hit state after animation completes
     }
-  }, [isTakingDamage]);
+  }, [isTakingDamage, enemy.hitAnimation]);
 
   const {
     initial,
@@ -45,34 +45,24 @@ export function EnemyDisplay({
   return (
     <AnimatePresence>
       {isVisible && (
-        // Renders the Enemy on the right side of the screen, centered vertically
-        <div
-          style={{
-            position: 'absolute',
-            left: '75%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
+        <motion.div
+          ref={scope}
+          key={enemy.enemyId}
+          initial={initial}
+          animate={animateProps}
+          exit={exit}
+          transition={transition}
         >
-          <motion.div
-            ref={scope}
-            key={enemy.enemyId}
-            initial={initial}
-            animate={animateProps}
-            exit={exit}
-            transition={transition}
-          >
-            <img
-              src={`/assets/sprites/enemies/${enemy.name.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
-              alt={enemy.name}
-              style={{ width: '150px', height: '150px' }}
-              // Triggers when the hit sprite fails to load (e.g. missing file), falls back to normal sprite
-              onError={(e) => {
-                e.target.src = `/assets/sprites/enemies/${enemy.name.toLowerCase()}-enemy.png`;
-              }}
-            />
-          </motion.div>
-        </div>
+          <img
+            src={`/assets/sprites/enemies/${enemy.name.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
+            alt={enemy.name}
+            className="h-48 w-auto object-contain"
+            style={{ imageRendering: 'pixelated' }}
+            onError={(e) => {
+              e.target.src = `/assets/sprites/enemies/${enemy.name.toLowerCase()}-enemy.png`;
+            }}
+          />
+        </motion.div>
       )}
     </AnimatePresence>
   );
