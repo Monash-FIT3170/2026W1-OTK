@@ -153,7 +153,7 @@ export const App = () => {
       </div>
 
       <div
-        className="absolute flex items-end"
+        className="absolute flex items-end pointer-events-none"
         style={{
           left: 87,
           right: 140,
