@@ -4,7 +4,7 @@ services:
     ports:
       - '80:3000'
     environment:
-      ROOT_URL: http://localhost:3000
+      ROOT_URL: http://3.104.120.177
       MONGO_URL: mongodb://mongo:27017/otk
       PORT: 3000
     depends_on:
