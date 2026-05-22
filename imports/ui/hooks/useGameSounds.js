@@ -4,7 +4,7 @@ import { soundManager } from '../soundManager';
 export function useGameSounds(result) {
   useEffect(() => {
     if (result === undefined) return;
-    if (!result) {
+    if (result === 'playing') {
       soundManager.playBackgroundMusic('spark-mandrill');
     } else {
       soundManager.stopMusic();

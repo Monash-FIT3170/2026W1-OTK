@@ -22,6 +22,7 @@ export class GameEngine {
   public enemy: Enemy;
   public stage: number;
   public userId: string;
+  public result: 'win' | 'loss' | 'playing';
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -29,6 +30,7 @@ export class GameEngine {
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
     this.enemy = enemyRegistry.create(userData.enemy);
     this.stage = userData.stage;
+    this.result = userData.result;
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -70,7 +72,7 @@ export class GameEngine {
     const BossClass = BOSS_LOOKUP[stage];
     const enemy: EnemyData = new BossClass().toJSON();
     const scene = SCENE_LOOKUP[stage]
-    const userData: UserData = { userId, stage, deck, hand: [], enemy, scene };
+    const userData: UserData = { userId, stage, deck, hand: [], enemy, scene, result: 'playing' };
 
     const engine = new GameEngine(userData);
     engine.shuffle();
@@ -123,6 +125,7 @@ export class GameEngine {
       hand: this.hand.map((card) => card.toJSON()),
       enemy: this.enemy.toJSON(),
       scene: SCENE_LOOKUP[this.stage],
+      result: this.result,
     };
   }
 }
