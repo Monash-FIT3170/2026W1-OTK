@@ -14,7 +14,7 @@ import { SaveGameButton } from './components/SaveGameButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 
-import { soundManager } from './soundManager';
+import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
 
 export const App = () => {
@@ -41,17 +41,7 @@ export const App = () => {
     }
   }, [loading, user, gameState]);
 
-  // Start background music when the game is active; stop on result
-  useEffect(() => {
-    if (!gameState) return;
-    if (!gameState.result) {
-      soundManager.playBackgroundMusic('spark-mandrill');
-    } else {
-      soundManager.stopMusic();
-      if (gameState.result === 'win') soundManager.playStageClear();
-      if (gameState.result === 'loss') soundManager.playGameOver();
-    }
-  }, [gameState?.result]);
+  useGameSounds(gameState?.result);
 
   // --- Loading state ---
   if (loading) {
