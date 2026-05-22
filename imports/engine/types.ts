@@ -33,5 +33,5 @@ export type UserData = {
   hand: cardData[];
   enemy: EnemyData;
   scene?: string;
-  result: 'playing' | 'win' | 'loss';
+  result: 'win' | 'loss' | 'playing';
 };
