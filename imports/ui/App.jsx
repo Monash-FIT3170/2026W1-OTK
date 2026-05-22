@@ -126,7 +126,7 @@ export const App = () => {
       </div>
 
       {/* Player display — positioned to match canvas coordinates derived from previous layout */}
-      <div className="absolute z-10" style={{ left: 400, bottom: 540 }}>
+      <div className="absolute " style={{ left: 400, bottom: 540 }}>
         <PlayerDisplay />
       </div>
 
