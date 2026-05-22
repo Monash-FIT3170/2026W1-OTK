@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 import { UserDataCollection } from '../api/user-data/collections/UserDataCollection';
@@ -20,11 +20,6 @@ import Settings from './components/Settings';
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
 
-  // Track whether the enemy sprite should play its hit animation.
-  // Toggled on whenever the server reports a drop in enemy HP.
-  const [isTakingDamage, setIsTakingDamage] = useState(false);
-  const prevHealthRef = useRef(null);
-
   // Subscribe to auth and game data reactively
   const { user, gameState, loading } = useTracker(() => {
     const userSub = Meteor.subscribe('auth.currentUser');
@@ -36,19 +31,6 @@ export const App = () => {
       : null;
     return { user, gameState: userData?.gameState ?? null, loading };
   });
-
-  // Trigger hit animation whenever enemy HP decreases
-  useEffect(() => {
-    if (!gameState) return;
-    const hp = gameState.enemy.currentHealth;
-    let timer;
-    if (prevHealthRef.current !== null && hp < prevHealthRef.current) {
-      setIsTakingDamage(true);
-      timer = setTimeout(() => setIsTakingDamage(false), 400);
-    }
-    prevHealthRef.current = hp;
-    return () => clearTimeout(timer);
-  }, [gameState?.enemy?.currentHealth]);
 
   // If logged in but no game state exists yet, start a new game automatically
   useEffect(() => {
@@ -132,11 +114,7 @@ export const App = () => {
 
       {/* Enemy display */}
       <div className="absolute" style={{ right: 400, bottom: 540 }}>
-        <EnemyDisplay
-          enemy={enemy}
-          isVisible={true}
-          isTakingDamage={isTakingDamage}
-        />
+        <EnemyDisplay enemy={enemy} isVisible={true} />
       </div>
 
       {/* End turn button — absolute to match its former flex-flow position */}

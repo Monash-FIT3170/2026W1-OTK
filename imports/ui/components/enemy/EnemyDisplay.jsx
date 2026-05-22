@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useAnimate } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 
 /**
@@ -10,30 +10,27 @@ import { EntryAnimations, HitAnimations } from './EnemyAnimations';
  * @component
  * @param {Enemy} enemy - The enemy instance
  * @param {boolean} isVisible - Controls whether the enemy is rendered. Setting to false triggers the exit animation.
- * @param {boolean} isTakingDamage - When toggled to true, triggers a shake animation
  *
  */
-export function EnemyDisplay({
-  enemy,
-  isVisible,
-  isTakingDamage,
-  _useAnimate = useAnimate,
-}) {
+export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
   const [scope, animate] = _useAnimate();
 
   // Used to swap out the hit sprite when taking damage. Resets to normal sprite after animation completes.
   const [isHit, setIsHit] = useState(false);
 
-  // Trigger hit animation when isTakingDamage becomes true
+  // Track previous HP to detect damage and trigger hit animation directly
+  const prevHealthRef = useRef(null);
+
   useEffect(() => {
-    if (isTakingDamage) {
+    const hp = enemy.currentHealth;
+    if (prevHealthRef.current !== null && hp < prevHealthRef.current) {
       setIsHit(true);
-      // Read animation name from plain data property (set by Enemy subclass constructor)
       const { keyframes, options } =
         HitAnimations[enemy.hitAnimation] ?? HitAnimations.knockback;
-      animate(scope.current, keyframes, options).then(() => setIsHit(false)); // Reset hit state after animation completes
+      animate(scope.current, keyframes, options).then(() => setIsHit(false));
     }
-  }, [isTakingDamage, enemy.hitAnimation]);
+    prevHealthRef.current = hp;
+  }, [enemy.currentHealth]);
 
   const {
     initial,
