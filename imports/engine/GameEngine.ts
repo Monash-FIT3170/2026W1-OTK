@@ -123,6 +123,7 @@ export class GameEngine {
       hand: this.hand.map((card) => card.toJSON()),
       enemy: this.enemy.toJSON(),
       scene: SCENE_LOOKUP[this.stage],
+      result: 'playing',
     };
   }
 }

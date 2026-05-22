@@ -3,13 +3,8 @@ import { soundManager } from '../soundManager';
 
 export function useGameSounds(result) {
   useEffect(() => {
-    if (result === undefined) return;
-    if (!result) {
-      soundManager.playBackgroundMusic('spark-mandrill');
-    } else {
-      soundManager.stopMusic();
-      if (result === 'win') soundManager.playStageClear();
-      if (result === 'loss') soundManager.playGameOver();
-    }
+    if (result === 'playing') soundManager.playBackgroundMusic('spark-mandrill');
+    if (result === 'win') { soundManager.stopMusic(); soundManager.playStageClear(); }
+    if (result === 'loss') { soundManager.stopMusic(); soundManager.playGameOver(); }
   }, [result]);
 }
