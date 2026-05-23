@@ -10,42 +10,44 @@ function Card({ cardProps, width = 300 }) {
     cardProps.currentAttack != cardProps.baseAttack
       ? 'text-lime-400'
       : 'text-red-400';
+  const s = (px) => `${px * scale}px`;
   return (
-    <div style={{ zoom: scale, display: 'inline-block' }}>
-      <div
-        style={{ fontFamily: '"Micro 5", monospace' }}
-        className="relative inline-block"
-      >
-        <img
-          draggable={false}
-          src={`/assets/sprites/cards/${cardProps.cardId}.png`}
-          alt={cardProps.name}
-          style={{ imageRendering: 'pixelated' }}
-          width={300}
-          onError={(e) => {
-            e.target.src = '/assets/sprites/cards/placeholder-card.png';
-          }}
-        />
+    <div style={{ fontFamily: '"Micro 5", monospace' }} className="relative inline-block">
+      <img
+        draggable={false}
+        src={`/assets/sprites/cards/${cardProps.cardId}.png`}
+        alt={cardProps.name}
+        style={{ imageRendering: 'pixelated' }}
+        width={width}
+        onError={(e) => {
+          e.target.src = '/assets/sprites/cards/placeholder-card.png';
+        }}
+      />
 
-        {/*Cost + Attack*/}
-        <div
-          className={`absolute top-8 left-11.5 -translate-x-1/2 text-[2.4rem] ${costFontColour}`}
-        >
-          {cardProps.currentCost}
-        </div>
-        <div
-          className={`absolute top-30 left-11.5 -translate-x-1/2 text-[2.4rem] ${attackFontColour}`}
-        >
-          {cardProps.currentAttack}
-        </div>
-        {/*Name*/}
-        <div className="absolute top-4 left-12 right-2 text-center text-[2.2rem] text-white">
-          {cardProps.name}
-        </div>
-        {/*Description*/}
-        <div className="absolute top-66 left-20 right-10 text-center text-[1.7rem] text-white leading-none">
-          {cardProps.description}
-        </div>
+      {/*Cost + Attack*/}
+      <div
+        className={costFontColour}
+        style={{ position: 'absolute', top: s(32), left: s(46), transform: 'translateX(-50%)', fontSize: s(38) }}
+      >
+        {cardProps.currentCost}
+      </div>
+      <div
+        className={attackFontColour}
+        style={{ position: 'absolute', top: s(120), left: s(46), transform: 'translateX(-50%)', fontSize: s(38) }}
+      >
+        {cardProps.currentAttack}
+      </div>
+      {/*Name*/}
+      <div
+        style={{ position: 'absolute', top: s(16), left: s(48), right: s(8), textAlign: 'center', fontSize: s(35), color: 'white' }}
+      >
+        {cardProps.name}
+      </div>
+      {/*Description*/}
+      <div
+        style={{ position: 'absolute', top: s(264), left: s(80), right: s(40), textAlign: 'center', fontSize: s(27), color: 'white', lineHeight: 1 }}
+      >
+        {cardProps.description}
       </div>
     </div>
   );
