@@ -8,7 +8,7 @@ export class TaxThePoor extends Card {
         super({
             cardId: 'tax-the-poor',
             name: 'Tax the Poor',
-            description: "adds the cost of the first card to the cost of the second card",
+            description: "Adds first card cost to second card",
             baseCost: 0,
             currentCost: 0,
             cardAmountToSelect: {min: 2, max: 2},
