@@ -24,6 +24,10 @@ export const LandingPage = ({ hasSave, onStart }) => {
     document.getElementById('settings-modal')?.showModal();
   };
 
+  const handleQuit = () => {
+    Meteor.logout();
+  };
+
   return (
     <GameBackground backgroundScene="landing">
       <div className="min-h-screen flex flex-col items-center justify-center gap-8">
@@ -62,6 +66,13 @@ export const LandingPage = ({ hasSave, onStart }) => {
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
             >
               Options
+            </button>
+
+            <button
+              onClick={handleQuit}
+              className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-600 text-white text-lg font-semibold transition-colors"
+            >
+              Quit
             </button>
           </div>
         )}
