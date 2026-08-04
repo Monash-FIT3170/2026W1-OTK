@@ -7,7 +7,7 @@ export const LandingPage = ({ hasSave, onStart }) => {
   const [starting, setStarting] = useState(false);
 
   const handleContinue = () => {
-    //
+    onStart();
   };
 
   const handleNewGame = () => {
