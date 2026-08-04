@@ -14,6 +14,10 @@ export const LandingPage = ({ hasSave, onStart }) => {
     //
   };
 
+  const handleEditDeck = () => {
+    // Deck-building page is a future sprint's task - this is just the entry point for now.
+  };
+
   return (
     <GameBackground backgroundScene="landing">
       <div className="min-h-screen flex flex-col items-center justify-center gap-8">
@@ -38,6 +42,13 @@ export const LandingPage = ({ hasSave, onStart }) => {
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors disabled:opacity-50"
             >
               {hasSave ? 'New Game' : 'Start'}
+            </button>
+
+            <button
+              onClick={handleEditDeck}
+              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+            >
+              Edit Deck
             </button>
           </div>
         )}
