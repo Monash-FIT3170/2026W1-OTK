@@ -9,6 +9,7 @@ import '/imports/api/auth/index.js';
 import '/imports/api/auth/auth.tests.js';
 import '/imports/api/auth/auth.app-tests.js';
 import '/imports/ui/AccountRegistrationForm.tests.jsx';
+import '/imports/ui/auth/LoginForm.tests.jsx';
 
 // USER DATA TESTS
 import '../imports/api/user-data/index.js';
