@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { GameBackground } from './components/GameBackground';
+import Settings from './components/Settings';
 
 export const LandingPage = ({ hasSave, onStart }) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
@@ -16,6 +17,11 @@ export const LandingPage = ({ hasSave, onStart }) => {
 
   const handleEditDeck = () => {
     // Deck-building page is a future sprint's task - this is just the entry point for now.
+  };
+
+  const handleOptions = () => {
+    // Reuses the settings dialog rendered by <Settings showTrigger={false} /> below.
+    document.getElementById('settings-modal')?.showModal();
   };
 
   return (
@@ -50,6 +56,13 @@ export const LandingPage = ({ hasSave, onStart }) => {
             >
               Edit Deck
             </button>
+
+            <button
+              onClick={handleOptions}
+              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+            >
+              Options
+            </button>
           </div>
         )}
 
@@ -76,6 +89,10 @@ export const LandingPage = ({ hasSave, onStart }) => {
           </div>
         )}
       </div>
+
+      {/* Hosts the settings dialog without its own gear-icon trigger,
+          since Options above opens it directly. */}
+      <Settings showTrigger={false} />
     </GameBackground>
   );
 };
