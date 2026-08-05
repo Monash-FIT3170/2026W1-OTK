@@ -6,6 +6,7 @@ import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData } from './types';
 import { DeckBuilder } from './DeckBuilder';
+import { debuffRegistry } from './debuffs';
 import { Goblin } from './enemy/enemies/Goblin';
 
 const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
@@ -39,6 +40,9 @@ export class GameEngine {
     cardAmountToSelect?: { min: number; max: number };
   } {
     const card = this.getCard(uniqueId);
+    if (!card.isPlayable()) {
+      throw new Error(`Card with uniqueId "${uniqueId}" is frozen`);
+    }
 
     this.draw(card.currentCost);
 
@@ -54,6 +58,9 @@ export class GameEngine {
   // removes card from hand and executes its effect
   executeCard(uniqueId: string, selectedCardIds: string[] = []): void {
     const card = this.getCard(uniqueId);
+    if (!card.isPlayable()) {
+      throw new Error(`Card with uniqueId "${uniqueId}" is frozen`);
+    }
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
   }
@@ -63,19 +70,31 @@ export class GameEngine {
   }
 
   hasPlayableCards(): boolean {
-    return this.hand.some((card) => card.currentCost <= this.deck.length);
+    return this.hand.some(
+      (card) => card.isPlayable() && card.currentCost <= this.deck.length
+    );
   }
 
   static newGame(userId: string): UserData {
     const deck = DeckBuilder.buildStartingDeck();
     const stage = 1;
     const BossClass = BOSS_LOOKUP[stage];
-    const enemy: EnemyData = new BossClass().toJSON();
-    const scene = SCENE_LOOKUP[stage]
-    const userData: UserData = { userId, stage, deck, hand: [], enemy, scene, result: 'playing' };
+    const boss = new BossClass();
+    const enemy: EnemyData = boss.toJSON();
+    const scene = SCENE_LOOKUP[stage];
+    const userData: UserData = {
+      userId,
+      stage,
+      deck,
+      hand: [],
+      enemy,
+      scene,
+      result: 'playing',
+    };
 
     const engine = new GameEngine(userData);
     engine.shuffle();
+    engine.activateEnemyDebuffs();
     engine.draw();
     return engine.toJSON();
   }
@@ -88,6 +107,13 @@ export class GameEngine {
       const j = Math.floor(Math.random() * (i + 1));
       [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
     }
+  }
+
+  // Activates debuffs on the player from the debuff registry.
+  activateEnemyDebuffs(): void {
+    this.enemy.debuffs.forEach((debuffId) => {
+      debuffRegistry.create(debuffId).activateDebuff(this);
+    });
   }
 
   draw(n: number = 5): void {

@@ -12,6 +12,7 @@ export type cardData = {
   baseAttack?: number;
   currentAttack?: number;
   cardAmountToSelect?: { min: number; max: number };
+  isFrozen?: boolean;
 };
 
 // data shape for an enemy (embedded in UserData)
