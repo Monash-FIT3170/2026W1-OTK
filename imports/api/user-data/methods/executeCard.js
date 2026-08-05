@@ -26,6 +26,13 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    const card = engine.getCard(uniqueCardId);
+    if (!card.isPlayable()) {
+      throw new Meteor.Error(
+        'game.executeCard.cardFrozen',
+        'Frozen cards cannot be played.'
+      );
+    }
     engine.executeCard(uniqueCardId, selectedCardIds ?? []);
 
     const newState = engine.toJSON();

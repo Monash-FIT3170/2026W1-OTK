@@ -101,6 +101,7 @@ export default function CardHand({ cards, deckSize }) {
               onPlay={onDragPlay}
               isInSelectionMode={inSelectionMode}
               affordable={card.currentCost <= deckSize}
+              playable={!card.isFrozen}
             />
           ))}
         </div>
