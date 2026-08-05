@@ -2,6 +2,7 @@
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
+import { debuffRegistry } from '../../debuffs';
 
 export class Goblin extends Enemy {
   static enemyId = 'goblin';
@@ -26,6 +27,12 @@ export class Goblin extends Enemy {
       entryAnimation: data.entryAnimation ?? 'drop',
       hitAnimation: data.hitAnimation ?? 'squish',
     });
+
+    // Only fresh Goblins receive their default debuffs. Saved enemies restore
+    // the exact debuff list provided in their serialized data.
+    if (data.debuffs === undefined) {
+      debuffRegistry.create('freeze').applyTo(this);
+    }
   }
 }
 

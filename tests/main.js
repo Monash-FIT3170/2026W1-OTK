@@ -3,6 +3,7 @@ import '../imports/ui/components/enemy/EnemyDisplay.test.jsx';
 import '../imports/api/enemy/index.js';
 //import '../imports/engine/enemy/DamageEnemy.tests.js';
 import '../imports/api/enemy/enemy.tests.js';
+import '../imports/engine/debuffs/Freeze.tests.js';
 
 // AUTH TESTS
 import '/imports/api/auth/index.js';

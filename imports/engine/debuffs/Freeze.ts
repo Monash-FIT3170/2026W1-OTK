@@ -1,5 +1,5 @@
 import type { GameEngine } from '../GameEngine';
-import { Debuff, debuffData } from './Debuff';
+import { Debuff, type debuffData } from './Debuff';
 import { debuffRegistry } from './DebuffRegistry';
 
 export class Freeze extends Debuff {
@@ -21,4 +21,5 @@ export class Freeze extends Debuff {
   }
 }
 
+// Make Freeze available when an enemy's debuff ID is activated.
 debuffRegistry.register('freeze', Freeze);
