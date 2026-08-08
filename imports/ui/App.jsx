@@ -4,6 +4,7 @@ import { useTracker } from 'meteor/react-meteor-data';
 import { UserDataCollection } from '../api/user-data/collections/UserDataCollection';
 import CardHand from './cards/CardHand';
 import { EnemyDisplay } from './components/enemy/EnemyDisplay';
+import { PlayerDisplay } from './components/PlayerDisplay';
 import { HealthBar } from './components/enemy/HealthBar';
 import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
