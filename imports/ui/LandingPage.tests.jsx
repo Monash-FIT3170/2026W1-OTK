@@ -39,5 +39,47 @@ if (Meteor.isClient) {
                 Meteor.call = originalCall;
             });
         });
+
+        describe('New Game button', function() {
+            it('shows a confirmation prompt on first click when a save exists', function () {
+                const originalCall = Meteor.call;
+                let called = false;
+                Meteor.call = () => { called = true; };
+
+                render(<LandingPage hasSave={true} onStart={() => { }} />);
+                fireEvent.click(screen.getByText('New Game'));
+
+                assert.exists(screen.getByText(/overwrite your current save/i));
+                assert.isFalse(called);
+                Meteor.call = originalCall;
+            });
+
+            it('calls game.newGame when Overwrite is confirmed', function () {
+                let calledWith = null;
+                const originalCall = Meteor.call;
+                Meteor.call = (name, cb) => { calledWith = name; cb(null); };
+
+                render(<LandingPage hasSave={true} onStart={() => { }} />);
+                fireEvent.click(screen.getByText('New Game'));
+                fireEvent.click(screen.getByText('Overwrite'));
+
+                assert.equal(calledWith, 'game.newGame');
+                Meteor.call = originalCall;
+            });
+
+            it('calls onStart after Overwrite succeeds', function () {
+                let callCount = 0;
+                const onStart = () => { callCount++; };
+                const originalCall = Meteor.call;
+                Meteor.call = (name, cb) => cb(null);
+
+                render(<LandingPage hasSave={true} onStart={onStart} />);
+                fireEvent.click(screen.getByText('New Game'));
+                fireEvent.click(screen.getByText('Overwrite'));
+
+                assert.equal(callCount, 1);
+                Meteor.call = originalCall;
+            });
+        });
     });
 }
