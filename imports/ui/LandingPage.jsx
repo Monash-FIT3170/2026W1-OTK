@@ -12,7 +12,22 @@ export const LandingPage = ({ hasSave, onStart }) => {
   };
 
   const handleNewGame = () => {
-    //
+    if (hasSave && !confirmingNewGame) {
+      //ask for confirmation
+      setConfirmingNewGame(true);
+      return;
+    }
+
+    setStarting(true);
+    Meteor.call('game.newGame', (err) => {
+      setStarting(false);
+      if (err) {
+        console.error('game.newGame failed:', err);
+        return;
+      }
+      setConfirmingNewGame(false);
+      onStart();
+    });
   };
 
   const handleEditDeck = () => {
