@@ -51,7 +51,7 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
           transition={transition}
         >
           <img
-            src={`/assets/sprites/enemies/${enemy.name.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
+            src={`/assets/sprites/enemies/${enemy.enemyId.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
             alt={enemy.name}
             className="h-48 w-auto object-contain"
             style={{ imageRendering: 'pixelated' }}

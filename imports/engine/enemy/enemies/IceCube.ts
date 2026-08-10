@@ -1,11 +1,11 @@
-// Goblin.ts
+// IceCube.ts
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
 import { debuffRegistry } from '../../debuffs';
 
-export class Goblin extends Enemy {
-  static enemyId = 'goblin';
+export class IceCube extends Enemy {
+  static enemyId = 'icecube';
 
   constructor(
     data: {
@@ -17,17 +17,22 @@ export class Goblin extends Enemy {
       hitAnimation?: string;
     } = {}
   ) {
-    const health = data.health ?? 100;
+    const health = data.health ?? 120;
     super({
-      enemyId: Goblin.enemyId,
-      name: data.name ?? 'Goblin',
+      enemyId: IceCube.enemyId,
+      name: data.name ?? 'Ice Cube',
       health,
       currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],
-      entryAnimation: data.entryAnimation ?? 'drop',
+      entryAnimation: data.entryAnimation ?? 'spin',
       hitAnimation: data.hitAnimation ?? 'squish',
     });
+
+    // Freeze debuff is added to all ice cubes
+    if (data.debuffs === undefined) {
+      debuffRegistry.create('freeze').applyTo(this);
+    }
   }
 }
 
-enemyRegistry.register('goblin', Goblin);
+enemyRegistry.register('icecube', IceCube);

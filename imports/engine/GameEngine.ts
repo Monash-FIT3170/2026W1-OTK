@@ -8,9 +8,10 @@ import { UserData, EnemyData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
 import { Goblin } from './enemy/enemies/Goblin';
+import { IceCube } from './enemy/enemies/IceCube';
 
 const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
-  1: Goblin,
+  1: IceCube,
 };
 
 const SCENE_LOOKUP: { [stage: number]: string } = {
