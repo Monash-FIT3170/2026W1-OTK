@@ -8,6 +8,7 @@ import { Transcode } from './card/Transcode';
 import { TeaCeremony } from './card/TeaCeremony';
 import { TaxThePoor } from './card/TaxThePoor';
 import { RichGetRicher } from './card/RichGetRicher';
+import { FinalStand } from './card/FinalStand';
 
 export class DeckBuilder {
   static buildStartingDeck(): cardData[] {
@@ -33,6 +34,9 @@ export class DeckBuilder {
       new RichGetRicher().toJSON(),
       new RichGetRicher().toJSON(),
       new RichGetRicher().toJSON(),
+      new FinalStand().toJSON(),
+      new FinalStand().toJSON(),
+      new FinalStand().toJSON(),
     ];
   }
 }
