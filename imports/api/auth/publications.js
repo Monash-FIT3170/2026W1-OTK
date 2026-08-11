@@ -24,19 +24,23 @@ import { Meteor } from 'meteor/meteor';
  * - Cursor containing the current user's data
  * - OR an empty ready state if not logged in
  */
-Meteor.publish('auth.currentUser', function () {
-  if (!this.userId) {
-    return this.ready();
-  }
-
-  return Meteor.users.find(
-    { _id: this.userId },
-    {
-      fields: {
-        username: 1,
-        emails: 1,
-        profile: 1,
-      },
+// Meteor.publish only exists on the server. This module is reached from the
+// client test bundle via tests/main.js, so the registration must be guarded.
+if (Meteor.isServer) {
+  Meteor.publish('auth.currentUser', function () {
+    if (!this.userId) {
+      return this.ready();
     }
-  );
-});
+
+    return Meteor.users.find(
+      { _id: this.userId },
+      {
+        fields: {
+          username: 1,
+          emails: 1,
+          profile: 1,
+        },
+      }
+    );
+  });
+}

@@ -37,7 +37,7 @@ import { check } from 'meteor/check';
  * - duplicate username
  * - duplicate email
  */
-Meteor.methods({
+const registerUserMethods = {
   'auth.registerUser': async function({ username, email, password }) {
     check(username, String);
     check(email, String);
@@ -77,4 +77,11 @@ Meteor.methods({
       },
     });
   },
-});
+};
+
+// Server-only registration: see the note in createTestUser.js. This body uses
+// server-only APIs (`Accounts.findUserByUsername`, server `Accounts.createUser`),
+// so it must not become a client stub when the test bundle loads this module.
+if (Meteor.isServer) {
+  Meteor.methods(registerUserMethods);
+}

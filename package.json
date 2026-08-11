@@ -58,7 +58,10 @@
       "client": "client/main.jsx",
       "server": "server/main.js"
     },
-    "testModule": "tests/main.js",
+    "testModule": {
+      "client": "tests/main.js",
+      "server": "tests/main.js"
+    },
     "modern": true
   },
   "eslintConfig": {
