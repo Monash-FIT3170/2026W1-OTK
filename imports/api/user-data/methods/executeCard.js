@@ -28,10 +28,12 @@ Meteor.methods({
     const engine = new GameEngine(userData.gameState);
     engine.executeCard(uniqueCardId, selectedCardIds ?? []);
 
-    const newState = engine.toJSON();
     if (engine.isEnemyDefeated()) {
-      newState.result = 'win';
+      engine.finalizeBossRecap('win');
+      engine.result = 'win';
     }
+
+    const newState = engine.toJSON();
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },
