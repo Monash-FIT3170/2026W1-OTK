@@ -8,6 +8,7 @@ import { Transcode } from './card/Transcode';
 import { TeaCeremony } from './card/TeaCeremony';
 import { MistConjuring } from './card/MistConjuring';
 import { KillingBlow } from './card/KillingBlow';
+import { AggraRay } from './card/AggraRay';
 
 export class DeckBuilder {
   static buildStartingDeck(): cardData[] {
@@ -35,6 +36,9 @@ export class DeckBuilder {
       new KillingBlow().toJSON(),
       new KillingBlow().toJSON(),
       new KillingBlow().toJSON(),
+      new AggraRay().toJSON(),
+      new AggraRay().toJSON(),
+      new AggraRay().toJSON(),
     ];
   }
 }
