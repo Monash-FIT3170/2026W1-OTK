@@ -4,7 +4,7 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData } from './types';
+import { UserData, EnemyData, BossRecapEntry } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { Goblin } from './enemy/enemies/Goblin';
 
@@ -23,6 +23,9 @@ export class GameEngine {
   public stage: number;
   public userId: string;
   public result: 'win' | 'loss' | 'playing';
+  public bossRecap: BossRecapEntry[];
+  public stageStartedAt: number;
+  public cardsUsedThisStage: number;
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -31,6 +34,9 @@ export class GameEngine {
     this.enemy = enemyRegistry.create(userData.enemy);
     this.stage = userData.stage;
     this.result = userData.result;
+    this.bossRecap = userData.bossRecap ?? [];
+    this.stageStartedAt = userData.stageStartedAt ?? Date.now();
+    this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -56,6 +62,18 @@ export class GameEngine {
     const card = this.getCard(uniqueId);
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
+    this.cardsUsedThisStage += 1;
+  }
+
+  // finalizes a recap entry for the current boss and appends it to bossRecap
+  finalizeBossRecap(bossResult: 'win' | 'loss'): void {
+    this.bossRecap.push({
+      bossName: this.enemy.name,
+      stage: this.stage,
+      timeMs: Date.now() - this.stageStartedAt,
+      cardsUsed: this.cardsUsedThisStage,
+      result: bossResult,
+    });
   }
 
   isEnemyDefeated(): boolean {
@@ -72,7 +90,12 @@ export class GameEngine {
     const BossClass = BOSS_LOOKUP[stage];
     const enemy: EnemyData = new BossClass().toJSON();
     const scene = SCENE_LOOKUP[stage]
-    const userData: UserData = { userId, stage, deck, hand: [], enemy, scene, result: 'playing' };
+    const userData: UserData = {
+      userId, stage, deck, hand: [], enemy, scene, result: 'playing',
+      bossRecap: [],
+      stageStartedAt: Date.now(),
+      cardsUsedThisStage: 0,
+    };
 
     const engine = new GameEngine(userData);
     engine.shuffle();
@@ -126,6 +149,9 @@ export class GameEngine {
       enemy: this.enemy.toJSON(),
       scene: SCENE_LOOKUP[this.stage],
       result: this.result,
+      bossRecap: this.bossRecap,
+      stageStartedAt: this.stageStartedAt,
+      cardsUsedThisStage: this.cardsUsedThisStage,
     };
   }
 }
