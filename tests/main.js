@@ -1,17 +1,11 @@
-import { Meteor } from 'meteor/meteor';
+// Must stay first: it installs the browser error handlers that make a throw
+// during test-bundle loading visible in CI. See tests/clientErrorReporter.js -
+// imports are hoisted, so ordering here is what makes it work.
+import './clientErrorReporter.js';
 
-// The puppeteer driver only forwards browser `console` messages, so an uncaught
-// error while the client bundle loads is invisible in CI: the run just reports
-// "0 passing" with one client failure and no explanation. Log it ourselves.
-if (Meteor.isClient) {
-  window.addEventListener('error', (event) => {
-    console.error(
-      'Uncaught client error while loading tests:',
-      event.message,
-      (event.error && event.error.stack) || ''
-    );
-  });
-}
+// Keep every test module below as a static `import`. @meteorjs/rspack builds the
+// client test bundle from the import list in this file; switching one to
+// `require()` drops it from the bundle and the suite silently reports "0 passing".
 
 // ENEMY TESTS
 import '../imports/ui/components/enemy/EnemyDisplay.test.jsx';
