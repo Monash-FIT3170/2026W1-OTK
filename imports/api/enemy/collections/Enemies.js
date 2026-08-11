@@ -1,3 +1,5 @@
 import { Mongo } from 'meteor/mongo';
 
-export const EnemiesCollection = new Mongo.Collection('enemies');
+export const EnemiesCollection =
+  global.EnemiesCollection ||
+  (global.EnemiesCollection = new Mongo.Collection('enemies'));
