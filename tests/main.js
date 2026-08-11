@@ -16,3 +16,6 @@ import '../imports/api/user-data/userData.tests.js';
 
 // SAVE GAME TESTS
 import '/imports/ui/components/SaveGameButton.app-tests.jsx';
+
+// LANDING PAGE TESTS
+import '../imports/ui/LandingPage.tests.jsx';
