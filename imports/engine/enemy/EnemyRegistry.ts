@@ -1,6 +1,7 @@
 // EnemyRegistry.ts
 
-import { Enemy, enemyData } from './Enemy';
+import { Enemy } from './Enemy';
+import { EnemyData } from '../types'; // (adjust the relative path depending on what folder you are in, e.g., '../types')
 
 export class EnemyRegistry {
 
@@ -10,7 +11,7 @@ export class EnemyRegistry {
     this.registry.set(enemyId, EnemyClass);
   }
 
-  create(data: enemyData): Enemy {
+  create(data: EnemyData): Enemy {
     const EnemyClass = this.registry.get(data.enemyId);
     if (!EnemyClass) throw new Error(`Unknown enemyId: ${data.enemyId}`);
     return new EnemyClass(data);

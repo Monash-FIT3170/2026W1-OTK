@@ -24,6 +24,10 @@ export type EnemyData = {
   debuffs: string[];
   entryAnimation: string;
   hitAnimation: string;
+  timerDebuffActive?: boolean;
+  timerDebuffDeadline?: number;
+  timerDebuffInterval?: number;
+  timerDebuffTickAmount?: number;
 };
 
 // data shape stored in UserDataCollection

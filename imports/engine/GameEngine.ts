@@ -40,6 +40,8 @@ export class GameEngine {
     requiresSelection: boolean;
     cardAmountToSelect?: { min: number; max: number };
   } {
+    this.resolveTimerDebuff();
+
     const card = this.getCard(uniqueId);
     if (!card.isPlayable()) {
       throw new Error(`Card with uniqueId "${uniqueId}" is frozen`);
@@ -58,12 +60,54 @@ export class GameEngine {
 
   // removes card from hand and executes its effect
   executeCard(uniqueId: string, selectedCardIds: string[] = []): void {
+    // 1. Catches up the math in case the player took too long
+    this.resolveTimerDebuff();
+
     const card = this.getCard(uniqueId);
     if (!card.isPlayable()) {
       throw new Error(`Card with uniqueId "${uniqueId}" is frozen`);
     }
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
+    
+    // 2. ADD THIS LINE: Stop the current timer because the player acted
+    this.clearTimerDebuff(); 
+    
+    // 3. This will trigger your Timer.executeDebuff(), which sees the timer 
+    // is cleared and restarts a fresh 5-second grace period!
+    this.executeEnemyDebuffs();
+  }
+
+  executeEnemyDebuffs(): void {
+    this.enemy.debuffs.forEach((debuffId) => {
+      debuffRegistry.create(debuffId).executeDebuff(this);
+    });
+  }
+
+  resolveTimerDebuff(now: number = Date.now()): void {
+    if (!this.enemy.timerDebuffActive || this.enemy.timerDebuffDeadline === null) {
+      return;
+    }
+
+    let deadline = this.enemy.timerDebuffDeadline;
+    const interval = this.enemy.timerDebuffInterval;
+    const tickAmount = this.enemy.timerDebuffTickAmount;
+    let ticked = false;
+
+    if (now >= deadline) {
+      const previousHealth = this.enemy.currentHealth;
+      this.enemy.currentHealth = Math.min(
+        this.enemy.health,
+        this.enemy.currentHealth + tickAmount
+      );
+      this.clearTimerDebuff();
+      ticked = true;
+    }
+  }
+
+  clearTimerDebuff(): void {
+    this.enemy.timerDebuffActive = false;
+    this.enemy.timerDebuffDeadline = null;
   }
 
   isEnemyDefeated(): boolean {
