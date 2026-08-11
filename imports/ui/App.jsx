@@ -91,7 +91,7 @@ export const App = () => {
 
   // --- Victory / Defeat screens ---
   if (result === 'win' || result === 'loss') {
-    return <ResultScreen result={result} enemyName={enemy.name} />;
+    return <ResultScreen result={result} enemyName={enemy.name} bossRecap={gameState.bossRecap} />;
   }
 
   // --- Main game screen ---
