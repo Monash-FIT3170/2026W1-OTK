@@ -52,6 +52,17 @@ export abstract class Card {
   isPlayable(): boolean {
     return !this.isFrozen;
   }
+  
+  /**
+   * Function that allows a card to update itself when another card is played
+   * Does nothing
+   * 
+   * @param card The other Card that was played
+   * @param engine GameEngine that played the other card
+   * 
+   * @see GameEngine
+   */
+  onOtherCardPlayed(card: Card, engine: GameEngine): void{}
 
   // runs when card is returned to deck: resets stats
   resetStats(): void {

@@ -11,7 +11,7 @@ import { Goblin } from './enemy/enemies/Goblin';
 import { IceCube } from './enemy/enemies/IceCube';
 
 const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
-  1: IceCube,
+  1: Goblin,
 };
 
 const SCENE_LOOKUP: { [stage: number]: string } = {
@@ -70,6 +70,9 @@ export class GameEngine {
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
     
+    this.hand.forEach(handCard => handCard.onOtherCardPlayed(card, this));
+    this.deck.forEach(deckCard => deckCard.onOtherCardPlayed(card, this));
+    
     // 2. ADD THIS LINE: Stop the current timer because the player acted
     this.clearTimerDebuff(); 
     
@@ -108,6 +111,8 @@ export class GameEngine {
   clearTimerDebuff(): void {
     this.enemy.timerDebuffActive = false;
     this.enemy.timerDebuffDeadline = null;
+
+    
   }
 
   isEnemyDefeated(): boolean {
