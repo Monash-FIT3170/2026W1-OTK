@@ -56,6 +56,9 @@ export class GameEngine {
     const card = this.getCard(uniqueId);
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
+
+    this.hand.forEach(handCard => handCard.onOtherCardPlayed(card, this));
+    this.deck.forEach(deckCard => deckCard.onOtherCardPlayed(card, this));
   }
 
   isEnemyDefeated(): boolean {
