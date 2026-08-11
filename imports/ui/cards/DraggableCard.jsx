@@ -71,7 +71,7 @@ export function DraggableCard({
           touchAction: 'none',
           cursor: isDragging ? 'grabbing' : 'grab',
         }}
-        whileHover={!isDragging ? { scale: 1.1 } : {}}
+        whileHover={!isDragging ? { scale: 1.1 } : { }}
         onClick={onClick}
         onHoverStart={() => !isDragging && soundManager.playCardHover()}
         onPanStart={handlePanStart}
