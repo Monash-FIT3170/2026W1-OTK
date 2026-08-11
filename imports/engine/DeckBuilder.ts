@@ -7,6 +7,7 @@ import { FogClearing } from './card/FogClearing';
 import { Transcode } from './card/Transcode';
 import { TeaCeremony } from './card/TeaCeremony';
 import { MistConjuring } from './card/MistConjuring';
+import { KillingBlow } from './card/KillingBlow';
 import { AggraRay } from './card/AggraRay';
 
 export class DeckBuilder {
@@ -31,6 +32,10 @@ export class DeckBuilder {
       new MistConjuring().toJSON(),
       new MistConjuring().toJSON(),
       new MistConjuring().toJSON(),
+      new KillingBlow().toJSON(),
+      new KillingBlow().toJSON(),
+      new KillingBlow().toJSON(),
+      new KillingBlow().toJSON(),
       new AggraRay().toJSON(),
       new AggraRay().toJSON(),
       new AggraRay().toJSON(),
