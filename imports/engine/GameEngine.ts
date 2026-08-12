@@ -193,6 +193,10 @@ export class GameEngine {
     }
   }
 
+  addToHand(card: Card): void {
+    this.hand.push(card);
+  }
+
   toJSON(): UserData {
     return {
       userId: this.userId,
