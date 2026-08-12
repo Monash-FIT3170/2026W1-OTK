@@ -1,14 +1,6 @@
 // Enemy.ts
 
-export type enemyData = {
-  enemyId: string;
-  name: string;
-  health: number;
-  currentHealth: number;
-  debuffs: string[];
-  entryAnimation: string;
-  hitAnimation: string;
-};
+import { EnemyData } from '../types';
 
 export abstract class Enemy {
 
@@ -19,6 +11,10 @@ export abstract class Enemy {
   public debuffs: string[];
   public entryAnimation: string;
   public hitAnimation: string;
+  public timerDebuffActive: boolean;
+  public timerDebuffDeadline: number | null;
+  public timerDebuffInterval: number;
+  public timerDebuffTickAmount: number;
 
   constructor(data: {
     enemyId: string;
@@ -28,6 +24,10 @@ export abstract class Enemy {
     debuffs?: string[];
     entryAnimation?: string;
     hitAnimation?: string;
+    timerDebuffActive?: boolean;
+    timerDebuffDeadline?: number;
+    timerDebuffInterval?: number;
+    timerDebuffTickAmount?: number;
   }) {
     this.enemyId = data.enemyId;
     this.name = data.name;
@@ -36,13 +36,17 @@ export abstract class Enemy {
     this.debuffs = data.debuffs ?? [];
     this.entryAnimation = data.entryAnimation ?? 'fade';
     this.hitAnimation = data.hitAnimation ?? 'shake';
+    this.timerDebuffActive = data.timerDebuffActive ?? false;
+    this.timerDebuffDeadline = data.timerDebuffDeadline ?? null;
+    this.timerDebuffInterval = data.timerDebuffInterval ?? 5000;
+    this.timerDebuffTickAmount = data.timerDebuffTickAmount ?? 5;
   }
 
   takeDamage(amount: number): void {
     this.currentHealth = Math.max(0, this.currentHealth - amount);
   }
 
-  toJSON(): enemyData {
+  toJSON(): EnemyData {
     return {
       enemyId: this.enemyId,
       name: this.name,
@@ -51,6 +55,10 @@ export abstract class Enemy {
       debuffs: [...this.debuffs],
       entryAnimation: this.entryAnimation,
       hitAnimation: this.hitAnimation,
+      timerDebuffActive: this.timerDebuffActive,
+      timerDebuffDeadline: this.timerDebuffDeadline ?? undefined,
+      timerDebuffInterval: this.timerDebuffInterval,
+      timerDebuffTickAmount: this.timerDebuffTickAmount,
     };
   }
 }
