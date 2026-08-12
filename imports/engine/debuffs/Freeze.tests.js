@@ -27,7 +27,12 @@ describe('Freeze', function () {
     freeze.applyTo(goblin);
 
     assert.instanceOf(freeze, Debuff);
-    assert.deepEqual(goblin.debuffs, ['freeze']);
+    // A Goblin carries other default debuffs (timer), so assert on the freeze
+    // entries alone: exactly one, even though applyTo was called twice.
+    assert.deepEqual(
+      goblin.debuffs.filter((debuffId) => debuffId === 'freeze'),
+      ['freeze']
+    );
   });
 
   it('registers itself and can be reconstructed by id', function () {
@@ -85,7 +90,10 @@ describe('Freeze', function () {
     const gameState = GameEngine.newGame('freeze-test-user');
     const allCards = [...gameState.deck, ...gameState.hand];
 
-    assert.deepEqual(gameState.enemy.debuffs, ['freeze']);
+    assert.deepEqual(
+      gameState.enemy.debuffs.filter((debuffId) => debuffId === 'freeze'),
+      ['freeze']
+    );
     assert.equal(allCards.filter((card) => card.isFrozen).length, 1);
 
     const restoredEngine = new GameEngine(gameState);
