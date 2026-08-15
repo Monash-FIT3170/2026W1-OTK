@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { GameBackground } from './components/GameBackground';
 import Settings from './components/Settings';
 
-export const LandingPage = ({ hasSave, onStart }) => {
+export const LandingPage = ({ hasSave, onStart, onEditDeck }) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [starting, setStarting] = useState(false);
 
@@ -31,7 +31,8 @@ export const LandingPage = ({ hasSave, onStart }) => {
   };
 
   const handleEditDeck = () => {
-    // Deck-building page is a future sprint's task - this is just the entry point for now.
+    // Deck-building page
+    onEditDeck();
   };
 
   const handleOptions = () => {
