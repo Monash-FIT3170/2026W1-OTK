@@ -15,6 +15,7 @@ import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
 import { TutorialOverlay } from './components/TutorialOverlay';
+import { TutorialDemoScreen } from './components/TutorialDemoScreen';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -24,10 +25,18 @@ export const App = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
 
+  // Manually-opened tutorial (landing page button) is a fully separate,
+  // ephemeral demo screen — it never touches the player's real save.
+  const [showTutorialDemo, setShowTutorialDemo] = useState(false);
+
   // Tracks whether the auto-tutorial has already been offered this session,
   // so a mid-session profile update (from closing the tutorial) doesn't
   // immediately reopen it.
   const [autoTutorialHandled, setAutoTutorialHandled] = useState(false);
+
+  // Set true only when the player just started a brand-new game (not
+  // Continue). The auto-tutorial should only ever trigger off this path.
+  const [justStartedNewGame, setJustStartedNewGame] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, gameState, loading } = useTracker(() => {
@@ -50,22 +59,24 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding]);
 
-  // Auto-show the tutorial once per account, the first time the player
-  // reaches the main game screen. profile.hasSeenTutorial is already
-  // published via the existing auth.currentUser publication.
+  // Auto-show the tutorial once per account, only when the player just
+  // started a brand-new game (never on Continue). profile.hasSeenTutorial
+  // is already published via the existing auth.currentUser publication.
   useEffect(() => {
     if (
       !loading &&
       user &&
       gameState &&
       !showLanding &&
+      justStartedNewGame &&
       !autoTutorialHandled &&
       !user.profile?.hasSeenTutorial
     ) {
       setShowTutorial(true);
       setAutoTutorialHandled(true);
+      setJustStartedNewGame(false);
     }
-  }, [loading, user, gameState, showLanding, autoTutorialHandled]);
+  }, [loading, user, gameState, showLanding, justStartedNewGame, autoTutorialHandled]);
 
   useGameSounds(gameState?.result);
 
@@ -74,6 +85,29 @@ export const App = () => {
     Meteor.call('user.markTutorialSeen', (err) => {
       if (err) console.error('user.markTutorialSeen failed:', err);
     });
+  };
+
+  // Manually-opened tutorial from the landing page. Fully ephemeral —
+  // no Meteor calls, no reads or writes to the player's real save.
+  // Renders as its own top-level screen (see the showTutorialDemo branch
+  // below), completely independent of showLanding/gameState.
+  const handleOpenTutorial = () => {
+    setShowTutorialDemo(true);
+  };
+
+  const handleCloseTutorialDemo = () => {
+    setShowTutorialDemo(false);
+    Meteor.call('user.markTutorialSeen', (err) => {
+      if (err) console.error('user.markTutorialSeen failed:', err);
+    });
+  };
+
+  // Called by LandingPage when leaving for the main game screen.
+  // isNewGame should be true only for the New Game/Start action, never
+  // for Continue — this is what the auto-tutorial trigger keys off.
+  const handleStart = (isNewGame = false) => {
+    setShowLanding(false);
+    if (isNewGame) setJustStartedNewGame(true);
   };
 
   // --- Loading state ---
@@ -98,17 +132,20 @@ export const App = () => {
     );
   }
 
+  // --- Manually-opened tutorial demo: fully ephemeral, independent of
+  // showLanding/gameState. Never touches the player's real save. ---
+  if (showTutorialDemo) {
+    return <TutorialDemoScreen onClose={handleCloseTutorialDemo} />;
+  }
+
   // --- Landing page: shown once user is authenticated, before game starts ---
   if (showLanding) {
     return (
-      <>
-        <LandingPage
-          hasSave={!!gameState}
-          onStart={() => setShowLanding(false)}
-          onOpenTutorial={() => setShowTutorial(true)}
-        />
-        {showTutorial && <TutorialOverlay onClose={handleCloseTutorial} />}
-      </>
+      <LandingPage
+        hasSave={gameState?.result === 'playing'}
+        onStart={handleStart}
+        onOpenTutorial={handleOpenTutorial}
+      />
     );
   }
 
@@ -125,7 +162,13 @@ export const App = () => {
 
   // --- Victory / Defeat screens ---
   if (result === 'win' || result === 'loss') {
-    return <ResultScreen result={result} enemyName={enemy.name} />;
+    return (
+      <ResultScreen
+        result={result}
+        enemyName={enemy.name}
+        onBackToMenu={() => setShowLanding(true)}
+      />
+    );
   }
 
   // --- Main game screen ---

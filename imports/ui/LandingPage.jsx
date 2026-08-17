@@ -8,15 +8,35 @@ export const LandingPage = ({ hasSave, onStart, onOpenTutorial }) => {
   const [starting, setStarting] = useState(false);
 
   const handleContinue = () => {
-    onStart();
+    // gameState is already loaded reactively in App.jsx from the user's save —
+    // nothing to fetch here, just leave the landing page. isNewGame is
+    // explicitly false so this never triggers the auto-tutorial.
+    onStart(false);
   };
 
   const handleNewGame = () => {
-    //
+    if (hasSave && !confirmingNewGame) {
+      //ask for confirmation
+      setConfirmingNewGame(true);
+      return;
+    }
+
+    setStarting(true);
+    Meteor.call('game.newGame', (err) => {
+      setStarting(false);
+      if (err) {
+        console.error('game.newGame failed:', err);
+        return;
+      }
+      setConfirmingNewGame(false);
+      // isNewGame=true is what lets App.jsx auto-show the tutorial for
+      // first-time players. Continue deliberately never passes true.
+      onStart(true);
+    });
   };
 
   const handleEditDeck = () => {
-    // Deck-building page is a future sprint's task — this is just the entry point for now.
+    // Deck-building page is a future sprint's task - this is just the entry point for now.
   };
 
   const handleOptions = () => {
@@ -51,7 +71,7 @@ export const LandingPage = ({ hasSave, onStart, onOpenTutorial }) => {
               disabled={starting}
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors disabled:opacity-50"
             >
-              {hasSave ? 'New Game' : 'Start'}
+              New Game
             </button>
 
             <button
