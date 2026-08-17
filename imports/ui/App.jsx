@@ -10,11 +10,11 @@ import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
-import { PlayerDisplay } from './components/PlayerDisplay';
 import { SaveGameButton } from './components/SaveGameButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
+import { TutorialOverlay } from './components/TutorialOverlay';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -22,6 +22,12 @@ import Settings from './components/Settings';
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // Tracks whether the auto-tutorial has already been offered this session,
+  // so a mid-session profile update (from closing the tutorial) doesn't
+  // immediately reopen it.
+  const [autoTutorialHandled, setAutoTutorialHandled] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, gameState, loading } = useTracker(() => {
@@ -44,23 +50,31 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding]);
 
+  // Auto-show the tutorial once per account, the first time the player
+  // reaches the main game screen. profile.hasSeenTutorial is already
+  // published via the existing auth.currentUser publication.
   useEffect(() => {
-    if (!gameState?.enemy?.timerDebuffActive || !gameState.enemy.timerDebuffDeadline) {
-      return undefined;
+    if (
+      !loading &&
+      user &&
+      gameState &&
+      !showLanding &&
+      !autoTutorialHandled &&
+      !user.profile?.hasSeenTutorial
+    ) {
+      setShowTutorial(true);
+      setAutoTutorialHandled(true);
     }
-
-    const interval = setInterval(() => {
-      if (Date.now() >= gameState.enemy.timerDebuffDeadline) {
-        Meteor.call('game.applyTimerTick', (err) => {
-          if (err) console.error('game.applyTimerTick failed:', err);
-        });
-      }
-    }, 250);
-
-    return () => clearInterval(interval);
-  }, [gameState?.enemy?.timerDebuffActive, gameState?.enemy?.timerDebuffDeadline]);
+  }, [loading, user, gameState, showLanding, autoTutorialHandled]);
 
   useGameSounds(gameState?.result);
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+    Meteor.call('user.markTutorialSeen', (err) => {
+      if (err) console.error('user.markTutorialSeen failed:', err);
+    });
+  };
 
   // --- Loading state ---
   if (loading) {
@@ -87,10 +101,14 @@ export const App = () => {
   // --- Landing page: shown once user is authenticated, before game starts ---
   if (showLanding) {
     return (
-      <LandingPage
-        hasSave={!!gameState}
-        onStart={() => setShowLanding(false)}
-      />
+      <>
+        <LandingPage
+          hasSave={!!gameState}
+          onStart={() => setShowLanding(false)}
+          onOpenTutorial={() => setShowTutorial(true)}
+        />
+        {showTutorial && <TutorialOverlay onClose={handleCloseTutorial} />}
+      </>
     );
   }
 
@@ -159,6 +177,8 @@ export const App = () => {
       >
         <DeckViewer cards={deck} />
       </div>
+
+      {showTutorial && <TutorialOverlay onClose={handleCloseTutorial} />}
     </GameBackground>
   );
 };
