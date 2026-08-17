@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { GameBackground } from './components/GameBackground';
 import Settings from './components/Settings';
 
-export const LandingPage = ({ hasSave, onStart }) => {
+export const LandingPage = ({ hasSave, onStart, onOpenTutorial }) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [starting, setStarting] = useState(false);
 
@@ -12,26 +12,11 @@ export const LandingPage = ({ hasSave, onStart }) => {
   };
 
   const handleNewGame = () => {
-    if (hasSave && !confirmingNewGame) {
-      //ask for confirmation
-      setConfirmingNewGame(true);
-      return;
-    }
-
-    setStarting(true);
-    Meteor.call('game.newGame', (err) => {
-      setStarting(false);
-      if (err) {
-        console.error('game.newGame failed:', err);
-        return;
-      }
-      setConfirmingNewGame(false);
-      onStart();
-    });
+    //
   };
 
   const handleEditDeck = () => {
-    // Deck-building page is a future sprint's task - this is just the entry point for now.
+    // Deck-building page is a future sprint's task — this is just the entry point for now.
   };
 
   const handleOptions = () => {
@@ -81,6 +66,13 @@ export const LandingPage = ({ hasSave, onStart }) => {
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
             >
               Options
+            </button>
+
+            <button
+              onClick={onOpenTutorial}
+              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+            >
+              Tutorial
             </button>
 
             <button
