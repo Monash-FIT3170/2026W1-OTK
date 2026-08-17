@@ -31,3 +31,7 @@ import '/imports/ui/components/SaveGameButton.app-tests.jsx';
 
 // LANDING PAGE TESTS
 import '../imports/ui/LandingPage.tests.jsx';
+
+// TUTORIAL TESTS
+import '../imports/ui/components/TutorialOverlay.tests.jsx';
+import '../imports/api/auth/methods/markTutorialSeen.tests.js';
