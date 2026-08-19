@@ -13,9 +13,10 @@ function nextUniqueId(cardId) {
 export function DeckBuilder({
   availableCards = [],
   initialDeck = [],
-  deckSize: maxDeckSize = 20,
+  deckSize: maxDeckSize = 15,
   maxCopiesPerCard = 2,
   onConfirm,
+  onBack,
 }) {
   const [deckCards, setDeckCards] = useState(() =>
     initialDeck.map((card) => ({
@@ -47,6 +48,10 @@ export function DeckBuilder({
     );
   };
 
+  const removeAllCardsFromDeck = () => {
+    setDeckCards((currentDeck) => [])
+  }
+
   const handleConfirm = () => {
     if (deckCards.length !== maxDeckSize) {
       return;
@@ -56,6 +61,7 @@ export function DeckBuilder({
       onConfirm(deckCards);
     }
   };
+
 
   return (
     <div
@@ -94,12 +100,34 @@ export function DeckBuilder({
       <div className="flex min-h-0 flex-1">
         {/* left panel for current selection */}
         <div className="flex w-[35%] min-w-[350px] flex-col border-r border-slate-700">
-          <div className="border-b border-slate-700 px-6 py-4">
-            <h2 className="text-3xl">Your Deck</h2>
+          <div className="border-b border-slate-700 px-6 py-4 flex">
+            <div className="flex-4">
+              <h2 className="text-3xl">Your Deck</h2>
+              <p className="text-lg text-slate-400">
+                {deckCards.length} / {maxDeckSize} cards
+              </p>
+            </div>
 
-            <p className="text-lg text-slate-400">
-              {deckCards.length} / {maxDeckSize} cards
-            </p>
+            <motion.button
+              type="button"
+              onClick={onBack}
+              whileHover={
+                {scale: 1.02}
+              }
+              whileTap={deckCards.length > 0}
+              className="
+                w-full rounded-lg
+                flex-1
+                bg-slate-700 px-6 my-2
+                text-xl font-bold text-slate-900
+                transition-colors
+                hover:bg-slate-600
+                disabled:cursor-not-allowed
+                disabled:opacity-40
+              "
+              >
+              Go Back
+            </motion.button>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
@@ -123,7 +151,7 @@ export function DeckBuilder({
           </div>
 
           {/* confirm button */}
-          <div className="border-t border-slate-700 p-5">
+          <div className="border-t border-slate-700 p-5 flex ">
             <motion.button
               type="button"
               disabled={deckCards.length !== maxDeckSize}
@@ -134,7 +162,8 @@ export function DeckBuilder({
               whileTap={deckCards.length === maxDeckSize ? { scale: 0.97 } : {}}
               className="
                 w-full rounded-lg
-                bg-white px-6 py-3
+                flex-2
+                bg-white px-6 py-3 mr-1
                 text-xl font-bold text-slate-900
                 transition-colors
                 hover:bg-slate-200
@@ -145,6 +174,27 @@ export function DeckBuilder({
               {deckCards.length === maxDeckSize
                 ? 'Confirm Deck'
                 : `Select ${maxDeckSize - deckCards.length} More`}
+            </motion.button>
+            <motion.button
+              type="button"
+              disabled={deckCards.length <= 0}
+              onClick={removeAllCardsFromDeck}
+              whileHover={
+                {scale: 1.02}
+              }
+              whileTap={deckCards.length > 0}
+              className="
+                w-full rounded-lg
+                flex-1
+                bg-red-700 px-6 py-3
+                text-xl font-bold text-slate-900
+                transition-colors
+                hover:bg-red-500
+                disabled:cursor-not-allowed
+                disabled:opacity-40
+              "
+            >
+              Clear All
             </motion.button>
           </div>
         </div>

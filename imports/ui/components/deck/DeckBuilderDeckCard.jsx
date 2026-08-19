@@ -45,6 +45,7 @@ function DeckBuilderDeckCard({
         cardProps={card}
         width={LARGE_CARD_WIDTH}
       />
+      
     </motion.button>
   );
 }

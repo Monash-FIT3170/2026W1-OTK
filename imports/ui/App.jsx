@@ -94,7 +94,10 @@ export const App = () => {
             setShowDeckBuilder(false);
           });
         }}
-        onBack={() => setShowDeckBuilder(false)}
+        onBack={() => {
+          setShowDeckBuilder(false);
+          setShowLanding(true);
+        }}
       />
     );
   }
