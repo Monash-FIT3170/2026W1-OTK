@@ -19,6 +19,7 @@ export class FerociousClaw extends Card {
       baseAttack: 24,
       currentAttack: 24,
       cardAmountToSelect: { min: 1, max: 1 },
+      maxCopies: 2,
       ...data,
     });
   }

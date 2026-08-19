@@ -31,6 +31,7 @@ export class MistConjuring extends Card {
       description: 'Create 3 copies of "Fog Clearing".',
       baseCost: 3,
       currentCost: 3,
+      maxCopies: 2,
       ...data,
     });
   }

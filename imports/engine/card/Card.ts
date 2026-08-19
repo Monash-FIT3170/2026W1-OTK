@@ -16,6 +16,7 @@ export abstract class Card {
   public baseAttack?: number;
   public currentAttack?: number;
   public cardAmountToSelect?: { min: number; max: number };
+  public maxCopies: number;
 
   // constructs card
   constructor(data: {
@@ -28,6 +29,7 @@ export abstract class Card {
     baseAttack?: number;
     currentAttack?: number;
     cardAmountToSelect?: { min: number; max: number };
+    maxCopies: number
   }) {
     this.cardId = data.cardId;
     this.uniqueId = data.uniqueId ?? crypto.randomUUID();
@@ -38,6 +40,7 @@ export abstract class Card {
     this.baseAttack = data.baseAttack;
     this.currentAttack = data.currentAttack;
     this.cardAmountToSelect = data.cardAmountToSelect;
+    this.maxCopies = data.maxCopies;
   }
 
   // executes card effects
@@ -75,6 +78,7 @@ export abstract class Card {
       baseAttack: this.baseAttack,
       currentAttack: this.currentAttack,
       cardAmountToSelect: this.cardAmountToSelect,
+      maxCopies: this.maxCopies,
     };
   }
 }

@@ -20,6 +20,7 @@ export class AirKnife extends Card {
       currentCost: 0,
       baseAttack: 8,
       currentAttack: 8,
+      maxCopies: 2,
       ...data
     });
   }

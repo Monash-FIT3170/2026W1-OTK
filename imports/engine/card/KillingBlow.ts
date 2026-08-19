@@ -32,6 +32,7 @@ export class KillingBlow extends Card {
       currentCost: 3,
       baseAttack: 2,
       currentAttack: 2,
+      maxCopies: 1,
       ...data,
     });
   }
