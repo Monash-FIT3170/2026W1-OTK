@@ -1,58 +1,181 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { GameBackground } from './GameBackground';
 import { HealthBar } from './enemy/HealthBar';
 import { PlayerDisplay } from './PlayerDisplay';
 import { EnemyDisplay } from './enemy/EnemyDisplay';
+import { DeckViewer } from './DeckViewer';
 import Card from '../cards/Card';
-import { TutorialOverlay } from './TutorialOverlay';
+import { tutorialSteps } from '../tutorial/tutorialSteps';
+import { useTutorialEngine } from '../hooks/useTutorialEngine';
 import {
-  tutorialDemoEnemy,
-  tutorialDemoHand,
-  tutorialDemoDeckSize,
-} from '../tutorial/tutorialDemoData';
+  measureTarget,
+  computeHighlightStyle,
+  computeCardPositionStyle,
+} from '../tutorial/spotlight';
 
-// A visual stand-in for the real battle screen, used only as a backdrop
-// for the tutorial walkthrough. Deliberately does NOT reuse CardHand or
-// EndTurnButton, since both of those call real Meteor methods
-// (game.executeCard / game.drawCards / game.endTurn) with no way to
-// intercept them — using them here could mutate the player's actual
-// save. Everything below is static/non-interactive and backed by fixed
-// mock data from tutorialDemoData.js, never UserDataCollection.
+// The interactive tutorial: real gameplay actions (playing a card,
+// ending your turn) run against a local, ephemeral GameEngine instance
+// from useTutorialEngine — never Meteor.call, never UserDataCollection.
+// Steps with an `action` requirement (see tutorialSteps.js) only advance
+// once the player actually performs that action, not via a Next click.
 export const TutorialDemoScreen = ({ onClose }) => {
+  const { hand, deck, enemy, cardsPlayedCount, playCard, endTurn } =
+    useTutorialEngine();
+
+  const [stepIndex, setStepIndex] = useState(0);
+  const [rect, setRect] = useState(null);
+
+  const step = tutorialSteps[stepIndex];
+  const isFirstStep = stepIndex === 0;
+  const isLastStep = stepIndex === tutorialSteps.length - 1;
+  const isWaitingForAction = Boolean(step.action);
+
+  // Baseline captured whenever we enter a gated step, so we can tell
+  // "the player just played a card" apart from "they already played one
+  // earlier and went Back". Reset each time stepIndex changes. The only
+  // gated action is 'play-card' — End Turn stays description-only, for
+  // consistency with the real-game tutorial (see TutorialOverlay.jsx),
+  // where gating it would risk a first-time player accidentally ending
+  // their actual turn too early.
+  const playBaselineRef = useRef(0);
+
+  useEffect(() => {
+    playBaselineRef.current = cardsPlayedCount;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIndex]);
+
+  useEffect(() => {
+    if (step.action === 'play-card' && cardsPlayedCount > playBaselineRef.current) {
+      setStepIndex((i) => Math.min(i + 1, tutorialSteps.length - 1));
+    }
+  }, [cardsPlayedCount, step.action]);
+
+  useEffect(() => {
+    const measure = () => setRect(measureTarget(step.target));
+    measure();
+    const settleTimer = setTimeout(measure, 60);
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearTimeout(settleTimer);
+    };
+  }, [stepIndex, step.target]);
+
+  const handleNext = () => {
+    if (isWaitingForAction) return; // gated steps only advance via the real action
+    if (isLastStep) {
+      onClose();
+      return;
+    }
+    setStepIndex((i) => i + 1);
+  };
+
+  const handleBack = () => {
+    if (isFirstStep) return;
+    setStepIndex((i) => i - 1);
+  };
+
+  const canAfford = (card) => card.currentCost <= deck.length;
+
+  const cardContent = (
+    <div className="bg-slate-800 rounded-xl shadow-2xl p-6 flex flex-col gap-5">
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-slate-400">
+          Step {stepIndex + 1} of {tutorialSteps.length}
+        </span>
+        <button
+          onClick={onClose}
+          aria-label="Skip tutorial"
+          className="text-sm text-slate-400 hover:text-white transition-colors"
+        >
+          Skip
+        </button>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-2">{step.title}</h2>
+        <p className="text-slate-200 leading-relaxed">{step.description}</p>
+        {isWaitingForAction && (
+          <p className="text-emerald-400 text-sm mt-3 font-semibold">
+            Waiting for you to try it...
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between pt-2">
+        <button
+          onClick={handleBack}
+          disabled={isFirstStep}
+          className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Back
+        </button>
+
+        {!isWaitingForAction && (
+          <button
+            onClick={handleNext}
+            className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors"
+          >
+            {isLastStep ? 'Done' : 'Next'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <GameBackground backgroundScene="underpass-overlaid">
-      <div className="px-6 py-4 mx-auto w-350">
-        <HealthBar
-          current={tutorialDemoEnemy.currentHealth}
-          max={tutorialDemoEnemy.health}
-          name={tutorialDemoEnemy.name}
-        />
+      <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
+        <HealthBar current={enemy.currentHealth} max={enemy.health} name={enemy.name} />
       </div>
 
       <div className="absolute" style={{ left: 400, bottom: 540 }}>
         <PlayerDisplay />
       </div>
 
-      <div className="absolute" style={{ right: 400, bottom: 540 }}>
-        <EnemyDisplay enemy={tutorialDemoEnemy} isVisible={true} />
-      </div>
-
-      {/* Static End Turn look-alike — not the real EndTurnButton, so it
-          can't call the real game.endTurn method. */}
-      <div className="absolute" style={{ top: 530, right: 30 }}>
-        <div className="px-8 py-4 bg-red-700/60 text-white font-semibold rounded-lg text-xl cursor-not-allowed select-none">
-          End Turn
-        </div>
-      </div>
-
-      {/* Static hand — plain Card display components, not CardHand, so
-          nothing here can call real Meteor methods. */}
       <div
-        className="absolute flex items-end gap-2 pointer-events-none"
-        style={{ left: 370, right: 140, bottom: 20 }}
+        className="absolute"
+        style={{ right: 400, bottom: 540 }}
+        data-tutorial-target="enemy"
       >
-        {tutorialDemoHand.map((cardProps) => (
-          <Card key={cardProps.uniqueId} cardProps={cardProps} width={180} />
+        <EnemyDisplay enemy={enemy} isVisible={true} />
+      </div>
+
+      {/* Real, local End Turn — calls the hook's endTurn(), not the real
+          game.endTurn Meteor method. */}
+      <div
+        className="absolute"
+        style={{ top: 530, right: 30 }}
+        data-tutorial-target="end-turn"
+      >
+        <button
+          onClick={endTurn}
+          className="px-8 py-4 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-xl transition-colors"
+        >
+          End Turn
+        </button>
+      </div>
+
+      {/* Real, local, clickable hand — click a card to actually play it
+          against the local engine. Card is rendered at its real-game
+          default width (300) rather than a shrunk-down size, so this
+          matches what the player will actually see in real gameplay. */}
+      <div
+        className="absolute flex items-end gap-2"
+        style={{ left: 370, right: 140, bottom: 20 }}
+        data-tutorial-target="hand"
+      >
+        {hand.map((cardProps) => (
+          <button
+            key={cardProps.uniqueId}
+            onClick={() => playCard(cardProps.uniqueId)}
+            disabled={!canAfford(cardProps)}
+            className="disabled:opacity-40 disabled:cursor-not-allowed transition-opacity bg-transparent border-0 p-0 cursor-pointer"
+            aria-label={`Play ${cardProps.name}`}
+          >
+            <Card cardProps={cardProps} />
+          </button>
         ))}
       </div>
 
@@ -60,12 +183,41 @@ export const TutorialDemoScreen = ({ onClose }) => {
         className="absolute flex items-end pointer-events-none"
         style={{ left: 87, right: 140, bottom: 163 }}
       >
-        <div className="text-white text-sm">
-          Deck: {tutorialDemoDeckSize} cards
+        {/* Reuses the real DeckViewer component — it's purely local/
+            presentational (no Meteor calls), so it's safe here and gives
+            pixel-perfect consistency with the real game screen instead
+            of a custom placeholder. Wrapped tightly so the tutorial
+            spotlight highlights just the visible deck number, not the
+            wide positioning container around it. */}
+        <div className="inline-block pointer-events-auto" data-tutorial-target="deck">
+          <DeckViewer cards={deck} />
         </div>
       </div>
 
-      <TutorialOverlay onClose={onClose} />
+      {/* Portaled straight to document.body — see the matching comment in
+          TutorialOverlay.jsx for why: rendering position: fixed elements
+          inside GameBackground (a possibly CSS-scaled ancestor) makes
+          them relative to that scaled box instead of the true viewport. */}
+      {!rect
+        ? createPortal(
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+              <div className="w-full max-w-md mx-4">{cardContent}</div>
+            </div>,
+            document.body
+          )
+        : createPortal(
+            <>
+              <div style={computeHighlightStyle(rect)} />
+              <div
+                style={computeCardPositionStyle(rect, {
+                  pinToTop: step.target === 'hand',
+                })}
+              >
+                {cardContent}
+              </div>
+            </>,
+            document.body
+          )}
     </GameBackground>
   );
 };
