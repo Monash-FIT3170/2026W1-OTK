@@ -8,21 +8,19 @@
 //
 // The tutorial deck is deliberately curated to only selection-free
 // cards (no cardAmountToSelect), so a guided "play a card" step always
-// succeeds immediately with no selection UI needed. The enemy is a
-// debuff-free Goblin, so nothing unpredictable (Freeze/Timer) interrupts
-// the guided steps.
+// succeeds immediately with no selection UI needed. The Training Dummy has
+// no debuffs and resets its health instead of dying, so the player can keep
+// practising until they choose to end the tutorial.
 
 import { GameEngine } from '../../engine/GameEngine';
-import { Goblin } from '../../engine/enemy/enemies/Goblin';
 import { FogClearing } from '../../engine/card/FogClearing';
 import { AirKnife } from '../../engine/card/AirKnife';
+import { TrainingDummy } from '../../engine/enemy/enemies/TrainingDummy';
 
 const TUTORIAL_STARTING_HAND_SIZE = 3;
 
 export function createTutorialEngine() {
-  // Passing debuffs: [] (not undefined) skips Goblin's default
-  // Timer/Freeze debuffs — see Goblin.ts's `data.debuffs === undefined` check.
-  const enemy = new Goblin({ debuffs: [] });
+  const enemy = new TrainingDummy();
 
   const deck = [
     ...Array.from({ length: 6 }, () => new FogClearing().toJSON()),

@@ -14,6 +14,21 @@ import {
   computeCardPositionStyle,
 } from '../tutorial/spotlight';
 
+// The standalone demo shares the main tutorial steps, but finishes in a
+// free-play state. Keeping this separate means the real-game overlay can
+// retain its safer Done button instead of requiring the player's real turn
+// to end.
+const demoTutorialSteps = [
+  ...tutorialSteps.slice(0, -1),
+  {
+    target: 'end-turn',
+    action: 'end-turn',
+    title: 'Keep Practising',
+    description:
+      'Keep playing cards against the Training Dummy for as long as you like. When you are ready to end the tutorial, press End Turn.',
+  },
+];
+
 // The interactive tutorial: real gameplay actions (playing a card,
 // ending your turn) run against a local, ephemeral GameEngine instance
 // from useTutorialEngine — never Meteor.call, never UserDataCollection.
@@ -26,18 +41,16 @@ export const TutorialDemoScreen = ({ onClose }) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState(null);
 
-  const step = tutorialSteps[stepIndex];
+  const step = demoTutorialSteps[stepIndex];
   const isFirstStep = stepIndex === 0;
-  const isLastStep = stepIndex === tutorialSteps.length - 1;
+  const isLastStep = stepIndex === demoTutorialSteps.length - 1;
   const isWaitingForAction = Boolean(step.action);
 
   // Baseline captured whenever we enter a gated step, so we can tell
   // "the player just played a card" apart from "they already played one
-  // earlier and went Back". Reset each time stepIndex changes. The only
-  // gated action is 'play-card' — End Turn stays description-only, for
-  // consistency with the real-game tutorial (see TutorialOverlay.jsx),
-  // where gating it would risk a first-time player accidentally ending
-  // their actual turn too early.
+  // earlier and went Back". Reset each time stepIndex changes. This baseline
+  // only applies to the play-card action; the final end-turn action is handled
+  // directly by handleEndTurn.
   const playBaselineRef = useRef(0);
 
   useEffect(() => {
@@ -46,8 +59,11 @@ export const TutorialDemoScreen = ({ onClose }) => {
   }, [stepIndex]);
 
   useEffect(() => {
-    if (step.action === 'play-card' && cardsPlayedCount > playBaselineRef.current) {
-      setStepIndex((i) => Math.min(i + 1, tutorialSteps.length - 1));
+    if (
+      step.action === 'play-card' &&
+      cardsPlayedCount > playBaselineRef.current
+    ) {
+      setStepIndex((i) => Math.min(i + 1, demoTutorialSteps.length - 1));
     }
   }, [cardsPlayedCount, step.action]);
 
@@ -76,13 +92,20 @@ export const TutorialDemoScreen = ({ onClose }) => {
     setStepIndex((i) => i - 1);
   };
 
+  const handleEndTurn = () => {
+    endTurn();
+    if (step.action === 'end-turn') {
+      onClose();
+    }
+  };
+
   const canAfford = (card) => card.currentCost <= deck.length;
 
   const cardContent = (
     <div className="bg-slate-800 rounded-xl shadow-2xl p-6 flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <span className="text-sm text-slate-400">
-          Step {stepIndex + 1} of {tutorialSteps.length}
+          Step {stepIndex + 1} of {demoTutorialSteps.length}
         </span>
         <button
           onClick={onClose}
@@ -127,7 +150,11 @@ export const TutorialDemoScreen = ({ onClose }) => {
   return (
     <GameBackground backgroundScene="underpass-overlaid">
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
-        <HealthBar current={enemy.currentHealth} max={enemy.health} name={enemy.name} />
+        <HealthBar
+          current={enemy.currentHealth}
+          max={enemy.health}
+          name={enemy.name}
+        />
       </div>
 
       <div className="absolute" style={{ left: 400, bottom: 540 }}>
@@ -150,7 +177,7 @@ export const TutorialDemoScreen = ({ onClose }) => {
         data-tutorial-target="end-turn"
       >
         <button
-          onClick={endTurn}
+          onClick={handleEndTurn}
           className="px-8 py-4 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-lg text-xl transition-colors"
         >
           End Turn
@@ -189,7 +216,10 @@ export const TutorialDemoScreen = ({ onClose }) => {
             of a custom placeholder. Wrapped tightly so the tutorial
             spotlight highlights just the visible deck number, not the
             wide positioning container around it. */}
-        <div className="inline-block pointer-events-auto" data-tutorial-target="deck">
+        <div
+          className="inline-block pointer-events-auto"
+          data-tutorial-target="deck"
+        >
           <DeckViewer cards={deck} />
         </div>
       </div>
@@ -210,7 +240,8 @@ export const TutorialDemoScreen = ({ onClose }) => {
               <div style={computeHighlightStyle(rect)} />
               <div
                 style={computeCardPositionStyle(rect, {
-                  pinToTop: step.target === 'hand',
+                  pinToTop:
+                    step.target === 'hand' || step.action === 'end-turn',
                 })}
               >
                 {cardContent}

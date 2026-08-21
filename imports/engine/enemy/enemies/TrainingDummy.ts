@@ -8,7 +8,7 @@ export class TrainingDummy extends Enemy {
   static enemyId = 'trainingDummy';
 
   constructor(data: Partial<EnemyData> = {}) {
-    const health = data.health ?? 200;
+    const health = data.health ?? 30;
 
     super({
       enemyId: TrainingDummy.enemyId,

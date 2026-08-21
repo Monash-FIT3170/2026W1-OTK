@@ -23,7 +23,7 @@ export function useTutorialEngine() {
     const card = engine.hand.find((c) => c.uniqueId === uniqueId);
 
     // The tutorial deck is curated to be entirely selection-free, and
-    // isFrozen never applies (the tutorial Goblin has no debuffs), so
+    // isFrozen never applies (the Training Dummy has no debuffs), so
     // this is mostly a defensive guard against playing an unaffordable card.
     if (!card || !card.isPlayable() || card.currentCost > engine.deck.length) {
       return;

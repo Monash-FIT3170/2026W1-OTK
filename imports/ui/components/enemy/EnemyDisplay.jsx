@@ -13,6 +13,11 @@ import TimerDebuff from './TimerDebuff';
  * @param {boolean} isVisible - Controls whether the enemy is rendered. Setting to false triggers the exit animation.
  *
  */
+
+const ENEMY_SPRITE_IDS = {
+  trainingDummy: 'goblin',
+};
+
 export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
   if (!enemy) {
     return (
@@ -47,6 +52,9 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
     transition,
   } = EntryAnimations[enemy.entryAnimation] ?? EntryAnimations.fade;
 
+  const spriteId =
+    ENEMY_SPRITE_IDS[enemy.enemyId] || enemy.enemyId.toLowerCase();
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -59,17 +67,25 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
           transition={transition}
         >
           <div className="relative inline-block">
-          <img
-            src={`/assets/sprites/enemies/${enemy.enemyId.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
-            alt={enemy.name}
-            className="h-48 w-auto object-contain"
-            style={{ imageRendering: 'pixelated' }}
-            onError={(e) => {
-              e.target.src = `/assets/sprites/enemies/${enemy.name.toLowerCase()}-enemy.png`;
-            }}
-          />
-          {/* Timer debuff badge overlay */}
-          <TimerDebuff enemy={enemy} />
+            <img
+              src={`/assets/sprites/enemies/${spriteId}${isHit ? '-attack' : ''}-enemy.gif`}
+              alt={enemy.name}
+              className="h-48 w-auto object-contain"
+              style={{ imageRendering: 'pixelated' }}
+              onError={(e) => {
+                const normalSprite = `/assets/sprites/enemies/${spriteId}-enemy.gif`;
+                if (e.currentTarget.getAttribute('src') !== normalSprite) {
+                  e.currentTarget.src = normalSprite;
+                  return;
+                }
+
+                e.currentTarget.onerror = null;
+                e.currentTarget.src =
+                  '/assets/sprites/enemies/placeholder-enemy.png';
+              }}
+            />
+            {/* Timer debuff badge overlay */}
+            <TimerDebuff enemy={enemy} />
           </div>
         </motion.div>
       )}
