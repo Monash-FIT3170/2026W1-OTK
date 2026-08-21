@@ -29,13 +29,12 @@ export const App = () => {
   // ephemeral demo screen — it never touches the player's real save.
   const [showTutorialDemo, setShowTutorialDemo] = useState(false);
 
-  // Tracks whether the auto-tutorial has already been offered this session,
-  // so a mid-session profile update (from closing the tutorial) doesn't
-  // immediately reopen it.
-  const [autoTutorialHandled, setAutoTutorialHandled] = useState(false);
-
   // Set true only when the player just started a brand-new game (not
-  // Continue). The auto-tutorial should only ever trigger off this path.
+  // Continue). The auto-tutorial triggers off this path — every time,
+  // not just a player's first-ever game, since re-showing it on every
+  // New Game (e.g. after trying a new strategy, or a returning player
+  // wanting a refresher) makes more sense for this kind of game than a
+  // strict one-time-only onboarding flow.
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
 
   // Subscribe to auth and game data reactively
@@ -59,24 +58,15 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding]);
 
-  // Auto-show the tutorial once per account, only when the player just
-  // started a brand-new game (never on Continue). profile.hasSeenTutorial
-  // is already published via the existing auth.currentUser publication.
+  // Auto-show the tutorial every time the player starts a brand-new game
+  // (never on Continue).
   useEffect(() => {
-    if (
-      !loading &&
-      user &&
-      gameState &&
-      !showLanding &&
-      justStartedNewGame &&
-      !autoTutorialHandled &&
-      !user.profile?.hasSeenTutorial
-    ) {
+    if (!loading && user && gameState && !showLanding && justStartedNewGame) {
       setShowTutorial(true);
-      setAutoTutorialHandled(true);
       setJustStartedNewGame(false);
     }
-  }, [loading, user, gameState, showLanding, justStartedNewGame, autoTutorialHandled]);
+  }, [loading, user, gameState, showLanding, justStartedNewGame]);
+
 
   useGameSounds(gameState?.result);
 
@@ -179,7 +169,7 @@ export const App = () => {
         <Settings saveButton={<SaveGameButton gameState={gameState} />} />
       </div>
 
-      <div className="px-6 py-4 mx-auto w-350">
+      <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
         <HealthBar
           current={enemy.currentHealth}
           max={enemy.health}
@@ -193,19 +183,28 @@ export const App = () => {
       </div>
 
       {/* Enemy display */}
-      <div className="absolute" style={{ right: 400, bottom: 540 }}>
+      <div
+        className="absolute"
+        style={{ right: 400, bottom: 540 }}
+        data-tutorial-target="enemy"
+      >
         <EnemyDisplay enemy={enemy} isVisible={true} />
       </div>
 
       {/* End turn button — absolute to match its former flex-flow position */}
-      <div className="absolute" style={{ top: 530, right: 30 }}>
-        <EndTurnButton />
+      <div
+        className="absolute"
+        style={{ top: 530, right: 30 }}
+        data-tutorial-target="end-turn"
+      >
+        <EndTurnButton disabled={showTutorial} />
       </div>
 
       {/* Card hand row: DeckViewer on left, hand on right */}
       <div
         className="absolute flex items-end"
         style={{ left: 370, right: 140, bottom: 20 }}
+        data-tutorial-target="hand"
       >
         <CardHand cards={hand} deckSize={deck.length} />
       </div>
@@ -218,10 +217,19 @@ export const App = () => {
           bottom: 163,
         }}
       >
-        <DeckViewer cards={deck} />
+        {/* Inner wrapper sized to DeckViewer's actual content, not the
+            wide positioning container above — that container spans
+            almost the full screen width and was causing the tutorial
+            spotlight to highlight a huge, wrong area instead of the
+            actual visible deck number. */}
+        <div className="inline-block" data-tutorial-target="deck">
+          <DeckViewer cards={deck} />
+        </div>
       </div>
 
-      {showTutorial && <TutorialOverlay onClose={handleCloseTutorial} />}
+      {showTutorial && (
+        <TutorialOverlay onClose={handleCloseTutorial} hand={hand} />
+      )}
     </GameBackground>
   );
 };
