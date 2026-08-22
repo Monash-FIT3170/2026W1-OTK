@@ -2,21 +2,15 @@
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
+import { EnemyData } from '../../types';
+import { debuffRegistry } from '../../debuffs';
 
 export class Goblin extends Enemy {
   static enemyId = 'goblin';
 
-  constructor(
-    data: {
-      name?: string;
-      health?: number;
-      currentHealth?: number;
-      debuffs?: string[];
-      entryAnimation?: string;
-      hitAnimation?: string;
-    } = {}
-  ) {
+  constructor(data: Partial<EnemyData> = {}) {
     const health = data.health ?? 100;
+
     super({
       enemyId: Goblin.enemyId,
       name: data.name ?? 'Goblin',
@@ -25,7 +19,18 @@ export class Goblin extends Enemy {
       debuffs: data.debuffs ?? [],
       entryAnimation: data.entryAnimation ?? 'drop',
       hitAnimation: data.hitAnimation ?? 'squish',
+      timerDebuffActive: data.timerDebuffActive,
+      timerDebuffDeadline: data.timerDebuffDeadline,
+      timerDebuffInterval: data.timerDebuffInterval,
+      timerDebuffTickAmount: data.timerDebuffTickAmount,
     });
+
+    // Only fresh Goblins receive their default debuffs. Saved enemies restore
+    // the exact debuff list provided in their serialized data.
+    if (data.debuffs === undefined) {
+      debuffRegistry.create('timer').applyTo(this);
+      debuffRegistry.create('freeze').applyTo(this);
+    }
   }
 }
 
