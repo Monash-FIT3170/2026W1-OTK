@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
+import TimerDebuff from './TimerDebuff';
 
 /**
  * Displays an enemy with entrance, exit, and damage animations.
@@ -13,6 +14,13 @@ import { EntryAnimations, HitAnimations } from './EnemyAnimations';
  *
  */
 export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
+  if (!enemy) {
+    return (
+      <div className="h-48 w-48 flex items-center justify-center bg-red-200 text-sm text-red-800">
+        No enemy
+      </div>
+    );
+  }
   const [scope, animate] = _useAnimate();
 
   // Used to swap out the hit sprite when taking damage. Resets to normal sprite after animation completes.
@@ -50,8 +58,9 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
           exit={exit}
           transition={transition}
         >
+          <div className="relative inline-block">
           <img
-            src={`/assets/sprites/enemies/${enemy.name.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
+            src={`/assets/sprites/enemies/${enemy.enemyId.toLowerCase()}${isHit ? '-attack' : ''}-enemy.gif`}
             alt={enemy.name}
             className="h-48 w-auto object-contain"
             style={{ imageRendering: 'pixelated' }}
@@ -59,6 +68,9 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
               e.target.src = `/assets/sprites/enemies/${enemy.name.toLowerCase()}-enemy.png`;
             }}
           />
+          {/* Timer debuff badge overlay */}
+          <TimerDebuff enemy={enemy} />
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

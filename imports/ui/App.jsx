@@ -10,15 +10,18 @@ import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
+import { PlayerDisplay } from './components/PlayerDisplay';
 import { SaveGameButton } from './components/SaveGameButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
+import { LandingPage } from './LandingPage';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
 
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
+  const [showLanding, setShowLanding] = useState(true);
 
   // Subscribe to auth and game data reactively
   const { user, gameState, loading } = useTracker(() => {
@@ -34,12 +37,28 @@ export const App = () => {
 
   // If logged in but no game state exists yet, start a new game automatically
   useEffect(() => {
-    if (!loading && user && !gameState) {
+    if (!loading && user && !gameState && !showLanding) {
       Meteor.call('game.newGame', (err) => {
         if (err) console.error('game.newGame failed:', err);
       });
     }
-  }, [loading, user, gameState]);
+  }, [loading, user, gameState, showLanding]);
+
+  useEffect(() => {
+    if (!gameState?.enemy?.timerDebuffActive || !gameState.enemy.timerDebuffDeadline) {
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      if (Date.now() >= gameState.enemy.timerDebuffDeadline) {
+        Meteor.call('game.applyTimerTick', (err) => {
+          if (err) console.error('game.applyTimerTick failed:', err);
+        });
+      }
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, [gameState?.enemy?.timerDebuffActive, gameState?.enemy?.timerDebuffDeadline]);
 
   useGameSounds(gameState?.result);
 
@@ -62,6 +81,16 @@ export const App = () => {
           <LoginForm onShowRegister={() => setShowRegister(true)} />
         )}
       </div>
+    );
+  }
+
+  // --- Landing page: shown once user is authenticated, before game starts ---
+  if (showLanding) {
+    return (
+      <LandingPage
+        hasSave={!!gameState}
+        onStart={() => setShowLanding(false)}
+      />
     );
   }
 

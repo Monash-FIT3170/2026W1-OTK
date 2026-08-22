@@ -1,5 +1,6 @@
 import React from 'react';
 import sinon from 'sinon';
+import { Meteor } from 'meteor/meteor';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { expect } from 'chai';
 import { EnemyDisplay } from './EnemyDisplay';
@@ -7,6 +8,11 @@ import { Goblin } from '/imports/engine/enemy/enemies/Goblin';
 let goblin;
 let animateSpy;
 let fakeUseAnimate;
+
+// EnemyDisplay detects damage by comparing enemy.currentHealth against the
+// previous render, so tests trigger the hit sprite by re-rendering with a
+// lower-health enemy rather than by passing a prop.
+const damaged = (currentHealth) => new Goblin({ currentHealth });
 
 // ─── Tests ───
 if (Meteor.isClient) {
@@ -26,7 +32,6 @@ if (Meteor.isClient) {
         <EnemyDisplay
           enemy={goblin}
           isVisible={true}
-          isTakingDamage={false}
           _useAnimate={fakeUseAnimate}
         />
       );
@@ -43,7 +48,6 @@ if (Meteor.isClient) {
         <EnemyDisplay
           enemy={goblin}
           isVisible={false}
-          isTakingDamage={false}
           _useAnimate={fakeUseAnimate}
         />
       );
@@ -51,22 +55,23 @@ if (Meteor.isClient) {
       expect(screen.queryByRole('img')).to.not.exist;
     });
 
-    // 3. Shows the -hit sprite when isTakingDamage flips to true
-    it('shows hit sprite when isTakingDamage becomes true', () => {
+    // 3. Shows the -attack sprite when the enemy loses health
+    it('shows hit sprite when the enemy loses health', () => {
+      // Keep the animation pending so the hit sprite is still showing when we assert.
+      animateSpy = sinon.stub().returns(new Promise(() => {}));
+
       const { rerender } = render(
         <EnemyDisplay
           enemy={goblin}
           isVisible={true}
-          isTakingDamage={false}
           _useAnimate={fakeUseAnimate}
         />
       );
 
       rerender(
         <EnemyDisplay
-          enemy={goblin}
+          enemy={damaged(50)}
           isVisible={true}
-          isTakingDamage={true}
           _useAnimate={fakeUseAnimate}
         />
       );
@@ -80,16 +85,14 @@ if (Meteor.isClient) {
         <EnemyDisplay
           enemy={goblin}
           isVisible={true}
-          isTakingDamage={false}
           _useAnimate={fakeUseAnimate}
         />
       );
 
       rerender(
         <EnemyDisplay
-          enemy={goblin}
+          enemy={damaged(50)}
           isVisible={true}
-          isTakingDamage={true}
           _useAnimate={fakeUseAnimate}
         />
       );
@@ -98,27 +101,28 @@ if (Meteor.isClient) {
       // It doesnt need to be longer because we are mocking animations so they should be done instantly
       await waitFor(() => {
         expect(screen.getByRole('img').getAttribute('src')).to.not.include(
-          '-hit'
+          '-attack'
         );
       });
     });
 
-    // 5. onError falls back to normal sprite if the -hit sprite fails to load
+    // 5. onError falls back to normal sprite if the -attack sprite fails to load
     it('falls back to normal sprite if hit sprite fails to load', () => {
+      // Keep the animation pending so the hit sprite is still showing when we assert.
+      animateSpy = sinon.stub().returns(new Promise(() => {}));
+
       const { rerender } = render(
         <EnemyDisplay
           enemy={goblin}
           isVisible={true}
-          isTakingDamage={false}
           _useAnimate={fakeUseAnimate}
         />
       );
 
       rerender(
         <EnemyDisplay
-          enemy={goblin}
+          enemy={damaged(50)}
           isVisible={true}
-          isTakingDamage={true}
           _useAnimate={fakeUseAnimate}
         />
       );

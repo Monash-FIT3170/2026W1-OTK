@@ -12,6 +12,7 @@ export type cardData = {
   baseAttack?: number;
   currentAttack?: number;
   cardAmountToSelect?: { min: number; max: number };
+  isFrozen?: boolean;
 };
 
 // data shape for an enemy (embedded in UserData)
@@ -23,6 +24,10 @@ export type EnemyData = {
   debuffs: string[];
   entryAnimation: string;
   hitAnimation: string;
+  timerDebuffActive?: boolean;
+  timerDebuffDeadline?: number;
+  timerDebuffInterval?: number;
+  timerDebuffTickAmount?: number;
 };
 
 // data shape stored in UserDataCollection
