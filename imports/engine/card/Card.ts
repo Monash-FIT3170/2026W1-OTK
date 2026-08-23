@@ -17,6 +17,7 @@ export abstract class Card {
   public currentAttack?: number;
   public cardAmountToSelect?: { min: number; max: number };
   public maxCopies: number;
+  public isFrozen: boolean;
 
   // constructs card
   constructor(data: {
@@ -30,6 +31,7 @@ export abstract class Card {
     currentAttack?: number;
     cardAmountToSelect?: { min: number; max: number };
     maxCopies: number
+    isFrozen?: boolean;
   }) {
     this.cardId = data.cardId;
     this.uniqueId = data.uniqueId ?? crypto.randomUUID();
@@ -41,6 +43,7 @@ export abstract class Card {
     this.currentAttack = data.currentAttack;
     this.cardAmountToSelect = data.cardAmountToSelect;
     this.maxCopies = data.maxCopies;
+    this.isFrozen = data.isFrozen ?? false;
   }
 
   // executes card effects
@@ -49,6 +52,10 @@ export abstract class Card {
   // runs when card is discarded: does nothing
   onDiscard(): void {}
 
+  isPlayable(): boolean {
+    return !this.isFrozen;
+  }
+  
   /**
    * Function that allows a card to update itself when another card is played
    * Does nothing
@@ -79,6 +86,7 @@ export abstract class Card {
       currentAttack: this.currentAttack,
       cardAmountToSelect: this.cardAmountToSelect,
       maxCopies: this.maxCopies,
+      isFrozen: this.isFrozen,
     };
   }
 }

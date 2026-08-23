@@ -49,6 +49,26 @@ function Card({ cardProps, width = 300 }) {
       >
         {cardProps.description}
       </div>
+
+      {cardProps.isFrozen && (
+        <div
+          aria-label="Frozen"
+          className="absolute inset-0 flex items-center justify-center text-cyan-100"
+          style={{
+            backgroundColor: 'rgba(8, 145, 178, 0.45)',
+            fontSize: s(70),
+            pointerEvents: 'none',
+            maskImage: `url(/assets/sprites/cards/${cardProps.cardId}.png)`,
+            maskSize: '100% 100%',
+            maskRepeat: 'no-repeat',
+            WebkitMaskImage: `url(/assets/sprites/cards/${cardProps.cardId}.png)`,
+            WebkitMaskSize: '100% 100%',
+            WebkitMaskRepeat: 'no-repeat',
+          }}
+        >
+          &#10052;
+        </div>
+      )}
     </div>
   );
 }

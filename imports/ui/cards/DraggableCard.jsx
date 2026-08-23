@@ -13,6 +13,7 @@ export function DraggableCard({
   onPlay,
   isInSelectionMode = false,
   affordable = true,
+  playable = true,
 }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -28,7 +29,7 @@ export function DraggableCard({
   };
 
   const handleDragEnd = () => {
-    if (isOutsideHand() && affordable) {
+    if (isOutsideHand() && affordable && playable) {
       onPlay(cardProps.uniqueId);
     }
     animate(x, 0, { type: 'spring', stiffness: 300, damping: 20 });
@@ -41,18 +42,18 @@ export function DraggableCard({
   };
 
   const handlePanStart = () => {
-    if (!isInSelectionMode) setIsDragging(true);
+    if (!isInSelectionMode && playable) setIsDragging(true);
   };
 
   const handlePan = (e, info) => {
-    if (isInSelectionMode) return;
+    if (isInSelectionMode || !playable) return;
     const s = gameScale?.get() ?? 1;
     x.set(x.get() + info.delta.x / s);
     y.set(y.get() + info.delta.y / s);
   };
 
   const handlePanEnd = () => {
-    if (!isInSelectionMode) handleDragEnd();
+    if (!isInSelectionMode && playable) handleDragEnd();
   };
 
   return (
@@ -69,7 +70,7 @@ export function DraggableCard({
           y,
           position: 'relative',
           touchAction: 'none',
-          cursor: isDragging ? 'grabbing' : 'grab',
+          cursor: !playable ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
         }}
         whileHover={!isDragging ? { scale: 1.1 } : { }}
         onClick={onClick}

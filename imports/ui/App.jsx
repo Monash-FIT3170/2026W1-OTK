@@ -46,6 +46,22 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding]);
 
+  useEffect(() => {
+    if (!gameState?.enemy?.timerDebuffActive || !gameState.enemy.timerDebuffDeadline) {
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      if (Date.now() >= gameState.enemy.timerDebuffDeadline) {
+        Meteor.call('game.applyTimerTick', (err) => {
+          if (err) console.error('game.applyTimerTick failed:', err);
+        });
+      }
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, [gameState?.enemy?.timerDebuffActive, gameState?.enemy?.timerDebuffDeadline]);
+
   useGameSounds(gameState?.result);
 
   // --- Loading state ---

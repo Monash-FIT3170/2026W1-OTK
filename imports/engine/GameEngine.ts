@@ -6,7 +6,9 @@ import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData } from './types';
 import { DeckBuilder } from './DeckBuilder';
+import { debuffRegistry } from './debuffs';
 import { Goblin } from './enemy/enemies/Goblin';
+import { IceCube } from './enemy/enemies/IceCube';
 
 const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
   1: Goblin,
@@ -38,7 +40,12 @@ export class GameEngine {
     requiresSelection: boolean;
     cardAmountToSelect?: { min: number; max: number };
   } {
+    this.resolveTimerDebuff();
+
     const card = this.getCard(uniqueId);
+    if (!card.isPlayable()) {
+      throw new Error(`Card with uniqueId "${uniqueId}" is frozen`);
+    }
 
     this.draw(card.currentCost);
 
@@ -53,12 +60,59 @@ export class GameEngine {
 
   // removes card from hand and executes its effect
   executeCard(uniqueId: string, selectedCardIds: string[] = []): void {
+    // 1. Catches up the math in case the player took too long
+    this.resolveTimerDebuff();
+
     const card = this.getCard(uniqueId);
+    if (!card.isPlayable()) {
+      throw new Error(`Card with uniqueId "${uniqueId}" is frozen`);
+    }
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
-
+    
     this.hand.forEach(handCard => handCard.onOtherCardPlayed(card, this));
     this.deck.forEach(deckCard => deckCard.onOtherCardPlayed(card, this));
+    
+    // 2. ADD THIS LINE: Stop the current timer because the player acted
+    this.clearTimerDebuff(); 
+    
+    // 3. This will trigger your Timer.executeDebuff(), which sees the timer 
+    // is cleared and restarts a fresh 5-second grace period!
+    this.executeEnemyDebuffs();
+  }
+
+  executeEnemyDebuffs(): void {
+    this.enemy.debuffs.forEach((debuffId) => {
+      debuffRegistry.create(debuffId).executeDebuff(this);
+    });
+  }
+
+  resolveTimerDebuff(now: number = Date.now()): void {
+    if (!this.enemy.timerDebuffActive || this.enemy.timerDebuffDeadline === null) {
+      return;
+    }
+
+    let deadline = this.enemy.timerDebuffDeadline;
+    const interval = this.enemy.timerDebuffInterval;
+    const tickAmount = this.enemy.timerDebuffTickAmount;
+    let ticked = false;
+
+    if (now >= deadline) {
+      const previousHealth = this.enemy.currentHealth;
+      this.enemy.currentHealth = Math.min(
+        this.enemy.health,
+        this.enemy.currentHealth + tickAmount
+      );
+      this.clearTimerDebuff();
+      ticked = true;
+    }
+  }
+
+  clearTimerDebuff(): void {
+    this.enemy.timerDebuffActive = false;
+    this.enemy.timerDebuffDeadline = null;
+
+    
   }
 
   isEnemyDefeated(): boolean {
@@ -66,19 +120,31 @@ export class GameEngine {
   }
 
   hasPlayableCards(): boolean {
-    return this.hand.some((card) => card.currentCost <= this.deck.length);
+    return this.hand.some(
+      (card) => card.isPlayable() && card.currentCost <= this.deck.length
+    );
   }
 
   static newGame(userId: string): UserData {
     const deck = DeckBuilder.buildStartingDeck();
     const stage = 1;
     const BossClass = BOSS_LOOKUP[stage];
-    const enemy: EnemyData = new BossClass().toJSON();
-    const scene = SCENE_LOOKUP[stage]
-    const userData: UserData = { userId, stage, deck, hand: [], enemy, scene, result: 'playing' };
+    const boss = new BossClass();
+    const enemy: EnemyData = boss.toJSON();
+    const scene = SCENE_LOOKUP[stage];
+    const userData: UserData = {
+      userId,
+      stage,
+      deck,
+      hand: [],
+      enemy,
+      scene,
+      result: 'playing',
+    };
 
     const engine = new GameEngine(userData);
     engine.shuffle();
+    engine.activateEnemyDebuffs();
     engine.draw();
     return engine.toJSON();
   }
@@ -91,6 +157,13 @@ export class GameEngine {
       const j = Math.floor(Math.random() * (i + 1));
       [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
     }
+  }
+
+  // Activates debuffs on the player from the debuff registry.
+  activateEnemyDebuffs(): void {
+    this.enemy.debuffs.forEach((debuffId) => {
+      debuffRegistry.create(debuffId).activateDebuff(this);
+    });
   }
 
   draw(n: number = 5): void {
