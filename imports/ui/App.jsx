@@ -10,11 +10,12 @@ import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
-import { PlayerDisplay } from './components/PlayerDisplay';
 import { SaveGameButton } from './components/SaveGameButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
+import { DeckBuilder } from './components/deck/DeckBuilder';
+import { buildAvailableCards } from './../engine/DeckBuilderCards';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -22,6 +23,7 @@ import Settings from './components/Settings';
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
+  const [showDeckBuilder, setShowDeckBuilder] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, gameState, loading } = useTracker(() => {
@@ -90,6 +92,28 @@ export const App = () => {
       <LandingPage
         hasSave={!!gameState}
         onStart={() => setShowLanding(false)}
+        onEditDeck={() => {
+          setShowLanding(false);
+          setShowDeckBuilder(true);
+        }}
+      />
+    );
+  }
+
+  if (showDeckBuilder) {
+    return (
+      <DeckBuilder
+        availableCards={buildAvailableCards()}
+        initialDeck={gameState?.deck ?? []}
+        onConfirm={(newDeck) => {
+          Meteor.call('userData.updateDeck', newDeck, (err) => {
+            setShowDeckBuilder(false);
+          });
+        }}
+        onBack={() => {
+          setShowDeckBuilder(false);
+          setShowLanding(true);
+        }}
       />
     );
   }
