@@ -9,30 +9,26 @@ import { GameEngine } from '../GameEngine';
 import { ReturnToDeckEffect } from '../effect/ReturnToDeckEffect';
 
 export class Reload extends Card {
-    constructor(data?: Partial<cardData>) {
-        super({
-          cardId: 'Reload',
-          name: 'Reload',
-          description: 'Return your entire hand to your deck, shuffle, then draw the same number of cards.',
-          baseCost: 1,
-          currentCost: 1,
-          baseAttack: 0,
-          currentAttack: 0,
-          cardAmountToSelect: { min: 0, max: 0 },
-          ...data,
-        });
+  constructor(data?: Partial<cardData>) {
+    super({
+      cardId: 'reload',
+      name: 'Reload',
+      description:
+        'Return your entire hand to your deck, shuffle, then draw the same number of cards.',
+      baseCost: 1,
+      currentCost: 1,
+      cardAmountToSelect: { min: 0, max: 0 },
+      ...data,
+    });
+  }
 
-    }
+  execute(engine: GameEngine, targetCardIndexes?: string[]): void {
+    const handSize = engine.getHand().length;
+    const allHandIds = engine.getHand().map((card) => card.uniqueId);
 
-    execute(engine: GameEngine, targetCardIndexes?: string[]): void {
-        const handSize = engine.getHand().length;
-        const allHandIds = engine.getHand().map(card => card.uniqueId);
-        
-        new ReturnToDeckEffect().resolve(engine, allHandIds);
+    new ReturnToDeckEffect().resolve(engine, allHandIds);
 
-        engine.shuffle();
-        engine.draw(handSize);
-        }
-    }
-
-
+    engine.shuffle();
+    engine.draw(handSize);
+  }
+}

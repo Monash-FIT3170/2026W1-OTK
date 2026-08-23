@@ -11,10 +11,11 @@ export class DoubleSacrifice extends Card {
       cardId: 'double-sacrifice',
       uniqueId,
       name: 'Double Sacrifice',
-      description: 'Destroy 2 cards from your hand, buff an offensive Card played to deal double damage.',
+      description:
+        'Destroy 2 cards from your hand, buff an offensive card to deal double damage.',
       baseCost: 1,
       currentCost: 1,
-      cardAmountToSelect: { min: 3, max: 3 }, 
+      cardAmountToSelect: { min: 3, max: 3 },
     });
   }
 
