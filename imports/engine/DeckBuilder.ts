@@ -13,6 +13,7 @@ import { KillingBlow } from './card/KillingBlow';
 import { AggraRay } from './card/AggraRay';
 import { DivideAndConquer } from './card/DivideAndConquer';
 import { ShortSword } from './card/ShortSword';
+import { HelpingHand } from './card/HelpingHand';
 
 export class DeckBuilder {
   static buildStartingDeck(): cardData[] {
@@ -40,7 +41,9 @@ export class DeckBuilder {
       new DivideAndConquer().toJSON(),
       new DivideAndConquer().toJSON(),
       new ShortSword().toJSON(),
-      new ShortSword().toJSON()
+      new ShortSword().toJSON(),
+      new HelpingHand().toJSON(),
+      new HelpingHand().toJSON()
     ];
   }
 }

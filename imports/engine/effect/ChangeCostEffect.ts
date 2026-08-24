@@ -35,7 +35,7 @@ export class ChangeCostEffect implements Effect {
    */
   resolve(engine: GameEngine, targetCardIndexes?: string[]): void {
     for (const card of this.cards) {
-        card.currentCost += this.amount
+        card.currentCost = Math.max(0, card.currentCost + this.amount);
     }
   }
 }
