@@ -34,6 +34,7 @@ export class AggraRay extends Card {
       baseAttack: 25,
       currentAttack: 25,
       ...data,
+      maxCopies: 2,
     });
   }
 
