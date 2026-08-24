@@ -16,6 +16,8 @@ import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
 import { TutorialOverlay } from './components/TutorialOverlay';
 import { TutorialDemoScreen } from './components/TutorialDemoScreen';
+import { DeckBuilder } from './components/deck/DeckBuilder';
+import { buildAvailableCards } from './../engine/DeckBuilderCards';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -36,6 +38,7 @@ export const App = () => {
   // wanting a refresher) makes more sense for this kind of game than a
   // strict one-time-only onboarding flow.
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
+  const [showDeckBuilder, setShowDeckBuilder] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, gameState, loading } = useTracker(() => {
@@ -131,10 +134,31 @@ export const App = () => {
   // --- Landing page: shown once user is authenticated, before game starts ---
   if (showLanding) {
     return (
-      <LandingPage
+            <LandingPage
         hasSave={gameState?.result === 'playing'}
         onStart={handleStart}
         onOpenTutorial={handleOpenTutorial}
+        onEditDeck={() => {
+          setShowLanding(false);
+          setShowDeckBuilder(true);
+        }}
+      />
+    );
+  }
+  if (showDeckBuilder) {
+    return (
+      <DeckBuilder
+        availableCards={buildAvailableCards()}
+        initialDeck={gameState?.deck ?? []}
+        onConfirm={(newDeck) => {
+          Meteor.call('userData.updateDeck', newDeck, (err) => {
+            setShowDeckBuilder(false);
+          });
+        }}
+        onBack={() => {
+          setShowDeckBuilder(false);
+          setShowLanding(true);
+        }}
       />
     );
   }

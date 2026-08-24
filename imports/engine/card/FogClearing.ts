@@ -17,6 +17,7 @@ export class FogClearing extends Card {
       currentCost: 2,
       baseAttack: 12,
       currentAttack: 12,
+      maxCopies: 2,
       ...data,
     });
   }

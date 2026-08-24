@@ -21,6 +21,7 @@ export class DivideAndConquer extends Card {
       baseCost: 0,
       currentCost: 0,
       cardAmountToSelect: { min: 1, max: 1 },
+      maxCopies: 2,
       ...data,
     });
   }
