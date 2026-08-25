@@ -45,7 +45,8 @@ Meteor.methods({
 
     const newState = engine.toJSON();
     if (engine.isEnemyDefeated()) {
-      newState.result = 'win';
+      engine.finalizeBossRecap('win');
+      engine.result = 'win';
     }
 
     await UserDataCollection.updateAsync(

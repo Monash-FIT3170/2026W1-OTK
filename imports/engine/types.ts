@@ -31,6 +31,15 @@ export type EnemyData = {
   timerDebuffTickAmount?: number;
 };
 
+// per-boss recap entry recorded when a boss fight ends
+export type BossRecapEntry = {
+  bossName: string;
+  stage: number;
+  timeMs: number; // wall-clock milliseconds spent on this boss
+  cardsUsed: number; // number of cards executed against this boss
+  result: 'win' | 'loss';
+};
+
 // data shape stored in UserDataCollection
 export type UserData = {
   userId: string;
@@ -41,4 +50,7 @@ export type UserData = {
   enemy: EnemyData;
   scene?: string;
   result: 'win' | 'loss' | 'playing';
+  bossRecap?: BossRecapEntry[]; // accumulated recap entries across stages
+  stageStartedAt?: number; // Date.now() timestamp when current stage began
+  cardsUsedThisStage?: number; // cards executed against the current boss
 };

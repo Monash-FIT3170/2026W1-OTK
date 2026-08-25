@@ -4,7 +4,7 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData, cardData } from './types';
+import { UserData, EnemyData, BossRecapEntry, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
 import { Goblin } from './enemy/enemies/Goblin';
@@ -26,15 +26,23 @@ export class GameEngine {
   public stage: number;
   public userId: string;
   public result: 'win' | 'loss' | 'playing';
+  public bossRecap: BossRecapEntry[];
+  public stageStartedAt: number;
+  public cardsUsedThisStage: number;
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
-    this.baseDeck = userData.baseDeck?.map((card) => cardRegistry.create(card)) || userData.hand.map((card) => cardRegistry.create(card));
+    this.baseDeck =
+      userData.baseDeck?.map((card) => cardRegistry.create(card)) ||
+      userData.hand.map((card) => cardRegistry.create(card));
     this.hand = userData.hand.map((card) => cardRegistry.create(card));
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
     this.enemy = enemyRegistry.create(userData.enemy);
     this.stage = userData.stage;
     this.result = userData.result;
+    this.bossRecap = userData.bossRecap ?? [];
+    this.stageStartedAt = userData.stageStartedAt ?? Date.now();
+    this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -71,16 +79,29 @@ export class GameEngine {
     }
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
-    
-    this.hand.forEach(handCard => handCard.onOtherCardPlayed(card, this));
-    this.deck.forEach(deckCard => deckCard.onOtherCardPlayed(card, this));
-    
+
+    this.hand.forEach((handCard) => handCard.onOtherCardPlayed(card, this));
+    this.deck.forEach((deckCard) => deckCard.onOtherCardPlayed(card, this));
+
     // 2. ADD THIS LINE: Stop the current timer because the player acted
-    this.clearTimerDebuff(); 
-    
-    // 3. This will trigger your Timer.executeDebuff(), which sees the timer 
+    this.clearTimerDebuff();
+
+    // 3. This will trigger your Timer.executeDebuff(), which sees the timer
     // is cleared and restarts a fresh 5-second grace period!
     this.executeEnemyDebuffs();
+
+    this.cardsUsedThisStage += 1;
+  }
+
+  // finalizes a recap entry for the current boss and appends it to bossRecap
+  finalizeBossRecap(bossResult: 'win' | 'loss'): void {
+    this.bossRecap.push({
+      bossName: this.enemy.name,
+      stage: this.stage,
+      timeMs: Date.now() - this.stageStartedAt,
+      cardsUsed: this.cardsUsedThisStage,
+      result: bossResult,
+    });
   }
 
   executeEnemyDebuffs(): void {
@@ -90,7 +111,10 @@ export class GameEngine {
   }
 
   resolveTimerDebuff(now: number = Date.now()): void {
-    if (!this.enemy.timerDebuffActive || this.enemy.timerDebuffDeadline === null) {
+    if (
+      !this.enemy.timerDebuffActive ||
+      this.enemy.timerDebuffDeadline === null
+    ) {
       return;
     }
 
@@ -113,8 +137,6 @@ export class GameEngine {
   clearTimerDebuff(): void {
     this.enemy.timerDebuffActive = false;
     this.enemy.timerDebuffDeadline = null;
-
-    
   }
 
   isEnemyDefeated(): boolean {
@@ -144,6 +166,9 @@ export class GameEngine {
       enemy,
       scene,
       result: 'playing',
+      bossRecap: [],
+      stageStartedAt: Date.now(),
+      cardsUsedThisStage: 0,
     };
 
     const engine = new GameEngine(userData);
@@ -211,6 +236,9 @@ export class GameEngine {
       enemy: this.enemy.toJSON(),
       scene: SCENE_LOOKUP[this.stage],
       result: this.result,
+      bossRecap: this.bossRecap,
+      stageStartedAt: this.stageStartedAt,
+      cardsUsedThisStage: this.cardsUsedThisStage,
     };
   }
 }
