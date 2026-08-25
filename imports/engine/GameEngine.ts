@@ -4,19 +4,15 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData, BossRecapEntry, cardData } from './types';
+import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { Goblin } from './enemy/enemies/Goblin';
-import { IceCube } from './enemy/enemies/IceCube';
+import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
 
-const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
-  1: Goblin,
-};
-
-const SCENE_LOOKUP: { [stage: number]: string } = {
-  1: 'underpass-overlaid',
-};
+// A gap larger than this since the last server-side action means the player
+// closed the tab rather than sat idle - the battle screen heartbeats every 2s
+// while it is mounted. See rebaseAfterAway().
+const AWAY_THRESHOLD_MS = 6000;
 
 export class GameEngine {
   public baseDeck: Card[];
@@ -25,10 +21,11 @@ export class GameEngine {
   public enemy: Enemy;
   public stage: number;
   public userId: string;
-  public result: 'win' | 'loss' | 'playing';
+  public result: RunResult;
   public bossRecap: BossRecapEntry[];
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
+  public lastActiveAt: number;
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -43,6 +40,7 @@ export class GameEngine {
     this.bossRecap = userData.bossRecap ?? [];
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
+    this.lastActiveAt = userData.lastActiveAt ?? Date.now();
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -104,6 +102,73 @@ export class GameEngine {
     });
   }
 
+  // The current boss just died. Ends the run on the final stage, otherwise
+  // parks at the interstitial until the player asks for the next enemy.
+  clearStage(): void {
+    this.finalizeBossRecap('win');
+    this.clearTimerDebuff();
+    this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
+  }
+
+  // Player confirmed "Next Enemy" on the stage-clear screen.
+  //
+  // The deck is rebuilt from this run's baseDeck and never from the player's
+  // saved nextDeck - that is what locks the deck for the duration of a run.
+  advanceStage(): void {
+    if (this.result !== 'stageCleared') {
+      throw new Error('Cannot advance: the current stage is not cleared');
+    }
+
+    this.stage += 1;
+    const { BossClass } = getStageConfig(this.stage);
+    this.enemy = new BossClass();
+    this.deck = this.freshDeckFromBase();
+    this.hand = [];
+    this.result = 'playing';
+    this.stageStartedAt = Date.now();
+    this.cardsUsedThisStage = 0;
+
+    this.shuffle();
+    this.activateEnemyDebuffs();
+    this.draw();
+  }
+
+  // Fresh copies of the run's locked deck. Cloning through the registry is what
+  // keeps cost changes and freezes from one stage leaking into the next -
+  // reusing the baseDeck instances directly would carry that mutation across.
+  private freshDeckFromBase(): Card[] {
+    return this.baseDeck.map((card) => {
+      const fresh = cardRegistry.create({
+        ...card.toJSON(),
+        // Dropping uniqueId makes Card mint a new one, so a reshuffled deck can
+        // never collide with a card conjured earlier in the run.
+        uniqueId: undefined,
+        isFrozen: false,
+      });
+      fresh.resetStats();
+      return fresh;
+    });
+  }
+
+  // Absolute deadlines must not tick down while the player is away. The battle
+  // screen heartbeats every 2s, so a longer gap means the tab was closed: push
+  // the clocks forward by exactly that gap. Idling *at* the battle screen keeps
+  // heartbeating, so the timer debuff keeps its teeth.
+  rebaseAfterAway(now: number = Date.now()): void {
+    const away = now - this.lastActiveAt;
+    if (away <= AWAY_THRESHOLD_MS) return;
+
+    if (this.enemy.timerDebuffDeadline !== null) {
+      this.enemy.timerDebuffDeadline += away;
+    }
+    this.stageStartedAt += away;
+  }
+
+  // Marks the player as present. Every game.* method calls this before saving.
+  touch(now: number = Date.now()): void {
+    this.lastActiveAt = now;
+  }
+
   executeEnemyDebuffs(): void {
     this.enemy.debuffs.forEach((debuffId) => {
       debuffRegistry.create(debuffId).executeDebuff(this);
@@ -152,11 +217,9 @@ export class GameEngine {
   static newGame(userId: string, deck?: cardData[] | null): UserData {
     deck ??= DeckBuilder.buildStartingDeck(); // No deck provided, use the default starting deck
     const baseDeck = [...deck];
-    const stage = 1;
-    const BossClass = BOSS_LOOKUP[stage];
-    const boss = new BossClass();
-    const enemy: EnemyData = boss.toJSON();
-    const scene = SCENE_LOOKUP[stage];
+    const stage = FIRST_STAGE;
+    const { BossClass, scene } = getStageConfig(stage);
+    const enemy: EnemyData = new BossClass().toJSON();
     const userData: UserData = {
       userId,
       stage,
@@ -169,6 +232,7 @@ export class GameEngine {
       bossRecap: [],
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
+      lastActiveAt: Date.now(),
     };
 
     const engine = new GameEngine(userData);
@@ -234,11 +298,12 @@ export class GameEngine {
       deck: this.deck.map((card) => card.toJSON()),
       hand: this.hand.map((card) => card.toJSON()),
       enemy: this.enemy.toJSON(),
-      scene: SCENE_LOOKUP[this.stage],
+      scene: getStageConfig(this.stage).scene,
       result: this.result,
       bossRecap: this.bossRecap,
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
+      lastActiveAt: this.lastActiveAt,
     };
   }
 }

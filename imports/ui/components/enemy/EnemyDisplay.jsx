@@ -14,8 +14,12 @@ import TimerDebuff from './TimerDebuff';
  *
  */
 
+// Enemies without their own art fall back to a sprite set that exists.
+// Remove an entry once the real sprites land in public/assets/sprites/enemies/.
 const ENEMY_SPRITE_IDS = {
   trainingDummy: 'goblin',
+  frostwarden: 'goblin',
+  timekeeper: 'goblin',
 };
 
 export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {

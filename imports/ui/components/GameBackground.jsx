@@ -40,6 +40,13 @@ export function GameBackground({ backgroundScene, children }) {
             aria-hidden="true"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ imageRendering: 'pixelated' }}
+            onError={(e) => {
+              // Not every scene has art yet (e.g. the landing page). Without a
+              // fallback the container just renders black.
+              e.currentTarget.onerror = null;
+              e.currentTarget.src =
+                '/assets/environments/placeholder-background.jpg';
+            }}
           />
           {/* Content canvas: authored at 1920x1080, scaled down to fit the container */}
           <motion.div

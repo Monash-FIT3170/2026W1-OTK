@@ -1,17 +1,17 @@
 import { assert } from 'chai';
 import { DeckBuilder } from '../DeckBuilder';
 import { GameEngine } from '../GameEngine';
-import { Goblin } from '../enemy/enemies/Goblin';
+import { Timekeeper } from '../enemy/enemies/Timekeeper';
 import { debuffRegistry } from './DebuffRegistry';
 import { Timer } from './Timer';
 
 function buildEngine() {
   return new GameEngine({
     userId: 'timer-test-user',
-    stage: 1,
+    stage: 3,
     deck: DeckBuilder.buildStartingDeck(),
     hand: [],
-    enemy: new Goblin().toJSON(),
+    enemy: new Timekeeper().toJSON(),
     scene: 'underpass-overlaid',
     result: 'playing',
   });

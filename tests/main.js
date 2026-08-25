@@ -15,6 +15,10 @@ import '../imports/api/enemy/enemy.tests.js';
 import '../imports/engine/debuffs/Freeze.tests.js';
 import '../imports/engine/debuffs/Timer.tests.js';
 
+// GAME ENGINE / STAGE TESTS
+import '../imports/engine/GameEngine.tests.js';
+import '../imports/api/user-data/methods/advanceStage.tests.js';
+
 // AUTH TESTS
 import '/imports/api/auth/index.js';
 import '/imports/api/auth/auth.tests.js';

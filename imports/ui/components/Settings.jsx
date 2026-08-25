@@ -50,7 +50,7 @@ const VolumeRow = ({
 // rendered. Pass showTrigger={false} when some other button (e.g. an "Options"
 // button elsewhere on the page) should open the same #settings-modal dialog
 // instead - the dialog itself is still rendered either way.
-const Settings = ({ saveButton, showTrigger = true }) => {
+const Settings = ({ saveButton, quitButton, showTrigger = true }) => {
   return (
     <>
       {/* Settings gear button - opens the modal */}
@@ -114,7 +114,12 @@ const Settings = ({ saveButton, showTrigger = true }) => {
             />
           </div>
 
-          {saveButton && <div className="mt-6">{saveButton}</div>}
+          {(saveButton || quitButton) && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {saveButton}
+              {quitButton}
+            </div>
+          )}
         </div>
 
         {/* Click outside to close */}
