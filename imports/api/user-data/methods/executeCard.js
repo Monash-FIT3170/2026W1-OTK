@@ -32,7 +32,7 @@ Meteor.methods({
       if (engine.isFinalStage()) {
         engine.result = 'win';
       } else {
-        engine.advanceStage();
+        engine.result = 'stageWin';
       }
     }
 

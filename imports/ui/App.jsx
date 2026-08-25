@@ -90,7 +90,7 @@ export const App = () => {
   const { hand, deck, enemy, result, scene } = gameState;
 
   // --- Victory / Defeat screens ---
-  if (result === 'win' || result === 'loss') {
+  if (result === 'win' || result === 'loss' || result === 'stageWin') {
     return <ResultScreen result={result} enemyName={enemy.name} />;
   }
 

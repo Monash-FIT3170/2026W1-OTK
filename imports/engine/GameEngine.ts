@@ -29,7 +29,7 @@ export class GameEngine {
   public enemy: Enemy;
   public stage: number;
   public userId: string;
-  public result: 'win' | 'loss' | 'playing';
+  public result: 'win' | 'loss' | 'playing' | 'stageWin';
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -76,6 +76,7 @@ export class GameEngine {
   // starts a fresh hand/deck for the next boss
   advanceStage(): void {
     this.loadStage(this.stage + 1);
+    this.result = 'playing';
   }
 
   hasPlayableCards(): boolean {
