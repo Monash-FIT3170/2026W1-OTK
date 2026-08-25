@@ -1,19 +1,36 @@
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { expect } from 'chai';
 import { TutorialDemoScreen } from './TutorialDemoScreen';
+import { useTutorialEngine } from '../hooks/useTutorialEngine';
 import { tutorialSteps } from '../tutorial/tutorialSteps';
 
 if (Meteor.isClient) {
   describe('TutorialDemoScreen', function () {
     it('keeps free play open until End Turn is pressed on the final step', async function () {
       let closed = false;
+      let latestHand;
+      let latestPlayCard;
+      const captureEngine = () => {
+        const engine = useTutorialEngine();
+        latestHand = engine.hand;
+        latestPlayCard = engine.playCard;
+        return engine;
+      };
+
       render(
         <TutorialDemoScreen
           onClose={() => {
             closed = true;
           }}
+          _useTutorialEngine={captureEngine}
         />
       );
 
@@ -23,7 +40,9 @@ if (Meteor.isClient) {
       fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
       // Playing a card advances the hand step automatically.
-      fireEvent.click(screen.getAllByRole('button', { name: /^Play / })[0]);
+      act(() => {
+        latestPlayCard(latestHand[0].uniqueId);
+      });
       await waitFor(() => {
         expect(screen.getByText(tutorialSteps[4].title)).to.exist;
       });
@@ -36,7 +55,9 @@ if (Meteor.isClient) {
       expect(screen.queryByRole('button', { name: 'Done' })).to.not.exist;
 
       // Cards remain playable without closing the tutorial.
-      fireEvent.click(screen.getAllByRole('button', { name: /^Play / })[0]);
+      act(() => {
+        latestPlayCard(latestHand[0].uniqueId);
+      });
       expect(screen.getByText('Keep Practising')).to.exist;
       expect(closed).to.equal(false);
 

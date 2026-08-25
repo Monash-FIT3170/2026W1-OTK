@@ -34,9 +34,12 @@ const demoTutorialSteps = [
 // from useTutorialEngine — never Meteor.call, never UserDataCollection.
 // Steps with an `action` requirement (see tutorialSteps.js) only advance
 // once the player actually performs that action, not via a Next click.
-export const TutorialDemoScreen = ({ onClose }) => {
+export const TutorialDemoScreen = ({
+  onClose,
+  _useTutorialEngine = useTutorialEngine,
+}) => {
   const { hand, deck, enemy, cardsPlayedCount, playCard, endTurn } =
-    useTutorialEngine();
+    _useTutorialEngine();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState(null);
