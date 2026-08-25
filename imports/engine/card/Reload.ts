@@ -18,7 +18,6 @@ export class Reload extends Card {
         'Return your entire hand to your deck, shuffle, then draw the same number of cards.',
       baseCost: 1,
       currentCost: 1,
-      cardAmountToSelect: { min: 0, max: 0 },
       maxCopies: 2,
       ...data,
     });
