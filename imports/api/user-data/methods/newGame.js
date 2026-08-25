@@ -12,8 +12,10 @@ Meteor.methods({
       throw new Meteor.Error('game.newGame.notLoggedIn', 'Must be logged in to start a game.');
     }
 
-    const gameState = GameEngine.newGame(this.userId);
     const existing = await UserDataCollection.findOneAsync({ userId: this.userId });
+    const deck = existing?.nextDeck ?? null;
+
+    const gameState = GameEngine.newGame(this.userId, deck);
 
     if (existing) {
       await UserDataCollection.updateAsync(

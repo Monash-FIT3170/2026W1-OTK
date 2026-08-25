@@ -4,7 +4,7 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData, BossRecapEntry } from './types';
+import { UserData, EnemyData, BossRecapEntry, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
 import { Goblin } from './enemy/enemies/Goblin';
@@ -19,6 +19,7 @@ const SCENE_LOOKUP: { [stage: number]: string } = {
 };
 
 export class GameEngine {
+  public baseDeck: Card[];
   public hand: Card[];
   public deck: Card[];
   public enemy: Enemy;
@@ -31,6 +32,7 @@ export class GameEngine {
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
+    this.baseDeck = userData.baseDeck?.map((card) => cardRegistry.create(card)) || userData.hand.map((card) => cardRegistry.create(card));
     this.hand = userData.hand.map((card) => cardRegistry.create(card));
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
     this.enemy = enemyRegistry.create(userData.enemy);
@@ -143,8 +145,9 @@ export class GameEngine {
     );
   }
 
-  static newGame(userId: string): UserData {
-    const deck = DeckBuilder.buildStartingDeck();
+  static newGame(userId: string, deck?: cardData[] | null): UserData {
+    deck ??= DeckBuilder.buildStartingDeck(); // No deck provided, use the default starting deck
+    const baseDeck = [...deck];
     const stage = 1;
     const BossClass = BOSS_LOOKUP[stage];
     const enemy: EnemyData = new BossClass().toJSON();
@@ -160,6 +163,7 @@ export class GameEngine {
     const userData: UserData = {
       userId,
       stage,
+      baseDeck,
       deck,
       hand: [],
       enemy,
@@ -226,6 +230,7 @@ export class GameEngine {
     return {
       userId: this.userId,
       stage: this.stage,
+      baseDeck: this.baseDeck.map((card) => card.toJSON()),
       deck: this.deck.map((card) => card.toJSON()),
       hand: this.hand.map((card) => card.toJSON()),
       enemy: this.enemy.toJSON(),

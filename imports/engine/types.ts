@@ -44,6 +44,7 @@ export type BossRecapEntry = {
 export type UserData = {
   userId: string;
   stage: number;
+  baseDeck?: cardData[];
   deck: cardData[];
   hand: cardData[];
   enemy: EnemyData;
