@@ -16,6 +16,7 @@ import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
+import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -26,7 +27,7 @@ export const App = () => {
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
 
   // Subscribe to auth and game data reactively
-  const { user, gameState, loading } = useTracker(() => {
+  const { user, userData, gameState, loading } = useTracker(() => {
     const userSub = Meteor.subscribe('auth.currentUser');
     const dataSub = Meteor.subscribe('userData');
     const loading = !userSub.ready() || !dataSub.ready();
@@ -34,7 +35,7 @@ export const App = () => {
     const userData = user
       ? UserDataCollection.findOne({ userId: user._id })
       : null;
-    return { user, gameState: userData?.gameState ?? null, loading };
+    return { user, userData, gameState: userData?.gameState ?? null, loading };
   });
 
   // If logged in but no game state exists yet, start a new game automatically
@@ -104,10 +105,11 @@ export const App = () => {
     return (
       <DeckBuilder
         availableCards={buildAvailableCards()}
-        initialDeck={gameState?.deck ?? []}
+        initialDeck={userData?.nextDeck ?? gameState?.baseDeck ?? DeckBuilderEngine.buildStartingDeck() ?? []}
         onConfirm={(newDeck) => {
-          Meteor.call('userData.updateDeck', newDeck, (err) => {
+          Meteor.call('userData.saveNextDeck', newDeck, (err) => {
             setShowDeckBuilder(false);
+            setShowLanding(true);
           });
         }}
         onBack={() => {
