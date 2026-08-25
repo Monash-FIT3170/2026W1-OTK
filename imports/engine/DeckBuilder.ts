@@ -27,7 +27,6 @@ export class DeckBuilder {
       new TeaCeremony().toJSON(),
       new TeaCeremony().toJSON(),
       new FinalStand().toJSON(),
-      new FinalStand().toJSON(),
       new MistConjuring().toJSON(),
       new MistConjuring().toJSON(),
       new KillingBlow().toJSON(),

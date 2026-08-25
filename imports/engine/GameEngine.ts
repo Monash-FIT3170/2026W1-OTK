@@ -3,6 +3,7 @@
 import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
+import './card/registerAllCards';
 import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';

@@ -1,4 +1,5 @@
 import { cardData } from './types';
+import './card/registerAllCards';
 import { FerociousClaw } from './card/FerociousClaw';
 import { FogClearing } from './card/FogClearing';
 import { Transcode } from './card/Transcode';
@@ -23,7 +24,6 @@ const CARD_CLASSES = [
   TeaCeremony,
   TaxThePoor,
   RichGetRicher,
-  FinalStand,
   MistConjuring,
   KillingBlow,
   AggraRay,

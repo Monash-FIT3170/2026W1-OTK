@@ -114,8 +114,22 @@ class SoundManager {
     this._currentMusic = audio;
     this._currentTrackId = trackId;
 
+    this._playWithAutoplayRetry(audio);
+  }
+
+  _playWithAutoplayRetry(audio) {
     audio.play().catch(() => {
-      // Autoplay policy — user interaction required; silently deferred
+      const events = ['click', 'keydown', 'touchstart'];
+      const retry = () => {
+        events.forEach((evt) => document.removeEventListener(evt, retry));
+        // Only retry if this track hasn't since been stopped/replaced.
+        if (this._currentMusic === audio) {
+          audio.play().catch(() => {});
+        }
+      };
+      events.forEach((evt) =>
+        document.addEventListener(evt, retry, { once: true })
+      );
     });
   }
 

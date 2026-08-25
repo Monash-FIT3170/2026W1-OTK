@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Card from '../../cards/Card';
-import DeckBuilderHandCard from './DeckBuilderHandCard'
+import DeckBuilderHandCard from './DeckBuilderHandCard';
 import DeckBuilderDeckCard from './DeckBuilderDeckCard';
 
 let instanceCounter = 0;
@@ -49,8 +49,8 @@ export function DeckBuilder({
   };
 
   const removeAllCardsFromDeck = () => {
-    setDeckCards((currentDeck) => [])
-  }
+    setDeckCards((currentDeck) => []);
+  };
 
   const handleConfirm = () => {
     if (deckCards.length !== maxDeckSize) {
@@ -62,7 +62,6 @@ export function DeckBuilder({
     }
   };
 
-
   return (
     <div
       className="flex h-screen w-full flex-col bg-slate-950 text-white"
@@ -73,6 +72,10 @@ export function DeckBuilder({
           <h1 className="text-4xl">Deck Builder</h1>
 
           <p className="text-xl text-slate-300">Select your cards</p>
+          <p className="text-lg text-slate-400 mt-1">
+            Changes apply to your next run, your deck is locked in for the rest
+            of a run already in progress.
+          </p>
         </div>
 
         <div className="text-3xl">
@@ -111,9 +114,7 @@ export function DeckBuilder({
             <motion.button
               type="button"
               onClick={onBack}
-              whileHover={
-                {scale: 1.02}
-              }
+              whileHover={{ scale: 1.02 }}
               whileTap={deckCards.length > 0}
               className="
                 w-full rounded-lg
@@ -125,7 +126,7 @@ export function DeckBuilder({
                 disabled:cursor-not-allowed
                 disabled:opacity-40
               "
-              >
+            >
               Go Back
             </motion.button>
           </div>
@@ -179,9 +180,7 @@ export function DeckBuilder({
               type="button"
               disabled={deckCards.length <= 0}
               onClick={removeAllCardsFromDeck}
-              whileHover={
-                {scale: 1.02}
-              }
+              whileHover={{ scale: 1.02 }}
               whileTap={deckCards.length > 0}
               className="
                 w-full rounded-lg
