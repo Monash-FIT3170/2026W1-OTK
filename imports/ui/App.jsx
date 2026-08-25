@@ -179,6 +179,7 @@ export const App = () => {
   // --- Victory / Defeat screens ---
   if (result === 'win' || result === 'loss') {
     return <ResultScreen result={result} enemyName={enemy.name} bossRecap={gameState.bossRecap} onBackToMenu={() => setShowLanding(true)}/>;
+  }
 
   // --- Main game screen ---
   return (
@@ -252,4 +253,3 @@ export const App = () => {
     </GameBackground>
   );
 };
-}
