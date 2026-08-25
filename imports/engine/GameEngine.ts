@@ -29,7 +29,7 @@ export class GameEngine {
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
-    this.baseDeck = userData.baseDeck.map((card) => cardRegistry.create(card));
+    this.baseDeck = userData.baseDeck?.map((card) => cardRegistry.create(card)) || userData.hand.map((card) => cardRegistry.create(card));
     this.hand = userData.hand.map((card) => cardRegistry.create(card));
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
     this.enemy = enemyRegistry.create(userData.enemy);
