@@ -26,24 +26,14 @@ export class DeckBuilder {
       new FerociousClaw().toJSON(),
       new TeaCeremony().toJSON(),
       new TeaCeremony().toJSON(),
-      new TaxThePoor().toJSON(),
-      new TaxThePoor().toJSON(),
-      new RichGetRicher().toJSON(),
-      new RichGetRicher().toJSON(),
       new FinalStand().toJSON(),
       new FinalStand().toJSON(),
       new MistConjuring().toJSON(),
       new MistConjuring().toJSON(),
       new KillingBlow().toJSON(),
-      new KillingBlow().toJSON(),
-      new AggraRay().toJSON(),
       new AggraRay().toJSON(),
       new DivideAndConquer().toJSON(),
-      new DivideAndConquer().toJSON(),
       new ShortSword().toJSON(),
-      new ShortSword().toJSON(),
-      new HelpingHand().toJSON(),
-      new HelpingHand().toJSON()
     ];
   }
 }

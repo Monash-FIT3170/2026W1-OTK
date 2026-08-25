@@ -31,6 +31,13 @@ export type EnemyData = {
   timerDebuffTickAmount?: number;
 };
 
+// Where a run currently sits.
+// - 'playing'      an active boss fight
+// - 'stageCleared' boss down, parked on the interstitial waiting for "Next Enemy"
+// - 'win'          final stage cleared, run complete
+// - 'loss'         run over
+export type RunResult = 'playing' | 'stageCleared' | 'win' | 'loss';
+
 // per-boss recap entry recorded when a boss fight ends
 export type BossRecapEntry = {
   bossName: string;
@@ -49,8 +56,9 @@ export type UserData = {
   hand: cardData[];
   enemy: EnemyData;
   scene?: string;
-  result: 'win' | 'loss' | 'playing';
+  result: RunResult;
   bossRecap?: BossRecapEntry[]; // accumulated recap entries across stages
   stageStartedAt?: number; // Date.now() timestamp when current stage began
   cardsUsedThisStage?: number; // cards executed against the current boss
+  lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
 };

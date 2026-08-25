@@ -10,7 +10,9 @@ import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
+import { StageClearScreen } from './components/StageClearScreen';
 import { SaveGameButton } from './components/SaveGameButton';
+import { QuitToMenuButton } from './components/QuitToMenuButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
@@ -19,6 +21,7 @@ import { TutorialDemoScreen } from './components/TutorialDemoScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
+import { FINAL_STAGE } from '../engine/stages';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -73,6 +76,24 @@ export const App = () => {
 
 
   useGameSounds(gameState?.result);
+
+  // Heartbeat while a fight is on screen. Ticks the timer debuff so the enemy
+  // heals in real time, and marks the player as present - a gap in these pings
+  // is what tells the server the tab was closed, so that time away neither
+  // heals the enemy nor inflates the run timer. See GameEngine.rebaseAfterAway.
+  const inBattle =
+    !loading && !!user && !showLanding && !showDeckBuilder && !showTutorialDemo &&
+    gameState?.result === 'playing';
+
+  useEffect(() => {
+    if (!inBattle) return;
+    const id = setInterval(() => {
+      Meteor.call('game.applyTimerTick', (err) => {
+        if (err) console.error('game.applyTimerTick failed:', err);
+      });
+    }, 2000);
+    return () => clearInterval(id);
+  }, [inBattle]);
 
   const handleCloseTutorial = () => {
     setShowTutorial(false);
@@ -136,7 +157,10 @@ export const App = () => {
   if (showLanding) {
     return (
             <LandingPage
-        hasSave={gameState?.result === 'playing'}
+        hasSave={
+          gameState?.result === 'playing' ||
+          gameState?.result === 'stageCleared'
+        }
         onStart={handleStart}
         onOpenTutorial={handleOpenTutorial}
         onEditDeck={() => {
@@ -174,7 +198,19 @@ export const App = () => {
     );
   }
 
-  const { hand, deck, enemy, result, scene } = gameState;
+  const { hand, deck, enemy, result, scene, stage } = gameState;
+
+  // --- Between stages: boss down, run still going ---
+  if (result === 'stageCleared') {
+    return (
+      <StageClearScreen
+        stage={stage}
+        enemyName={enemy.name}
+        bossRecap={gameState.bossRecap}
+        onBackToMenu={() => setShowLanding(true)}
+      />
+    );
+  }
 
   // --- Victory / Defeat screens ---
   if (result === 'win' || result === 'loss') {
@@ -186,10 +222,16 @@ export const App = () => {
     <GameBackground backgroundScene={scene}>
       {/* Settings pinned to top-right corner */}
       <div className="absolute" style={{ right: 20, top: 30 }}>
-        <Settings saveButton={<SaveGameButton gameState={gameState} />} />
+        <Settings
+          saveButton={<SaveGameButton gameState={gameState} />}
+          quitButton={<QuitToMenuButton onQuit={() => setShowLanding(true)} />}
+        />
       </div>
 
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
+        <p className="text-white text-2xl font-semibold mb-2 drop-shadow-lg">
+          Stage {stage} / {FINAL_STAGE}
+        </p>
         <HealthBar
           current={enemy.currentHealth}
           max={enemy.health}

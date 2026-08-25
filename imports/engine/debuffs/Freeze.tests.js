@@ -27,8 +27,8 @@ describe('Freeze', function () {
     freeze.applyTo(goblin);
 
     assert.instanceOf(freeze, Debuff);
-    // A Goblin carries other default debuffs (timer), so assert on the freeze
-    // entries alone: exactly one, even though applyTo was called twice.
+    // Assert on the freeze entries alone: exactly one, even though applyTo was
+    // called twice.
     assert.deepEqual(
       goblin.debuffs.filter((debuffId) => debuffId === 'freeze'),
       ['freeze']
@@ -86,8 +86,21 @@ describe('Freeze', function () {
     );
   });
 
-  it('attaches and activates Freeze once when a new game is created', function () {
+  it('leaves a brand new game unfrozen - stage 1 is debuff-free', function () {
     const gameState = GameEngine.newGame('freeze-test-user');
+    const allCards = [...gameState.deck, ...gameState.hand];
+
+    assert.deepEqual(gameState.enemy.debuffs, []);
+    assert.equal(allCards.filter((card) => card.isFrozen).length, 0);
+  });
+
+  it('attaches and activates Freeze once when the stage 2 boss appears', function () {
+    const engine = new GameEngine(GameEngine.newGame('freeze-test-user'));
+    engine.enemy.takeDamage(engine.enemy.health);
+    engine.clearStage();
+    engine.advanceStage();
+
+    const gameState = engine.toJSON();
     const allCards = [...gameState.deck, ...gameState.hand];
 
     assert.deepEqual(

@@ -25,6 +25,7 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    engine.rebaseAfterAway();
 
     const card = engine.getCard(uniqueCardId);
     if (!card.isPlayable()) {
@@ -38,6 +39,7 @@ Meteor.methods({
     }
 
     const result = engine.drawCost(uniqueCardId);
+    engine.touch();
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },

@@ -75,12 +75,21 @@ export const LandingPage = ({ hasSave, onStart, onOpenTutorial, onEditDeck }) =>
               New Game
             </button>
 
-            <button
-              onClick={handleEditDeck}
-              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
-            >
-              Edit Deck
-            </button>
+            <div className="flex flex-col gap-1">
+              <button
+                onClick={handleEditDeck}
+                className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+              >
+                Edit Deck
+              </button>
+              {hasSave && (
+                // The deck is locked for the duration of a run: edits are saved
+                // to nextDeck and only picked up by game.newGame.
+                <p className="text-slate-400 text-xs text-center">
+                  Applies to your next run
+                </p>
+              )}
+            </div>
 
             <button
               onClick={handleOptions}

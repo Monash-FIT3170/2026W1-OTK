@@ -18,8 +18,11 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    engine.rebaseAfterAway();
     engine.finalizeBossRecap('loss');
     engine.result = 'loss';
+    engine.clearTimerDebuff();
+    engine.touch();
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },

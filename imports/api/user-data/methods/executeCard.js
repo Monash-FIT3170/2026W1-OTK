@@ -27,6 +27,8 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    engine.rebaseAfterAway();
+
     const card = engine.getCard(uniqueCardId);
     if (!card.isPlayable()) {
       throw new Meteor.Error(
@@ -36,22 +38,25 @@ Meteor.methods({
     }
     engine.executeCard(uniqueCardId, selectedCardIds ?? []);
 
-    // If the enemy still has the 'timer' debuff id but the timer fields
-    // are not active (could happen after serialization or a tick), make
-    // sure it's activated so the UI and effects persist across plays.
-    if ((engine.enemy.debuffs || []).includes('timer') && !engine.enemy.timerDebuffActive) {
+    if (engine.isEnemyDefeated()) {
+      // Records the recap entry and moves the run to 'stageCleared' or 'win'.
+      // Must run before the state is serialised below.
+      engine.clearStage();
+    } else if (
+      (engine.enemy.debuffs || []).includes('timer') &&
+      !engine.enemy.timerDebuffActive
+    ) {
+      // The enemy still has the 'timer' debuff id but the timer fields are not
+      // active (could happen after serialization or a tick), so re-arm it to
+      // keep the UI and effects consistent across plays. Skipped on a corpse.
       debuffRegistry.create('timer').activateDebuff(engine);
     }
 
-    const newState = engine.toJSON();
-    if (engine.isEnemyDefeated()) {
-      engine.finalizeBossRecap('win');
-      engine.result = 'win';
-    }
+    engine.touch();
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },
-      { $set: { gameState: newState } }
+      { $set: { gameState: engine.toJSON() } }
     );
   },
 });

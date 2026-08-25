@@ -1,18 +1,20 @@
-// Goblin.ts
+// Timekeeper.ts
+// Stage 3 boss. Carries the timer debuff.
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
 import { EnemyData } from '../../types';
+import { debuffRegistry } from '../../debuffs';
 
-export class Goblin extends Enemy {
-  static enemyId = 'goblin';
+export class Timekeeper extends Enemy {
+  static enemyId = 'timekeeper';
 
   constructor(data: Partial<EnemyData> = {}) {
-    const health = data.health ?? 100;
+    const health = data.health ?? 140;
 
     super({
-      enemyId: Goblin.enemyId,
-      name: data.name ?? 'Goblin',
+      enemyId: Timekeeper.enemyId,
+      name: data.name ?? 'Timekeeper',
       health,
       currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],
@@ -24,9 +26,12 @@ export class Goblin extends Enemy {
       timerDebuffTickAmount: data.timerDebuffTickAmount,
     });
 
-    // The stage 1 boss is deliberately debuff-free - it is the run's tutorial
-    // fight. Debuffs are a per-enemy property; see Frostwarden and Timekeeper.
+    // Only fresh spawns receive their default debuffs. Saved enemies restore
+    // the exact debuff list provided in their serialized data.
+    if (data.debuffs === undefined) {
+      debuffRegistry.create('timer').applyTo(this);
+    }
   }
 }
 
-enemyRegistry.register(Goblin.enemyId, Goblin);
+enemyRegistry.register(Timekeeper.enemyId, Timekeeper);
