@@ -34,7 +34,7 @@ export function SelectionPanel({
             const card = selectedTargets[idx];
             return (
               <div
-                key={card?.uniqueId ?? idx}
+                /*key={card?.uniqueId ?? idx}*/
                 className="relative inline-block"
               >
                 {/* Invisible card establishes the natural slot size */}

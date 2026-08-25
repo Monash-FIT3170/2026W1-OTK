@@ -3,12 +3,15 @@ import { Meteor } from 'meteor/meteor';
 import { GameBackground } from './components/GameBackground';
 import Settings from './components/Settings';
 
-export const LandingPage = ({ hasSave, onStart }) => {
+export const LandingPage = ({ hasSave, onStart, onOpenTutorial, onEditDeck }) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [starting, setStarting] = useState(false);
 
   const handleContinue = () => {
-    onStart();
+    // gameState is already loaded reactively in App.jsx from the user's save —
+    // nothing to fetch here, just leave the landing page. isNewGame is
+    // explicitly false so this never triggers the auto-tutorial.
+    onStart(false);
   };
 
   const handleNewGame = () => {
@@ -26,12 +29,15 @@ export const LandingPage = ({ hasSave, onStart }) => {
         return;
       }
       setConfirmingNewGame(false);
-      onStart();
+      // isNewGame=true is what lets App.jsx auto-show the tutorial for
+      // first-time players. Continue deliberately never passes true.
+      onStart(true);
     });
   };
 
   const handleEditDeck = () => {
-    // Deck-building page is a future sprint's task - this is just the entry point for now.
+    // Deck-building page
+    onEditDeck();
   };
 
   const handleOptions = () => {
@@ -66,7 +72,7 @@ export const LandingPage = ({ hasSave, onStart }) => {
               disabled={starting}
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors disabled:opacity-50"
             >
-              {hasSave ? 'New Game' : 'Start'}
+              New Game
             </button>
 
             <button
@@ -81,6 +87,13 @@ export const LandingPage = ({ hasSave, onStart }) => {
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
             >
               Options
+            </button>
+
+            <button
+              onClick={onOpenTutorial}
+              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+            >
+              Tutorial
             </button>
 
             <button

@@ -12,6 +12,7 @@ export class FinalStand extends Card {
       description: 'Discard all non-damage cards, set all card costs to zero',
       baseCost: 0,
       currentCost: 0,
+      maxCopies: 1,
       ...data,
     });
   }

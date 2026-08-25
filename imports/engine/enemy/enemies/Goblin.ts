@@ -34,4 +34,4 @@ export class Goblin extends Enemy {
   }
 }
 
-enemyRegistry.register('goblin', Goblin);
+enemyRegistry.register(Goblin.enemyId, Goblin);

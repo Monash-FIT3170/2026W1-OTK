@@ -16,6 +16,7 @@ export abstract class Card {
   public baseAttack?: number;
   public currentAttack?: number;
   public cardAmountToSelect?: { min: number; max: number };
+  public maxCopies: number;
   public isFrozen: boolean;
 
   // constructs card
@@ -29,6 +30,7 @@ export abstract class Card {
     baseAttack?: number;
     currentAttack?: number;
     cardAmountToSelect?: { min: number; max: number };
+    maxCopies: number
     isFrozen?: boolean;
   }) {
     this.cardId = data.cardId;
@@ -40,6 +42,7 @@ export abstract class Card {
     this.baseAttack = data.baseAttack;
     this.currentAttack = data.currentAttack;
     this.cardAmountToSelect = data.cardAmountToSelect;
+    this.maxCopies = data.maxCopies;
     this.isFrozen = data.isFrozen ?? false;
   }
 
@@ -82,6 +85,7 @@ export abstract class Card {
       baseAttack: this.baseAttack,
       currentAttack: this.currentAttack,
       cardAmountToSelect: this.cardAmountToSelect,
+      maxCopies: this.maxCopies,
       isFrozen: this.isFrozen,
     };
   }

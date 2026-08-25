@@ -11,6 +11,9 @@ function Card({ cardProps, width = 300 }) {
       ? 'text-lime-400'
       : 'text-red-400';
   const s = (px) => `${px * scale}px`;
+  const descriptionLength = cardProps.description?.length ?? 0;
+  const descriptionFontSize =
+    descriptionLength > 70 ? 19 : descriptionLength > 50 ? 23 : 27;
   return (
     <div style={{ fontFamily: '"Micro 5", monospace' }} className="relative inline-block">
       <img
@@ -45,7 +48,21 @@ function Card({ cardProps, width = 300 }) {
       </div>
       {/*Description*/}
       <div
-        style={{ position: 'absolute', top: s(264), left: s(80), right: s(40), textAlign: 'center', fontSize: s(27), color: 'white', lineHeight: 1 }}
+        style={{
+          position: 'absolute',
+          top: s(264),
+          bottom: s(20),
+          left: s(80),
+          right: s(40),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          textAlign: 'center',
+          fontSize: s(descriptionFontSize),
+          color: 'white',
+          lineHeight: 1,
+        }}
       >
         {cardProps.description}
       </div>

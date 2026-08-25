@@ -12,6 +12,7 @@ export class TeaCeremony extends Card {
             baseCost: 1,
             currentCost: 1,
             cardAmountToSelect: {min: 2, max: 2},
+            maxCopies: 2,
             ...data,
         });
     }

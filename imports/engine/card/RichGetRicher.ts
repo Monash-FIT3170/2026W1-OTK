@@ -12,6 +12,7 @@ export class RichGetRicher extends Card {
       baseCost: 3,
       currentCost: 3,
       cardAmountToSelect: { min: 1, max: 1 },
+      maxCopies: 1,
       ...data,
     });
   }

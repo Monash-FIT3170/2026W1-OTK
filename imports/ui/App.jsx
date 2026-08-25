@@ -10,11 +10,14 @@ import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
-import { PlayerDisplay } from './components/PlayerDisplay';
 import { SaveGameButton } from './components/SaveGameButton';
 import { LoginForm } from './auth/LoginForm';
 import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
+import { TutorialOverlay } from './components/TutorialOverlay';
+import { TutorialDemoScreen } from './components/TutorialDemoScreen';
+import { DeckBuilder } from './components/deck/DeckBuilder';
+import { buildAvailableCards } from './../engine/DeckBuilderCards';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -22,6 +25,20 @@ import Settings from './components/Settings';
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // Manually-opened tutorial (landing page button) is a fully separate,
+  // ephemeral demo screen — it never touches the player's real save.
+  const [showTutorialDemo, setShowTutorialDemo] = useState(false);
+
+  // Set true only when the player just started a brand-new game (not
+  // Continue). The auto-tutorial triggers off this path — every time,
+  // not just a player's first-ever game, since re-showing it on every
+  // New Game (e.g. after trying a new strategy, or a returning player
+  // wanting a refresher) makes more sense for this kind of game than a
+  // strict one-time-only onboarding flow.
+  const [justStartedNewGame, setJustStartedNewGame] = useState(false);
+  const [showDeckBuilder, setShowDeckBuilder] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, gameState, loading } = useTracker(() => {
@@ -44,23 +61,47 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding]);
 
+  // Auto-show the tutorial every time the player starts a brand-new game
+  // (never on Continue).
   useEffect(() => {
-    if (!gameState?.enemy?.timerDebuffActive || !gameState.enemy.timerDebuffDeadline) {
-      return undefined;
+    if (!loading && user && gameState && !showLanding && justStartedNewGame) {
+      setShowTutorial(true);
+      setJustStartedNewGame(false);
     }
+  }, [loading, user, gameState, showLanding, justStartedNewGame]);
 
-    const interval = setInterval(() => {
-      if (Date.now() >= gameState.enemy.timerDebuffDeadline) {
-        Meteor.call('game.applyTimerTick', (err) => {
-          if (err) console.error('game.applyTimerTick failed:', err);
-        });
-      }
-    }, 250);
-
-    return () => clearInterval(interval);
-  }, [gameState?.enemy?.timerDebuffActive, gameState?.enemy?.timerDebuffDeadline]);
 
   useGameSounds(gameState?.result);
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+    Meteor.call('user.markTutorialSeen', (err) => {
+      if (err) console.error('user.markTutorialSeen failed:', err);
+    });
+  };
+
+  // Manually-opened tutorial from the landing page. Fully ephemeral —
+  // no Meteor calls, no reads or writes to the player's real save.
+  // Renders as its own top-level screen (see the showTutorialDemo branch
+  // below), completely independent of showLanding/gameState.
+  const handleOpenTutorial = () => {
+    setShowTutorialDemo(true);
+  };
+
+  const handleCloseTutorialDemo = () => {
+    setShowTutorialDemo(false);
+    Meteor.call('user.markTutorialSeen', (err) => {
+      if (err) console.error('user.markTutorialSeen failed:', err);
+    });
+  };
+
+  // Called by LandingPage when leaving for the main game screen.
+  // isNewGame should be true only for the New Game/Start action, never
+  // for Continue — this is what the auto-tutorial trigger keys off.
+  const handleStart = (isNewGame = false) => {
+    setShowLanding(false);
+    if (isNewGame) setJustStartedNewGame(true);
+  };
 
   // --- Loading state ---
   if (loading) {
@@ -84,12 +125,40 @@ export const App = () => {
     );
   }
 
+  // --- Manually-opened tutorial demo: fully ephemeral, independent of
+  // showLanding/gameState. Never touches the player's real save. ---
+  if (showTutorialDemo) {
+    return <TutorialDemoScreen onClose={handleCloseTutorialDemo} />;
+  }
+
   // --- Landing page: shown once user is authenticated, before game starts ---
   if (showLanding) {
     return (
-      <LandingPage
-        hasSave={!!gameState}
-        onStart={() => setShowLanding(false)}
+            <LandingPage
+        hasSave={gameState?.result === 'playing'}
+        onStart={handleStart}
+        onOpenTutorial={handleOpenTutorial}
+        onEditDeck={() => {
+          setShowLanding(false);
+          setShowDeckBuilder(true);
+        }}
+      />
+    );
+  }
+  if (showDeckBuilder) {
+    return (
+      <DeckBuilder
+        availableCards={buildAvailableCards()}
+        initialDeck={gameState?.deck ?? []}
+        onConfirm={(newDeck) => {
+          Meteor.call('userData.updateDeck', newDeck, (err) => {
+            setShowDeckBuilder(false);
+          });
+        }}
+        onBack={() => {
+          setShowDeckBuilder(false);
+          setShowLanding(true);
+        }}
       />
     );
   }
@@ -107,8 +176,7 @@ export const App = () => {
 
   // --- Victory / Defeat screens ---
   if (result === 'win' || result === 'loss') {
-    return <ResultScreen result={result} enemyName={enemy.name} bossRecap={gameState.bossRecap} />;
-  }
+    return <ResultScreen result={result} enemyName={enemy.name} bossRecap={gameState.bossRecap} onBackToMenu={() => setShowLanding(true)}/>;
 
   // --- Main game screen ---
   return (
@@ -118,7 +186,7 @@ export const App = () => {
         <Settings saveButton={<SaveGameButton gameState={gameState} />} />
       </div>
 
-      <div className="px-6 py-4 mx-auto w-350">
+      <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
         <HealthBar
           current={enemy.currentHealth}
           max={enemy.health}
@@ -132,19 +200,28 @@ export const App = () => {
       </div>
 
       {/* Enemy display */}
-      <div className="absolute" style={{ right: 400, bottom: 540 }}>
+      <div
+        className="absolute"
+        style={{ right: 400, bottom: 540 }}
+        data-tutorial-target="enemy"
+      >
         <EnemyDisplay enemy={enemy} isVisible={true} />
       </div>
 
       {/* End turn button — absolute to match its former flex-flow position */}
-      <div className="absolute" style={{ top: 530, right: 30 }}>
-        <EndTurnButton />
+      <div
+        className="absolute"
+        style={{ top: 530, right: 30 }}
+        data-tutorial-target="end-turn"
+      >
+        <EndTurnButton disabled={showTutorial} />
       </div>
 
       {/* Card hand row: DeckViewer on left, hand on right */}
       <div
         className="absolute flex items-end"
         style={{ left: 370, right: 140, bottom: 20 }}
+        data-tutorial-target="hand"
       >
         <CardHand cards={hand} deckSize={deck.length} />
       </div>
@@ -157,8 +234,19 @@ export const App = () => {
           bottom: 163,
         }}
       >
-        <DeckViewer cards={deck} />
+        {/* Inner wrapper sized to DeckViewer's actual content, not the
+            wide positioning container above — that container spans
+            almost the full screen width and was causing the tutorial
+            spotlight to highlight a huge, wrong area instead of the
+            actual visible deck number. */}
+        <div className="inline-block" data-tutorial-target="deck">
+          <DeckViewer cards={deck} />
+        </div>
       </div>
+
+      {showTutorial && (
+        <TutorialOverlay onClose={handleCloseTutorial} hand={hand} />
+      )}
     </GameBackground>
   );
 };

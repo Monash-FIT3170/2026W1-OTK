@@ -10,7 +10,7 @@ function formatTime(ms) {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-export function ResultScreen({ result, enemyName, bossRecap = [] }) {
+export function ResultScreen({ result, enemyName, bossRecap = [], onBackToMenu}) {
   const isWin = result === 'win';
 
   const totalTimeMs = bossRecap.reduce((sum, entry) => sum + entry.timeMs, 0);
@@ -106,6 +106,12 @@ export function ResultScreen({ result, enemyName, bossRecap = [] }) {
         onClick={() => Meteor.call('game.newGame')}
       >
         {isWin ? 'Play Again' : 'Try Again'}
+      </button>
+      <button
+        className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
+        onClick={onBackToMenu}
+      >
+        Back to Menu
       </button>
       <button
         className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
