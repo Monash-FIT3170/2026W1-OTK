@@ -4,6 +4,7 @@
 
 import { Card } from './Card';
 import { GameEngine } from '../GameEngine';
+import { cardRegistry } from './CardRegistry';
 
 export class DoubleSacrifice extends Card {
   constructor(uniqueId?: string) {
@@ -33,3 +34,5 @@ export class DoubleSacrifice extends Card {
     }
   }
 }
+
+cardRegistry.register('double-sacrifice', DoubleSacrifice);

@@ -7,6 +7,7 @@
 import { Card, cardData } from './Card';
 import { GameEngine } from '../GameEngine';
 import { ReturnToDeckEffect } from '../effect/ReturnToDeckEffect';
+import { cardRegistry } from './CardRegistry';
 
 export class Reload extends Card {
   constructor(data?: Partial<cardData>) {
@@ -32,3 +33,5 @@ export class Reload extends Card {
     engine.draw(handSize);
   }
 }
+
+cardRegistry.register('reload', Reload);
