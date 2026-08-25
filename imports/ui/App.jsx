@@ -74,16 +74,16 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding, justStartedNewGame]);
 
+  const onGameScreen =
+    !loading && !!user && !showLanding && !showDeckBuilder && !showTutorialDemo;
 
-  useGameSounds(gameState?.result);
+  useGameSounds(gameState?.result, onGameScreen);
 
   // Heartbeat while a fight is on screen. Ticks the timer debuff so the enemy
   // heals in real time, and marks the player as present - a gap in these pings
   // is what tells the server the tab was closed, so that time away neither
   // heals the enemy nor inflates the run timer. See GameEngine.rebaseAfterAway.
-  const inBattle =
-    !loading && !!user && !showLanding && !showDeckBuilder && !showTutorialDemo &&
-    gameState?.result === 'playing';
+  const inBattle = onGameScreen && gameState?.result === 'playing';
 
   useEffect(() => {
     if (!inBattle) return;
@@ -156,7 +156,7 @@ export const App = () => {
   // --- Landing page: shown once user is authenticated, before game starts ---
   if (showLanding) {
     return (
-            <LandingPage
+      <LandingPage
         hasSave={
           gameState?.result === 'playing' ||
           gameState?.result === 'stageCleared'
@@ -174,7 +174,12 @@ export const App = () => {
     return (
       <DeckBuilder
         availableCards={buildAvailableCards()}
-        initialDeck={userData?.nextDeck ?? gameState?.baseDeck ?? DeckBuilderEngine.buildStartingDeck() ?? []}
+        initialDeck={
+          userData?.nextDeck ??
+          gameState?.baseDeck ??
+          DeckBuilderEngine.buildStartingDeck() ??
+          []
+        }
         onConfirm={(newDeck) => {
           Meteor.call('userData.saveNextDeck', newDeck, (err) => {
             setShowDeckBuilder(false);
@@ -214,7 +219,14 @@ export const App = () => {
 
   // --- Victory / Defeat screens ---
   if (result === 'win' || result === 'loss') {
-    return <ResultScreen result={result} enemyName={enemy.name} bossRecap={gameState.bossRecap} onBackToMenu={() => setShowLanding(true)}/>;
+    return (
+      <ResultScreen
+        result={result}
+        enemyName={enemy.name}
+        bossRecap={gameState.bossRecap}
+        onBackToMenu={() => setShowLanding(true)}
+      />
+    );
   }
 
   // --- Main game screen ---

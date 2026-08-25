@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
 import { soundManager } from '../soundManager';
 
-export function useGameSounds(result) {
+export function useGameSounds(result, active) {
   useEffect(() => {
-    if (result === undefined) return;
+    if (!active || result === undefined) {
+      soundManager.stopMusic();
+      return;
+    }
     if (result === 'playing') {
       soundManager.playBackgroundMusic('spark-mandrill');
       return;
@@ -17,5 +20,5 @@ export function useGameSounds(result) {
     soundManager.stopMusic();
     if (result === 'win') soundManager.playStageClear();
     if (result === 'loss') soundManager.playGameOver();
-  }, [result]);
+  }, [result, active]);
 }
