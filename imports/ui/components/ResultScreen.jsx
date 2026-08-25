@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
-export function ResultScreen({ result, enemyName }) {
+export function ResultScreen({ result, enemyName, onBackToMenu }) {
   const isWin = result === 'win';
 
   return (
@@ -23,6 +23,12 @@ export function ResultScreen({ result, enemyName }) {
         onClick={() => Meteor.call('game.newGame')}
       >
         {isWin ? 'Play Again' : 'Try Again'}
+      </button>
+      <button
+        className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
+        onClick={onBackToMenu}
+      >
+        Back to Menu
       </button>
       <button
         className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
