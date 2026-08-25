@@ -32,7 +32,9 @@ export class GameEngine {
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
-    this.baseDeck = userData.baseDeck?.map((card) => cardRegistry.create(card)) || userData.hand.map((card) => cardRegistry.create(card));
+    this.baseDeck =
+      userData.baseDeck?.map((card) => cardRegistry.create(card)) ||
+      userData.hand.map((card) => cardRegistry.create(card));
     this.hand = userData.hand.map((card) => cardRegistry.create(card));
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
     this.enemy = enemyRegistry.create(userData.enemy);
@@ -77,6 +79,17 @@ export class GameEngine {
     }
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
+
+    this.hand.forEach((handCard) => handCard.onOtherCardPlayed(card, this));
+    this.deck.forEach((deckCard) => deckCard.onOtherCardPlayed(card, this));
+
+    // 2. ADD THIS LINE: Stop the current timer because the player acted
+    this.clearTimerDebuff();
+
+    // 3. This will trigger your Timer.executeDebuff(), which sees the timer
+    // is cleared and restarts a fresh 5-second grace period!
+    this.executeEnemyDebuffs();
+
     this.cardsUsedThisStage += 1;
   }
 
@@ -89,16 +102,6 @@ export class GameEngine {
       cardsUsed: this.cardsUsedThisStage,
       result: bossResult,
     });
-    
-    this.hand.forEach(handCard => handCard.onOtherCardPlayed(card, this));
-    this.deck.forEach(deckCard => deckCard.onOtherCardPlayed(card, this));
-    
-    // 2. ADD THIS LINE: Stop the current timer because the player acted
-    this.clearTimerDebuff(); 
-    
-    // 3. This will trigger your Timer.executeDebuff(), which sees the timer 
-    // is cleared and restarts a fresh 5-second grace period!
-    this.executeEnemyDebuffs();
   }
 
   executeEnemyDebuffs(): void {
@@ -108,7 +111,10 @@ export class GameEngine {
   }
 
   resolveTimerDebuff(now: number = Date.now()): void {
-    if (!this.enemy.timerDebuffActive || this.enemy.timerDebuffDeadline === null) {
+    if (
+      !this.enemy.timerDebuffActive ||
+      this.enemy.timerDebuffDeadline === null
+    ) {
       return;
     }
 
@@ -131,8 +137,6 @@ export class GameEngine {
   clearTimerDebuff(): void {
     this.enemy.timerDebuffActive = false;
     this.enemy.timerDebuffDeadline = null;
-
-    
   }
 
   isEnemyDefeated(): boolean {
@@ -150,13 +154,6 @@ export class GameEngine {
     const baseDeck = [...deck];
     const stage = 1;
     const BossClass = BOSS_LOOKUP[stage];
-    const enemy: EnemyData = new BossClass().toJSON();
-    const scene = SCENE_LOOKUP[stage]
-    const userData: UserData = {
-      userId, stage, deck, hand: [], enemy, scene, result: 'playing',
-      bossRecap: [],
-      stageStartedAt: Date.now(),
-      cardsUsedThisStage: 0,
     const boss = new BossClass();
     const enemy: EnemyData = boss.toJSON();
     const scene = SCENE_LOOKUP[stage];
@@ -169,6 +166,9 @@ export class GameEngine {
       enemy,
       scene,
       result: 'playing',
+      bossRecap: [],
+      stageStartedAt: Date.now(),
+      cardsUsedThisStage: 0,
     };
 
     const engine = new GameEngine(userData);
