@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { GameBackground } from './components/GameBackground';
 import Settings from './components/Settings';
 
-export const LandingPage = ({ hasSave, onStart, onOpenTutorial, onEditDeck }) => {
+export const LandingPage = ({
+  hasSave,
+  onStart,
+  onOpenTutorial,
+  onEditDeck,
+}) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [starting, setStarting] = useState(false);
 
@@ -50,7 +54,7 @@ export const LandingPage = ({ hasSave, onStart, onOpenTutorial, onEditDeck }) =>
   };
 
   return (
-    <GameBackground backgroundScene="landing">
+    <div className="min-h-screen w-screen bg-slate-900">
       <div className="min-h-screen flex flex-col items-center justify-center gap-8">
         <h1 className="text-5xl font-bold text-white tracking-wide drop-shadow-lg">
           One Turn Kill
@@ -85,7 +89,7 @@ export const LandingPage = ({ hasSave, onStart, onOpenTutorial, onEditDeck }) =>
               {hasSave && (
                 // The deck is locked for the duration of a run: edits are saved
                 // to nextDeck and only picked up by game.newGame.
-                <p className="text-slate-400 text-xs text-center">
+                <p className="text-slate-400 text-sm text-center">
                   Applies to your next run
                 </p>
               )}
@@ -117,7 +121,8 @@ export const LandingPage = ({ hasSave, onStart, onOpenTutorial, onEditDeck }) =>
         {confirmingNewGame && (
           <div className="flex flex-col items-center gap-4 w-72">
             <p className="text-white text-center">
-              Starting a new game will overwrite your current save. Are you sure?
+              Starting a new game will overwrite your current save. Are you
+              sure?
             </p>
             <div className="flex gap-4">
               <button
@@ -141,7 +146,7 @@ export const LandingPage = ({ hasSave, onStart, onOpenTutorial, onEditDeck }) =>
       {/* Hosts the settings dialog without its own gear-icon trigger,
           since Options above opens it directly. */}
       <Settings showTrigger={false} />
-    </GameBackground>
+    </div>
   );
 };
 

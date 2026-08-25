@@ -47,7 +47,7 @@ export const tutorialSteps = [
     action: null,
     title: 'Your Deck',
     description:
-      'Notice your deck just got smaller — playing a card draws that many cards from the deck into your hand first, so your deck shrinks as you build up your turn.',
+      'Notice your deck just got smaller — playing a card draws that many cards from the deck into your hand first, so your deck shrinks as you build up your turn. Click this number any time to see exactly what cards are left in your deck.',
   },
   {
     target: 'end-turn',
