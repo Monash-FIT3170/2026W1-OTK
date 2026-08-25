@@ -24,10 +24,19 @@ export class Reload extends Card {
   }
 
   execute(engine: GameEngine, targetCardIndexes?: string[]): void {
-    const handSize = engine.getHand().length;
-    const allHandIds = engine.getHand().map((card) => card.uniqueId);
+    const handCards = [...engine.getHand()];
+    const handSize = handCards.length;
+    const allHandIds = handCards.map((card) => card.uniqueId);
 
     new ReturnToDeckEffect().resolve(engine, allHandIds);
+
+    // Mint a fresh uniqueId for every returned card. Without this, a card the
+    // shuffle happens to redraw into the same hand keeps its old id, so its
+    // React key doesn't change and the client's card-entrance animation never
+    // replays for it
+    handCards.forEach((card) => {
+      card.uniqueId = crypto.randomUUID();
+    });
 
     engine.shuffle();
     engine.draw(handSize);
