@@ -24,7 +24,6 @@ const CARD_CLASSES = [
   TeaCeremony,
   TaxThePoor,
   RichGetRicher,
-  FinalStand,
   MistConjuring,
   KillingBlow,
   AggraRay,
