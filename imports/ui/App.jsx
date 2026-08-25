@@ -115,9 +115,9 @@ export const App = () => {
         <PlayerDisplay />
       </div>
 
-      {/* Enemy display */}
+      {/* Enemy display, keyed by stage so the entry animation replays for each new boss */}
       <div className="absolute" style={{ right: 400, bottom: 540 }}>
-        <EnemyDisplay enemy={enemy} isVisible={true} />
+        <EnemyDisplay key={gameState.stage} enemy={enemy} isVisible={true} />
       </div>
 
       {/* End turn button — absolute to match its former flex-flow position */}

@@ -4,17 +4,24 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData } from './types';
+import { UserData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { Goblin } from './enemy/enemies/Goblin';
 
-const BOSS_LOOKUP: { [stage: number]: new (data?: any) => Enemy } = {
-  1: Goblin,
+// factory per stage so each boss can have distinct data despite reusing the Goblin class for now
+const BOSS_LOOKUP: { [stage: number]: () => Enemy } = {
+  1: () => new Goblin(),
+  2: () => new Goblin({ name: 'Goblin II' }),
+  3: () => new Goblin({ name: 'Goblin III' }),
 };
 
 const SCENE_LOOKUP: { [stage: number]: string } = {
   1: 'underpass-overlaid',
+  2: 'underpass-overlaid',
+  3: 'underpass-overlaid',
 };
+
+const MAX_STAGE = Math.max(...Object.keys(BOSS_LOOKUP).map(Number));
 
 export class GameEngine {
   public hand: Card[];
@@ -62,22 +69,44 @@ export class GameEngine {
     return this.enemy.currentHealth <= 0;
   }
 
+  isFinalStage(): boolean {
+    return this.stage >= MAX_STAGE;
+  }
+
+  // starts a fresh hand/deck for the next boss
+  advanceStage(): void {
+    this.loadStage(this.stage + 1);
+  }
+
   hasPlayableCards(): boolean {
     return this.hand.some((card) => card.currentCost <= this.deck.length);
   }
 
   static newGame(userId: string): UserData {
-    const deck = DeckBuilder.buildStartingDeck();
     const stage = 1;
-    const BossClass = BOSS_LOOKUP[stage];
-    const enemy: EnemyData = new BossClass().toJSON();
-    const scene = SCENE_LOOKUP[stage]
-    const userData: UserData = { userId, stage, deck, hand: [], enemy, scene, result: 'playing' };
+    const userData: UserData = {
+      userId,
+      stage,
+      deck: DeckBuilder.buildStartingDeck(),
+      hand: [],
+      enemy: BOSS_LOOKUP[stage]().toJSON(),
+      scene: SCENE_LOOKUP[stage],
+      result: 'playing',
+    };
 
     const engine = new GameEngine(userData);
-    engine.shuffle();
-    engine.draw();
+    engine.loadStage(stage);
     return engine.toJSON();
+  }
+
+  private loadStage(stage: number): void {
+    this.stage = stage;
+    this.deck = DeckBuilder.buildStartingDeck().map((card) => cardRegistry.create(card));
+    this.enemy = enemyRegistry.create(BOSS_LOOKUP[stage]().toJSON());
+    this.hand = [];
+
+    this.shuffle();
+    this.draw();
   }
 
   // ------------------
