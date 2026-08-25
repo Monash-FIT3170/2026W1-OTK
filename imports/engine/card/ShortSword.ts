@@ -8,8 +8,8 @@ import { cardRegistry } from './CardRegistry';
 
 /**
  * Short Sword Card
- * 
- * 
+ *
+ *
  * @author Ahmad Abu-Shaqra
  * @version 1.0
  */
@@ -17,9 +17,9 @@ export class ShortSword extends Card {
   /**
    * Card constructor
    * Initialises values based on default, can instead pass cardData to restore mutable stats
-   * 
+   *
    * @param data Passed cardData
-   * 
+   *
    * @see cardData
    */
   constructor(data?: Partial<cardData>) {
@@ -38,9 +38,9 @@ export class ShortSword extends Card {
 
   /**
    * Execution of the Short Sword card effect
-   * 
+   *
    * @param engine GameEngine executing this function
-   * 
+   *
    * @see GameEngine
    * @see DamageEffect
    */

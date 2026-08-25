@@ -18,6 +18,7 @@ export class Reload extends Card {
       baseCost: 1,
       currentCost: 1,
       cardAmountToSelect: { min: 0, max: 0 },
+      maxCopies: 1,
       ...data,
     });
   }
