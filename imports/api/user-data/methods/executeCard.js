@@ -49,8 +49,6 @@ Meteor.methods({
       engine.result = 'win';
     }
 
-    const newState = engine.toJSON();
-
     await UserDataCollection.updateAsync(
       { userId: this.userId },
       { $set: { gameState: newState } }
