@@ -1,21 +1,20 @@
-// AggraRay.ts
+// HelpingHand.ts
 
 // Importing components
 import { Card, cardData } from './Card';
 import { GameEngine } from '../GameEngine';
 import { ChangeCostEffect } from '../effect/ChangeCostEffect';
-import { DamageEffect } from '../effect/DamageEffect';
 import { cardRegistry } from './CardRegistry';
 
 /**
- * Aggra-Ray Card
+ * Helping Hand Card
  *
- * Effect: Adds 1 cost to all cards in hand
+ * Effect: Decreases cost of selected card by 2
  *
  * @author Ahmad Abu-Shaqra
  * @version 1.0
  */
-export class AggraRay extends Card {
+export class HelpingHand extends Card {
   /**
    * Card constructor
    * Initialises values based on default, can instead pass cardData to restore mutable stats
@@ -26,31 +25,34 @@ export class AggraRay extends Card {
    */
   constructor(data?: Partial<cardData>) {
     super({
-      cardId: 'aggra-ray',
-      name: 'Aggra-Ray',
-      description: 'Adds 1 cost to all cards in hand.',
+      cardId: 'helping-hand',
+      name: 'Helping Hand',
+      description: 'Decreases cost of selected card by 2.',
       baseCost: 1,
       currentCost: 1,
-      baseAttack: 25,
-      currentAttack: 25,
+      cardAmountToSelect: {min: 1, max: 1},
       ...data,
       maxCopies: 2,
     });
   }
 
   /**
-   * Execution of the AggraRay card effect
+   * Execution of the HelpingHand card effect
    *
    * @param engine GameEngine executing this function
    *
    * @see GameEngine
    * @see ChangeCostEffect
-   * @see DamageEffect
    */
-  execute(engine: GameEngine): void {
-    new ChangeCostEffect(engine.getHand(), 1).resolve(engine);
-    new DamageEffect(this.currentAttack).resolve(engine);
+  execute(engine: GameEngine, targetCardIndexes?: string[]): void {
+    if (!targetCardIndexes) return;
+
+    const cards = targetCardIndexes
+      .map((id: string) => engine.hand.find((card) => card.uniqueId === id))
+      .filter((card) => card !== undefined);
+
+    new ChangeCostEffect(cards, -2).resolve(engine);
   }
 }
 
-cardRegistry.register('aggra-ray', AggraRay);
+cardRegistry.register('helping-hand', HelpingHand);
