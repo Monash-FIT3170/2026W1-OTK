@@ -5,7 +5,7 @@ import { HealthBar } from './enemy/HealthBar';
 import { PlayerDisplay } from './PlayerDisplay';
 import { EnemyDisplay } from './enemy/EnemyDisplay';
 import { DeckViewer } from './DeckViewer';
-import Card from '../cards/Card';
+import { DraggableCard } from '../cards/DraggableCard';
 import { tutorialSteps } from '../tutorial/tutorialSteps';
 import { useTutorialEngine } from '../hooks/useTutorialEngine';
 import {
@@ -40,6 +40,7 @@ export const TutorialDemoScreen = ({ onClose }) => {
 
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState(null);
+  const handRef = useRef(null);
 
   const step = demoTutorialSteps[stepIndex];
   const isFirstStep = stepIndex === 0;
@@ -184,25 +185,29 @@ export const TutorialDemoScreen = ({ onClose }) => {
         </button>
       </div>
 
-      {/* Real, local, clickable hand — click a card to actually play it
-          against the local engine. Card is rendered at its real-game
-          default width (300) rather than a shrunk-down size, so this
-          matches what the player will actually see in real gameplay. */}
+      {/* Real, local, draggable hand — drag a card out to actually play it
+          against the local engine, same gesture as the real game's
+          DraggableCard. Card is rendered at its real-game default width
+          (300) rather than a shrunk-down size, so this matches what the
+          player will actually see in real gameplay. */}
       <div
+        ref={handRef}
         className="absolute flex items-end gap-2"
         style={{ left: 370, right: 140, bottom: 20 }}
         data-tutorial-target="hand"
       >
         {hand.map((cardProps) => (
-          <button
+          <DraggableCard
             key={cardProps.uniqueId}
-            onClick={() => playCard(cardProps.uniqueId)}
-            disabled={!canAfford(cardProps)}
-            className="disabled:opacity-40 disabled:cursor-not-allowed transition-opacity bg-transparent border-0 p-0 cursor-pointer"
-            aria-label={`Play ${cardProps.name}`}
-          >
-            <Card cardProps={cardProps} />
-          </button>
+            cardProps={cardProps}
+            marginLeft="0px"
+            onClick={() => {}}
+            handRef={handRef}
+            onPlay={playCard}
+            isInSelectionMode={false}
+            affordable={canAfford(cardProps)}
+            playable={!cardProps.isFrozen}
+          />
         ))}
       </div>
 
