@@ -17,6 +17,7 @@ export class DoubleSacrifice extends Card {
       baseCost: 1,
       currentCost: 1,
       cardAmountToSelect: { min: 3, max: 3 },
+      maxCopies: 1,
     });
   }
 
