@@ -1,15 +1,14 @@
 import { GameEngine } from '../GameEngine';
 import { Card } from '../card/Card';
 import { Effect } from './Effect';
-import { cardRegistry } from '../card/CardRegistry';
 
 /**
- * IncreaseCostEffect increases the cost of one or more cards
+ * ChangeCostEffect increases the cost of one or more cards
  * 
  * @author Ahmad Abu-Shaqra
  * @version 1.0
  */
-export class IncreaseCostEffect implements Effect {
+export class ChangeCostEffect implements Effect {
   private cards: Card[];
   private amount: number;
 
@@ -36,7 +35,7 @@ export class IncreaseCostEffect implements Effect {
    */
   resolve(engine: GameEngine, targetCardIndexes?: string[]): void {
     for (const card of this.cards) {
-        card.currentCost += this.amount
+        card.currentCost = Math.max(0, card.currentCost + this.amount);
     }
   }
 }

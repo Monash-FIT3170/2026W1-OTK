@@ -132,7 +132,7 @@ if (Meteor.isClient) {
       fireEvent.error(img);
 
       expect(img.getAttribute('src')).to.equal(
-        `/assets/sprites/enemies/${goblin.name.toLowerCase()}-enemy.png`
+        `/assets/sprites/enemies/${goblin.enemyId}-enemy.gif`
       );
     });
   });
