@@ -25,7 +25,7 @@ import { GameEngine } from '../../../engine/GameEngine';
  *
  * @author Eric Blyth
  * @author Hydar Rabiaa
- * @version 1.1
+ * @version 1.2
  */
 Meteor.methods({
   /**
@@ -134,4 +134,61 @@ Meteor.methods({
       }
     );
   },
+
+  /**
+   * Updates the deck for the next run for the authenticated user.
+   *
+   * This method overwrites the user's current saved nextDeck
+   * with the provided nextDeck array.
+   *
+   * NextDeck is designed to contain the user's selected deck for the next run.
+   *
+   * Security:
+   * - Only authenticated users may update nextDeck
+   * - Users may only update their own nextDeck
+   *
+   * @method userData.updateGameState
+   *
+   * @param {Card[]} newDeck - GameState update payload
+   *
+   * @returns {number} modifiedCount - Number of modified documents
+   *
+   * @throws {Meteor.Error} userData.notAuthorized
+   * Thrown when an unauthenticated user attempts to update GameState
+   * 
+   * @throws {Meteor.Error} userData.notFound
+   * Thrown when no user data exists for the authenticated user
+   *
+   * @see UserDataCollection
+   */
+  'userData.saveNextDeck': async function (newDeck) {
+    check(newDeck, Array);
+
+    if (!this.userId) {
+      throw new Meteor.Error(
+        'userData.notAuthorized',
+        'You must be logged in to save the next deck.'
+      );
+    }
+
+    const existingUserData = await UserDataCollection.findOneAsync({
+      userId: this.userId,
+    });
+
+    if (!existingUserData) {
+      throw new Meteor.Error(
+        'userData.notFound',
+        'No user data exists for this user.'
+      );
+    }
+
+    return UserDataCollection.updateAsync(
+      { userId: this.userId },
+      {
+        $set: {
+          nextDeck: newDeck,
+        },
+      }
+    );
+  }
 });

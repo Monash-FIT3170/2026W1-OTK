@@ -13,7 +13,7 @@ import { Accounts } from 'meteor/accounts-base';
  * - Create known user credentials before login tests
  * - Clear the database between tests to avoid state leakage
  */
-Meteor.methods({
+const testUserMethods = {
 
   /**
    * Creates a test user with the specified credentials.
@@ -75,4 +75,15 @@ Meteor.methods({
   async 'auth.clearTestUsers'() {
     return await Meteor.users.removeAsync({});
   },
-});
+};
+
+// Register on the server only. This module is reached from the client test
+// bundle via tests/main.js, and `Meteor.methods` on the client defines a *stub*
+// that runs these bodies in the browser. The bodies use server-only semantics:
+// client-side `Accounts.createUser` means "create a user AND log in as them",
+// which drives the accounts login state machine and breaks the subsequent
+// `Meteor.loginWithPassword` in auth.app-tests.js with "No result from call to
+// login". These helpers are server-side test fixtures and must never be stubs.
+if (Meteor.isServer) {
+  Meteor.methods(testUserMethods);
+}

@@ -58,7 +58,11 @@ export default function CardHand({ cards, deckSize }) {
   return (
     <div className="flex flex-col w-full">
       {pendingSelection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pb-90 pointer-events-none">
+        // z-[60] — deliberately above the tutorial overlay's z-51 spotlight
+        // card. Card-selection confirmation is real, functional gameplay
+        // UI; it must never be visually blocked by an informational
+        // overlay like the tutorial, no matter what else is on screen.
+        <div className="fixed inset-0 z-[60] flex items-center justify-center pb-90 pointer-events-none">
           <div className="pointer-events-auto">
             <SelectionPanel
               pendingSelection={pendingSelection}
@@ -101,6 +105,7 @@ export default function CardHand({ cards, deckSize }) {
               onPlay={onDragPlay}
               isInSelectionMode={inSelectionMode}
               affordable={card.currentCost <= deckSize}
+              playable={!card.isFrozen}
             />
           ))}
         </div>

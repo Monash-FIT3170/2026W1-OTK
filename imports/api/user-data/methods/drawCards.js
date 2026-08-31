@@ -25,13 +25,21 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    engine.rebaseAfterAway();
 
     const card = engine.getCard(uniqueCardId);
+    if (!card.isPlayable()) {
+      throw new Meteor.Error(
+        'game.drawCards.cardFrozen',
+        'Frozen cards cannot be played.'
+      );
+    }
     if (card.currentCost > engine.deck.length) {
       throw new Meteor.Error('game.drawCards.notEnoughCards', 'Not enough cards in deck to play this card.');
     }
 
     const result = engine.drawCost(uniqueCardId);
+    engine.touch();
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },

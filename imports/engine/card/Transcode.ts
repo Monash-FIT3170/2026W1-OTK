@@ -16,6 +16,7 @@ export class Transcode extends Card {
       baseCost: 4,
       currentCost: 4,
       cardAmountToSelect: { min: 3, max: 3 },
+      maxCopies: 2,
       ...data,
     });
   }

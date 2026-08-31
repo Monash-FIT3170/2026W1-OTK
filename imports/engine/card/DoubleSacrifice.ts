@@ -1,0 +1,39 @@
+/**
+ * Destroy 2 cards from your hand and the next offensive card will do double the damage
+ */
+
+import { Card, cardData } from './Card';
+import { GameEngine } from '../GameEngine';
+import { cardRegistry } from './CardRegistry';
+
+export class DoubleSacrifice extends Card {
+  constructor(data?: Partial<cardData>) {
+    super({
+      cardId: 'double-sacrifice',
+      name: 'Double Sacrifice',
+      description:
+        'Destroy 2 cards from your hand, buff an offensive card to deal double damage.',
+      baseCost: 1,
+      currentCost: 1,
+      cardAmountToSelect: { min: 3, max: 3 },
+      maxCopies: 1,
+      ...data,
+    });
+  }
+
+  execute(engine: GameEngine, targetCardIndexes?: string[]): void {
+    if (!targetCardIndexes || targetCardIndexes.length !== 3) return;
+
+    const [sacrificeId1, sacrificeId2, buffTargetId] = targetCardIndexes;
+
+    engine.removeFromHand(sacrificeId1);
+    engine.removeFromHand(sacrificeId2);
+
+    const buffTarget = engine.hand.find((c) => c.uniqueId === buffTargetId);
+    if (buffTarget && buffTarget.currentAttack !== undefined) {
+      buffTarget.currentAttack *= 2;
+    }
+  }
+}
+
+cardRegistry.register('double-sacrifice', DoubleSacrifice);
