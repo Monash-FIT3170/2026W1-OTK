@@ -10,25 +10,28 @@ export function usePlayCard() {
   // Called when a card is dragged out of the hand.
   // Uses card.cardAmountToSelect to decide whether to prompt for selection or execute immediately.
   const onPlay = (card) => {
-    Meteor.call(
-      'game.playCard',
-      { uniqueCardId: card.uniqueId, selectedCardIds: [] },
-      (err, result) => {
-        if (err) {
-          console.error('game.playCard failed:', err);
-          return;
-        }
-        if (result.requiresSelection) {
-          setPendingSelection({
-            uniqueCardId: card.uniqueId,
-            card,
-            cardAmountToSelect: result.cardAmountToSelect,
-          });
-        } else {
-          soundManager.playCardSound(card.cardId);
-        }
+    Meteor.call('game.drawCards', { uniqueCardId: card.uniqueId }, (err, result) => {
+      if (err) {
+        console.error('game.drawCards failed:', err);
+        return;
       }
-    );
+      if (result.requiresSelection) {
+        setPendingSelection({
+          uniqueCardId: card.uniqueId,
+          card,
+          cardAmountToSelect: result.cardAmountToSelect,
+        });
+      } else {
+        soundManager.playCardSound(card.cardId);
+        Meteor.call(
+          'game.executeCard',
+          { uniqueCardId: card.uniqueId, selectedCardIds: [] },
+          (execErr) => {
+            if (execErr) console.error('game.executeCard failed:', execErr);
+          }
+        );
+      }
+    });
   };
 
   const confirmSelection = (selectedCardIds) => {
