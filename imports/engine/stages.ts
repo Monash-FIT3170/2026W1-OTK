@@ -14,6 +14,7 @@ import { Timekeeper } from './enemy/enemies/Timekeeper';
 // Not part of any stage, but kept registered so enemyRegistry can still
 // reconstruct it - GameEngine used to carry this side-effect import.
 import './enemy/enemies/IceCube';
+import { Dragon } from './enemy/enemies/Dragon';
 
 export type StageConfig = {
   stage: number;
@@ -26,7 +27,7 @@ export const STAGES: StageConfig[] = [
   // TODO: swap to 'frostcavern' / 'clocktower' once the art lands. Stages 2 and
   // 3 deliberately reuse stage 1's background for now - see also the goblin
   // sprite aliases in ui/components/enemy/EnemyDisplay.jsx.
-  { stage: 2, BossClass: Frostwarden, scene: 'underpass-overlaid' },
+  { stage: 2, BossClass: Frostwarden, scene: 'otkclone_bg_temple' },
   { stage: 3, BossClass: Timekeeper, scene: 'underpass-overlaid' },
 ];
 

@@ -30,17 +30,7 @@ export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
-
-  // Manually-opened tutorial (landing page button) is a fully separate,
-  // ephemeral demo screen — it never touches the player's real save.
   const [showTutorialDemo, setShowTutorialDemo] = useState(false);
-
-  // Set true only when the player just started a brand-new game (not
-  // Continue). The auto-tutorial triggers off this path — every time,
-  // not just a player's first-ever game, since re-showing it on every
-  // New Game (e.g. after trying a new strategy, or a returning player
-  // wanting a refresher) makes more sense for this kind of game than a
-  // strict one-time-only onboarding flow.
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
 
@@ -56,6 +46,23 @@ export const App = () => {
     return { user, userData, gameState: userData?.gameState ?? null, loading };
   });
 
+  // Delayed result state to allow death/hit animations to finish playing before switching screens
+  const [delayedResult, setDelayedResult] = useState(gameState?.result);
+
+  useEffect(() => {
+    const currentResult = gameState?.result;
+
+    if (currentResult === 'stageCleared' || currentResult === 'win') {
+      // 1.8-second delay before switching to StageClear/Result screens
+      const timer = setTimeout(() => {
+        setDelayedResult(currentResult);
+      }, 1800);
+      return () => clearTimeout(timer);
+    } else {
+      setDelayedResult(currentResult);
+    }
+  }, [gameState?.result]);
+
   // If logged in but no game state exists yet, start a new game automatically
   useEffect(() => {
     if (!loading && user && !gameState && !showLanding) {
@@ -66,7 +73,6 @@ export const App = () => {
   }, [loading, user, gameState, showLanding]);
 
   // Auto-show the tutorial every time the player starts a brand-new game
-  // (never on Continue).
   useEffect(() => {
     if (!loading && user && gameState && !showLanding && justStartedNewGame) {
       setShowTutorial(true);
@@ -79,10 +85,6 @@ export const App = () => {
 
   useGameSounds(gameState?.result, onGameScreen);
 
-  // Heartbeat while a fight is on screen. Ticks the timer debuff so the enemy
-  // heals in real time, and marks the player as present - a gap in these pings
-  // is what tells the server the tab was closed, so that time away neither
-  // heals the enemy nor inflates the run timer. See GameEngine.rebaseAfterAway.
   const inBattle = onGameScreen && gameState?.result === 'playing';
 
   useEffect(() => {
@@ -102,10 +104,6 @@ export const App = () => {
     });
   };
 
-  // Manually-opened tutorial from the landing page. Fully ephemeral —
-  // no Meteor calls, no reads or writes to the player's real save.
-  // Renders as its own top-level screen (see the showTutorialDemo branch
-  // below), completely independent of showLanding/gameState.
   const handleOpenTutorial = () => {
     setShowTutorialDemo(true);
   };
@@ -117,15 +115,11 @@ export const App = () => {
     });
   };
 
-  // Called by LandingPage when leaving for the main game screen.
-  // isNewGame should be true only for the New Game/Start action, never
-  // for Continue — this is what the auto-tutorial trigger keys off.
   const handleStart = (isNewGame = false) => {
     setShowLanding(false);
     if (isNewGame) setJustStartedNewGame(true);
   };
 
-  // --- Loading state ---
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -134,7 +128,6 @@ export const App = () => {
     );
   }
 
-  // --- Auth gate: show login or registration ---
   if (!user) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -147,13 +140,10 @@ export const App = () => {
     );
   }
 
-  // --- Manually-opened tutorial demo: fully ephemeral, independent of
-  // showLanding/gameState. Never touches the player's real save. ---
   if (showTutorialDemo) {
     return <TutorialDemoScreen onClose={handleCloseTutorialDemo} />;
   }
 
-  // --- Landing page: shown once user is authenticated, before game starts ---
   if (showLanding) {
     return (
       <LandingPage
@@ -170,6 +160,7 @@ export const App = () => {
       />
     );
   }
+
   if (showDeckBuilder) {
     return (
       <DeckBuilder
@@ -194,7 +185,6 @@ export const App = () => {
     );
   }
 
-  // --- Waiting for game state to be created ---
   if (!gameState) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -203,10 +193,10 @@ export const App = () => {
     );
   }
 
-  const { hand, deck, enemy, result, scene, stage } = gameState;
+  const { hand, deck, enemy, scene, stage } = gameState;
 
-  // --- Between stages: boss down, run still going ---
-  if (result === 'stageCleared') {
+  // --- Between stages: boss down (delayed screen switch) ---
+  if (delayedResult === 'stageCleared') {
     return (
       <StageClearScreen
         stage={stage}
@@ -217,11 +207,11 @@ export const App = () => {
     );
   }
 
-  // --- Victory / Defeat screens ---
-  if (result === 'win' || result === 'loss') {
+  // --- Victory / Defeat screens (delayed screen switch) ---
+  if (delayedResult === 'win' || delayedResult === 'loss') {
     return (
       <ResultScreen
-        result={result}
+        result={delayedResult}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
         onBackToMenu={() => setShowLanding(true)}
@@ -232,7 +222,6 @@ export const App = () => {
   // --- Main game screen ---
   return (
     <GameBackground backgroundScene={scene}>
-      {/* Settings pinned to top-right corner */}
       <div className="absolute" style={{ right: 20, top: 30 }}>
         <Settings
           saveButton={<SaveGameButton gameState={gameState} />}
@@ -251,12 +240,10 @@ export const App = () => {
         />
       </div>
 
-      {/* Player display — positioned to match canvas coordinates derived from previous layout */}
       <div className="absolute " style={{ left: 400, bottom: 540 }}>
         <PlayerDisplay />
       </div>
 
-      {/* Enemy display */}
       <div
         className="absolute"
         style={{ right: 400, bottom: 540 }}
@@ -265,7 +252,6 @@ export const App = () => {
         <EnemyDisplay enemy={enemy} isVisible={true} />
       </div>
 
-      {/* End turn button — absolute to match its former flex-flow position */}
       <div
         className="absolute"
         style={{ top: 530, right: 30 }}
@@ -274,7 +260,6 @@ export const App = () => {
         <EndTurnButton disabled={showTutorial} />
       </div>
 
-      {/* Card hand row: DeckViewer on left, hand on right */}
       <div
         className="absolute flex items-end"
         style={{ left: 370, right: 140, bottom: 20 }}
@@ -291,11 +276,6 @@ export const App = () => {
           bottom: 163,
         }}
       >
-        {/* Inner wrapper sized to DeckViewer's actual content, not the
-            wide positioning container above — that container spans
-            almost the full screen width and was causing the tutorial
-            spotlight to highlight a huge, wrong area instead of the
-            actual visible deck number. */}
         <div className="inline-block" data-tutorial-target="deck">
           <DeckViewer cards={deck} />
         </div>

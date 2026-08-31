@@ -2,50 +2,62 @@ import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
+import { motion, AnimatePresence, useAnimate } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+import { EntryAnimations, HitAnimations } from './EnemyAnimations';
+import TimerDebuff from './TimerDebuff';
 
-/**
- * Displays an enemy with entrance, exit, and damage animations.
- * The image used must be named in the format: [enemy-name]-enemy.png and placed in the /assets/sprites/enemies/ directory.
- * For example, a Goblin enemy would require an image named goblin-enemy.png.
- *
- * @component
- * @param {Enemy} enemy - The enemy instance
- * @param {boolean} isVisible - Controls whether the enemy is rendered. Setting to false triggers the exit animation.
- *
- */
-
-// Enemies without their own art fall back to a sprite set that exists.
-// Remove an entry once the real sprites land in public/assets/sprites/enemies/.
 const ENEMY_SPRITE_IDS = {
-  trainingDummy: 'goblin',
-  frostwarden: 'goblin',
+  trainingdummy: 'goblin',
+  frostwarden: 'dragon',
   timekeeper: 'goblin',
 };
 
+const ENEMY_SPRITE_SIZES = {
+  goblin: 'h-70',
+  dragon: 'h-100',
+};
+
+const ENEMY_SPRITE_OFFSETS = {
+  dragon: 'translate-x-100',
+};
+
 export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
-  if (!enemy) {
-    return (
-      <div className="h-48 w-48 flex items-center justify-center bg-red-200 text-sm text-red-800">
-        No enemy
-      </div>
-    );
-  }
+  if (!enemy) return null;
+
   const [scope, animate] = _useAnimate();
-
-  // Used to swap out the hit sprite when taking damage. Resets to normal sprite after animation completes.
-  const [isHit, setIsHit] = useState(false);
-
-  // Track previous HP to detect damage and trigger hit animation directly
+  const [spriteState, setSpriteState] = useState('entry'); // 'entry' | 'idle' | 'hit' | 'die'
   const prevHealthRef = useRef(null);
+  const entryTimerRef = useRef(null);
 
+  // 1. Play Entry sprite on mount / enemy change, then transition to Idle
+  useEffect(() => {
+    setSpriteState('entry');
+    entryTimerRef.current = setTimeout(() => {
+      setSpriteState('idle');
+    }, 1500); // Match entry animation duration (1s)
+
+    return () => clearTimeout(entryTimerRef.current);
+  }, [enemy.enemyId]);
+
+  // 2. Play Hit or Die sprites based on health changes
   useEffect(() => {
     const hp = enemy.currentHealth;
-    if (prevHealthRef.current !== null && hp < prevHealthRef.current) {
-      setIsHit(true);
-      const { keyframes, options } =
-        HitAnimations[enemy.hitAnimation] ?? HitAnimations.knockback;
-      animate(scope.current, keyframes, options).then(() => setIsHit(false));
+
+    if (prevHealthRef.current !== null) {
+      if (hp <= 0) {
+        setSpriteState('die');
+      } else if (hp < prevHealthRef.current) {
+        setSpriteState('hit');
+        const { keyframes, options } =
+          HitAnimations[enemy.hitAnimation] ?? HitAnimations.knockback;
+
+        animate(scope.current, keyframes, options).then(() => {
+          setSpriteState((current) => (current === 'hit' ? 'idle' : current));
+        });
+      }
     }
+
     prevHealthRef.current = hp;
   }, [enemy.currentHealth]);
 
@@ -56,8 +68,19 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
     transition,
   } = EntryAnimations[enemy.entryAnimation] ?? EntryAnimations.fade;
 
-  const spriteId =
-    ENEMY_SPRITE_IDS[enemy.enemyId] || enemy.enemyId.toLowerCase();
+  const normalizedId = enemy.enemyId ? enemy.enemyId.toLowerCase() : '';
+  const spriteId = ENEMY_SPRITE_IDS[normalizedId] || normalizedId;
+  const spriteSizeClass = ENEMY_SPRITE_SIZES[spriteId] || 'h-48';
+  const spriteOffsetClass = ENEMY_SPRITE_OFFSETS[spriteId] || '';
+
+  // Maps current state to file suffix
+  const STATE_SUFFIXES = {
+    entry: '-entry',
+    hit: '-attack',
+    die: '-die',
+    idle: '',
+  };
+  const suffix = STATE_SUFFIXES[spriteState] ?? '';
 
   return (
     <AnimatePresence>
@@ -72,23 +95,30 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
         >
           <div className="relative inline-block">
             <img
-              src={`/assets/sprites/enemies/${spriteId}${isHit ? '-attack' : ''}-enemy.gif`}
+              src={`/assets/sprites/enemies/${spriteId}${suffix}-enemy.gif`}
               alt={enemy.name}
-              className="h-48 w-auto object-contain"
+              className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
               style={{ imageRendering: 'pixelated' }}
               onError={(e) => {
-                const normalSprite = `/assets/sprites/enemies/${spriteId}-enemy.gif`;
-                if (e.currentTarget.getAttribute('src') !== normalSprite) {
-                  e.currentTarget.src = normalSprite;
+                const target = e.currentTarget;
+                const idleGif = `/assets/sprites/enemies/${spriteId}-enemy.gif`;
+                const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
+
+                // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
+                if (!target.src.endsWith(`${spriteId}-enemy.gif`) && !target.src.endsWith(`${spriteId}-enemy.png`)) {
+                  target.src = idleGif;
+                  return;
+                }
+                // Fall back to PNG if GIF is missing
+                if (target.src.endsWith('.gif')) {
+                  target.src = idlePng;
                   return;
                 }
 
-                e.currentTarget.onerror = null;
-                e.currentTarget.src =
-                  '/assets/sprites/enemies/placeholder-enemy.png';
+                target.onerror = null;
+                target.src = '/assets/sprites/enemies/placeholder-enemy.png';
               }}
             />
-            {/* Timer debuff badge overlay */}
             <TimerDebuff enemy={enemy} />
           </div>
         </motion.div>
