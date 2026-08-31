@@ -20,6 +20,7 @@ const EVENT_SOUNDS = {
   'game-over': 'game_over.wav',
   'stage-clear': 'stage-clear.mp3',
   'card-hover': 'card_hover.mp3',
+  gong: 'gong.mp3',
 };
 
 class SoundManager {
@@ -84,10 +85,19 @@ class SoundManager {
     this.playEventSound('game-over');
   }
   playStageClear() {
-    this.playEventSound('stage-clear');
+    // Non-overlapping: a rushed stage clear + win must not stack two stings.
+    // Reuse the one cached element and restart it instead of cloning.
+    if (this._muted || this._sfxMuted) return;
+    const audio = this._getSfx('stage-clear.mp3', this._eventCache, SFX_BASE);
+    audio.currentTime = 0;
+    audio.volume = Math.max(0, Math.min(1, this._masterVolume * this._sfxVolume));
+    audio.play().catch(() => {});
   }
   playCardHover() {
     this.playEventSound('card-hover');
+  }
+  playGong() {
+    this.playEventSound('gong');
   }
 
   /**

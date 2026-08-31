@@ -2,24 +2,29 @@ import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
-import { motion, AnimatePresence, useAnimate } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
-import { EntryAnimations, HitAnimations } from './EnemyAnimations';
-import TimerDebuff from './TimerDebuff';
+import { soundManager } from '../../soundManager';
 
 const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
   frostwarden: 'dragon',
-  timekeeper: 'goblin',
+  timekeeper: 'lion',
 };
 
 const ENEMY_SPRITE_SIZES = {
   goblin: 'h-70',
   dragon: 'h-100',
+  lion: 'h-100',
 };
 
 const ENEMY_SPRITE_OFFSETS = {
   dragon: 'translate-x-100',
+  lion: 'translate-x-35 translate-y-10',
+};
+
+// Sprites that only ship an idle GIF. Every state resolves to idle rather
+// than requesting a file that will 404 into the onError cascade below.
+const ENEMY_SPRITE_STATES = {
+  lion: ['idle'],
 };
 
 export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
@@ -27,6 +32,7 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
 
   const [scope, animate] = _useAnimate();
   const [spriteState, setSpriteState] = useState('entry'); // 'entry' | 'idle' | 'hit' | 'die'
+  const [healFlash, setHealFlash] = useState(false);
   const prevHealthRef = useRef(null);
   const entryTimerRef = useRef(null);
 
@@ -55,11 +61,22 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
         animate(scope.current, keyframes, options).then(() => {
           setSpriteState((current) => (current === 'hit' ? 'idle' : current));
         });
+      } else if (hp > prevHealthRef.current) {
+        // Timer debuff healed the enemy: green fade + gong.
+        setHealFlash(true);
+        soundManager.playGong();
       }
     }
 
     prevHealthRef.current = hp;
   }, [enemy.currentHealth]);
+
+  // Clear the heal flash after it fades in.
+  useEffect(() => {
+    if (!healFlash) return;
+    const id = setTimeout(() => setHealFlash(false), 900);
+    return () => clearTimeout(id);
+  }, [healFlash]);
 
   const {
     initial,
@@ -80,10 +97,20 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
     die: '-die',
     idle: '',
   };
-  const suffix = STATE_SUFFIXES[spriteState] ?? '';
+  const availableStates = ENEMY_SPRITE_STATES[spriteId];
+  const effectiveState =
+    availableStates && !availableStates.includes(spriteState)
+      ? 'idle'
+      : spriteState;
+  const suffix = STATE_SUFFIXES[effectiveState] ?? '';
 
   return (
-    <AnimatePresence>
+    <>
+      <div
+        className="pointer-events-none fixed inset-0 z-50 bg-green-400 mix-blend-screen transition-opacity duration-700"
+        style={{ opacity: healFlash ? 0.6 : 0 }}
+      />
+      <AnimatePresence>
       {isVisible && (
         <motion.div
           ref={scope}
@@ -105,7 +132,10 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
                 const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
 
                 // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
-                if (!target.src.endsWith(`${spriteId}-enemy.gif`) && !target.src.endsWith(`${spriteId}-enemy.png`)) {
+                if (
+                  !target.src.endsWith(`${spriteId}-enemy.gif`) &&
+                  !target.src.endsWith(`${spriteId}-enemy.png`)
+                ) {
                   target.src = idleGif;
                   return;
                 }
@@ -123,6 +153,7 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   );
 }

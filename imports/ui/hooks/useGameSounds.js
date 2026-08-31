@@ -11,14 +11,12 @@ export function useGameSounds(result, active) {
       soundManager.playBackgroundMusic('spark-mandrill');
       return;
     }
-    if (result === 'stageCleared') {
-      // Mid-run: sting the stage clear but keep the run's music going, since
-      // the player is heading straight into the next fight.
-      soundManager.playStageClear();
-      return;
-    }
+    // Any non-playing result: cut the battle music first so the sting plays
+    // clean. The next fight restarts the track from the top.
     soundManager.stopMusic();
-    if (result === 'win') soundManager.playStageClear();
+    if (result === 'stageCleared' || result === 'win') {
+      soundManager.playStageClear();
+    }
     if (result === 'loss') soundManager.playGameOver();
   }, [result, active]);
 }

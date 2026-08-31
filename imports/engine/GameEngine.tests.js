@@ -70,10 +70,15 @@ describe('GameEngine - multi-stage run', function () {
     assert.equal(engine.stage, 3);
     assert.equal(engine.enemy.enemyId, 'timekeeper');
     assert.include(engine.enemy.debuffs, 'timer');
-    assert.isTrue(
+    assert.isFalse(
       engine.enemy.timerDebuffActive,
-      'the timer debuff arms on arrival'
+      'the timer debuff stays quiet while the boss is at full health'
     );
+
+    // Once the boss has damage to heal, the countdown arms.
+    engine.enemy.takeDamage(20);
+    engine.executeEnemyDebuffs();
+    assert.isTrue(engine.enemy.timerDebuffActive);
   });
 
   it('ends the run in a win once the final stage is cleared', function () {
@@ -173,6 +178,10 @@ describe('GameEngine - resume after time away', function () {
     engine.advanceStage();
     killBoss(engine);
     engine.advanceStage(); // stage 3: the timer boss
+
+    // The countdown only arms once the boss has damage to heal.
+    engine.enemy.takeDamage(20);
+    engine.executeEnemyDebuffs();
     return engine;
   }
 

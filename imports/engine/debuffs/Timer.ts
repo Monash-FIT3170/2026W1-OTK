@@ -15,6 +15,9 @@ export class Timer extends Debuff {
   activateDebuff(engine: GameEngine): void {
     if (engine.enemy.timerDebuffActive) return;
 
+    // Nothing to heal at full health, so don't start the countdown.
+    if (engine.enemy.currentHealth >= engine.enemy.health) return;
+
     engine.enemy.timerDebuffActive = true;
 
     // Heal once by 5 after 5 seconds. Keep in sync with the Enemy defaults.
