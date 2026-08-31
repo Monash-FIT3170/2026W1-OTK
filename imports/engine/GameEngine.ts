@@ -105,7 +105,13 @@ export class GameEngine {
 
   // The current boss just died. Ends the run on the final stage, otherwise
   // parks at the interstitial until the player asks for the next enemy.
+  //
+  // Idempotent: a card dragged during the 1.8s death-animation window (the UI
+  // still shows the battle while result is already 'stageCleared'/'win') fires
+  // another game.executeCard on the corpse, which would otherwise push a second
+  // recap entry for the boss just beaten.
   clearStage(): void {
+    if (this.result !== 'playing') return;
     this.finalizeBossRecap('win');
     this.clearTimerDebuff();
     this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';

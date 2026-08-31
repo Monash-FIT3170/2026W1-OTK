@@ -40,6 +40,16 @@ describe('GameEngine - multi-stage run', function () {
     assert.equal(engine.bossRecap[0].result, 'win');
   });
 
+  it('ignores a second clearStage on the same corpse', function () {
+    const engine = freshEngine();
+    killBoss(engine);
+    // A card dragged during the death-animation window fires another
+    // executeCard -> clearStage on the already-dead boss.
+    engine.clearStage();
+
+    assert.equal(engine.bossRecap.length, 1, 'boss recorded exactly once');
+  });
+
   it('advances to the stage 2 freeze boss', function () {
     const engine = freshEngine();
     killBoss(engine);
