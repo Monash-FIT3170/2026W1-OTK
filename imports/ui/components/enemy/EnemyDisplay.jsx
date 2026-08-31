@@ -12,11 +12,12 @@ const ENEMY_SPRITE_IDS = {
 const ENEMY_SPRITE_SIZES = {
   goblin: 'h-70',
   dragon: 'h-100',
-  lion: 'h-80',
+  lion: 'h-100',
 };
 
 const ENEMY_SPRITE_OFFSETS = {
   dragon: 'translate-x-100',
+  lion: 'translate-x-35 translate-y-10',
 };
 
 // Sprites that only ship an idle GIF. Every state resolves to idle rather
@@ -85,7 +86,9 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
   };
   const availableStates = ENEMY_SPRITE_STATES[spriteId];
   const effectiveState =
-    availableStates && !availableStates.includes(spriteState) ? 'idle' : spriteState;
+    availableStates && !availableStates.includes(spriteState)
+      ? 'idle'
+      : spriteState;
   const suffix = STATE_SUFFIXES[effectiveState] ?? '';
 
   return (
@@ -111,7 +114,10 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
                 const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
 
                 // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
-                if (!target.src.endsWith(`${spriteId}-enemy.gif`) && !target.src.endsWith(`${spriteId}-enemy.png`)) {
+                if (
+                  !target.src.endsWith(`${spriteId}-enemy.gif`) &&
+                  !target.src.endsWith(`${spriteId}-enemy.png`)
+                ) {
                   target.src = idleGif;
                   return;
                 }
