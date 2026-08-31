@@ -22,10 +22,11 @@ describe('Timer', function () {
     assert.instanceOf(debuffRegistry.create('timer'), Timer);
   });
 
-  it('activates timer state on an enemy', function () {
+  it('activates timer state on a damaged enemy', function () {
     const engine = buildEngine();
     assert.isFalse(engine.enemy.timerDebuffActive);
 
+    engine.enemy.takeDamage(20);
     new Timer().activateDebuff(engine);
 
     assert.isTrue(engine.enemy.timerDebuffActive);
@@ -55,6 +56,7 @@ describe('Timer', function () {
 
   it('never heals the enemy above its maximum health', function () {
     const engine = buildEngine();
+    engine.enemy.takeDamage(3);
     new Timer().activateDebuff(engine);
 
     engine.resolveTimerDebuff(engine.enemy.timerDebuffDeadline + 100);
@@ -62,8 +64,18 @@ describe('Timer', function () {
     assert.equal(engine.enemy.currentHealth, engine.enemy.health);
   });
 
+  it('does not start the countdown while the enemy is at full health', function () {
+    const engine = buildEngine();
+
+    new Timer().activateDebuff(engine);
+
+    assert.isFalse(engine.enemy.timerDebuffActive);
+    assert.isNull(engine.enemy.timerDebuffDeadline);
+  });
+
   it('restarts a fresh grace period when the player plays a card', function () {
     const engine = buildEngine();
+    engine.enemy.takeDamage(20);
     new Timer().activateDebuff(engine);
 
     const firstCard = engine.deck[0];

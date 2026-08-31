@@ -10,15 +10,12 @@ export default function TimerDebuff({ enemy }) {
     return () => clearInterval(id);
   }, []);
 
-  const hasTimerDebuff =
-    !!enemy.timerDebuffActive || (enemy.debuffs || []).includes('timer');
-  if (!hasTimerDebuff) return null;
+  // Only show the countdown while it is actually running (the engine leaves it
+  // inactive until the boss has taken damage worth healing).
+  if (!enemy.timerDebuffActive || !enemy.timerDebuffDeadline) return null;
 
-  let label = '';
-  if (enemy.timerDebuffActive && enemy.timerDebuffDeadline) {
-    const msLeft = Math.max(0, enemy.timerDebuffDeadline - now);
-    label = String(Math.ceil(msLeft / 1000));
-  }
+  const msLeft = Math.max(0, enemy.timerDebuffDeadline - now);
+  const label = String(Math.ceil(msLeft / 1000));
 
   // Roughly above the lion's head; dimensions/placement to be tuned.
   return (
