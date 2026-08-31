@@ -2,24 +2,27 @@ import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
-import { motion, AnimatePresence, useAnimate } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
-import { EntryAnimations, HitAnimations } from './EnemyAnimations';
-import TimerDebuff from './TimerDebuff';
 
 const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
   frostwarden: 'dragon',
-  timekeeper: 'goblin',
+  timekeeper: 'lion',
 };
 
 const ENEMY_SPRITE_SIZES = {
   goblin: 'h-70',
   dragon: 'h-100',
+  lion: 'h-80',
 };
 
 const ENEMY_SPRITE_OFFSETS = {
   dragon: 'translate-x-100',
+};
+
+// Sprites that only ship an idle GIF. Every state resolves to idle rather
+// than requesting a file that will 404 into the onError cascade below.
+const ENEMY_SPRITE_STATES = {
+  lion: ['idle'],
 };
 
 export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
@@ -80,7 +83,10 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
     die: '-die',
     idle: '',
   };
-  const suffix = STATE_SUFFIXES[spriteState] ?? '';
+  const availableStates = ENEMY_SPRITE_STATES[spriteId];
+  const effectiveState =
+    availableStates && !availableStates.includes(spriteState) ? 'idle' : spriteState;
+  const suffix = STATE_SUFFIXES[effectiveState] ?? '';
 
   return (
     <AnimatePresence>

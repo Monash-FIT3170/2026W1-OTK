@@ -24,11 +24,11 @@ export type StageConfig = {
 
 export const STAGES: StageConfig[] = [
   { stage: 1, BossClass: Goblin, scene: 'underpass-overlaid' },
-  // TODO: swap to 'frostcavern' / 'clocktower' once the art lands. Stages 2 and
-  // 3 deliberately reuse stage 1's background for now - see also the goblin
-  // sprite aliases in ui/components/enemy/EnemyDisplay.jsx.
+  // Each scene resolves to public/assets/environments/<scene>-background.png.
+  // Bosses still borrow sprites from other enemies - see the id aliases in
+  // ui/components/enemy/EnemyDisplay.jsx.
   { stage: 2, BossClass: Frostwarden, scene: 'otkclone_bg_temple' },
-  { stage: 3, BossClass: Timekeeper, scene: 'underpass-overlaid' },
+  { stage: 3, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
