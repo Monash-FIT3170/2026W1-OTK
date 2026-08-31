@@ -249,7 +249,11 @@ export const App = () => {
         style={{ right: 400, bottom: 540 }}
         data-tutorial-target="enemy"
       >
-        <EnemyDisplay enemy={enemy} isVisible={true} />
+        <EnemyDisplay
+          enemy={enemy}
+          isVisible={true}
+          lastActiveAt={gameState.lastActiveAt}
+        />
       </div>
 
       <div

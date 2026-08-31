@@ -27,7 +27,12 @@ const ENEMY_SPRITE_STATES = {
   lion: ['idle'],
 };
 
-export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
+export function EnemyDisplay({
+  enemy,
+  isVisible,
+  lastActiveAt,
+  _useAnimate = useAnimate,
+}) {
   if (!enemy) return null;
 
   const [scope, animate] = _useAnimate();
@@ -149,7 +154,7 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
                 target.src = '/assets/sprites/enemies/placeholder-enemy.png';
               }}
             />
-            <TimerDebuff enemy={enemy} />
+            <TimerDebuff enemy={enemy} lastActiveAt={lastActiveAt} />
           </div>
         </motion.div>
       )}
