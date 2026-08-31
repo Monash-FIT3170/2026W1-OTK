@@ -1,35 +1,44 @@
 import React, { useEffect, useState } from 'react';
 
-// Rough timer debuff UI: shows seconds until next tick and a small badge
+// Countdown orb that floats above the enemy's head while the timer debuff is
+// ticking. When it reaches zero the engine heals the enemy and clears the debuff.
 export default function TimerDebuff({ enemy }) {
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 500);
+    const id = setInterval(() => setNow(Date.now()), 250);
     return () => clearInterval(id);
   }, []);
 
-  const hasTimerDebuff = !!enemy.timerDebuffActive || (enemy.debuffs || []).includes('timer');
+  const hasTimerDebuff =
+    !!enemy.timerDebuffActive || (enemy.debuffs || []).includes('timer');
   if (!hasTimerDebuff) return null;
 
-  let content = <div className="text-[10px] opacity-80">pending</div>;
+  let label = '';
   if (enemy.timerDebuffActive && enemy.timerDebuffDeadline) {
     const msLeft = Math.max(0, enemy.timerDebuffDeadline - now);
-    const secondsLeft = Math.ceil(msLeft / 1000);
-    content = <div className="text-[10px] opacity-80">{secondsLeft}s</div>;
+    label = String(Math.ceil(msLeft / 1000));
   }
 
+  // Roughly above the lion's head; dimensions/placement to be tuned.
   return (
-    <div className="absolute right-0 top-0 flex items-center pointer-events-none">
-      <div className="bg-black/70 text-white text-xs px-2 py-1 rounded-md flex items-center space-x-2">
-        <svg className="w-4 h-4 text-cyan-200" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <circle cx="12" cy="12" r="9" strokeWidth="2"></circle>
-          <path d="M12 7v6l4 2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
-        </svg>
-        <div>
-          <div className="font-semibold">Timer</div>
-          {content}
-        </div>
+    <div className="pointer-events-none absolute left-80 -top-12 -translate-x-1/2">
+      <div className="relative h-50 w-50">
+        <img
+          src="/assets/sprites/enemies/orb.png"
+          alt=""
+          className="h-full w-full object-contain"
+          style={{ imageRendering: 'pixelated' }}
+        />
+        <span
+          className="absolute inset-0 flex items-center justify-center text-white text-6xl leading-none"
+          style={{
+            fontFamily: '"Micro 5", monospace',
+            transform: 'translateY(-5%)',
+          }}
+        >
+          {label}
+        </span>
       </div>
     </div>
   );

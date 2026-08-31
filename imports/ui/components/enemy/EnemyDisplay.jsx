@@ -2,6 +2,7 @@ import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
+import { soundManager } from '../../soundManager';
 
 const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
@@ -31,6 +32,7 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
 
   const [scope, animate] = _useAnimate();
   const [spriteState, setSpriteState] = useState('entry'); // 'entry' | 'idle' | 'hit' | 'die'
+  const [healFlash, setHealFlash] = useState(false);
   const prevHealthRef = useRef(null);
   const entryTimerRef = useRef(null);
 
@@ -59,11 +61,22 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
         animate(scope.current, keyframes, options).then(() => {
           setSpriteState((current) => (current === 'hit' ? 'idle' : current));
         });
+      } else if (hp > prevHealthRef.current) {
+        // Timer debuff healed the enemy: green fade + gong.
+        setHealFlash(true);
+        soundManager.playGong();
       }
     }
 
     prevHealthRef.current = hp;
   }, [enemy.currentHealth]);
+
+  // Clear the heal flash after it fades in.
+  useEffect(() => {
+    if (!healFlash) return;
+    const id = setTimeout(() => setHealFlash(false), 900);
+    return () => clearTimeout(id);
+  }, [healFlash]);
 
   const {
     initial,
@@ -92,7 +105,12 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
   const suffix = STATE_SUFFIXES[effectiveState] ?? '';
 
   return (
-    <AnimatePresence>
+    <>
+      <div
+        className="pointer-events-none fixed inset-0 z-50 bg-green-400 mix-blend-screen transition-opacity duration-700"
+        style={{ opacity: healFlash ? 0.6 : 0 }}
+      />
+      <AnimatePresence>
       {isVisible && (
         <motion.div
           ref={scope}
@@ -135,6 +153,7 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   );
 }

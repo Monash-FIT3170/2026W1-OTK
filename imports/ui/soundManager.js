@@ -20,6 +20,7 @@ const EVENT_SOUNDS = {
   'game-over': 'game_over.wav',
   'stage-clear': 'stage-clear.mp3',
   'card-hover': 'card_hover.mp3',
+  gong: 'gong.mp3',
 };
 
 class SoundManager {
@@ -88,6 +89,9 @@ class SoundManager {
   }
   playCardHover() {
     this.playEventSound('card-hover');
+  }
+  playGong() {
+    this.playEventSound('gong');
   }
 
   /**
