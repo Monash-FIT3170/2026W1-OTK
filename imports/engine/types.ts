@@ -61,4 +61,5 @@ export type UserData = {
   stageStartedAt?: number; // Date.now() timestamp when current stage began
   cardsUsedThisStage?: number; // cards executed against the current boss
   lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
+  freeNextCard?: boolean; // powerup: next card played draws 0 cards as cost, then resets
 };

@@ -26,6 +26,7 @@ export class GameEngine {
   public bossRecap: BossRecapEntry[];
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
+  public freeNextCard: boolean;
   public lastActiveAt: number;
 
   constructor(userData: UserData) {
@@ -41,6 +42,7 @@ export class GameEngine {
     this.bossRecap = userData.bossRecap ?? [];
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
+    this.freeNextCard = userData.freeNextCard ?? false;
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
   }
 
@@ -56,7 +58,7 @@ export class GameEngine {
       throw new Error(`Card with uniqueId "${uniqueId}" is frozen`);
     }
 
-    this.draw(card.currentCost);
+    this.draw(this.freeNextCard ? 0 : card.currentCost);
 
     if (card.cardAmountToSelect) {
       return {
@@ -78,6 +80,7 @@ export class GameEngine {
     }
     this.removeFromHand(uniqueId);
     card.execute(this, selectedCardIds);
+    this.freeNextCard = false;
 
     this.hand.forEach((handCard) => handCard.onOtherCardPlayed(card, this));
     this.deck.forEach((deckCard) => deckCard.onOtherCardPlayed(card, this));
@@ -91,6 +94,12 @@ export class GameEngine {
 
     this.cardsUsedThisStage += 1;
   }
+
+  // Grants a powerup that makes the next card played free (draws 0 cards as cost).
+  grantFreeNextCard(): void {
+    this.freeNextCard = true;
+  }
+  
 
   // finalizes a recap entry for the current boss and appends it to bossRecap
   finalizeBossRecap(bossResult: 'win' | 'loss'): void {
@@ -310,6 +319,7 @@ export class GameEngine {
       bossRecap: this.bossRecap,
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
+      freeNextCard: this.freeNextCard,
       lastActiveAt: this.lastActiveAt,
     };
   }

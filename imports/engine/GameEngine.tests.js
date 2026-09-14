@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import { GameEngine } from './GameEngine';
 import { FINAL_STAGE, getStageConfig } from './stages';
+import { ShortSword } from './card/ShortSword';
 
 const USER_ID = 'stage-test-user';
 
@@ -178,6 +179,23 @@ describe('GameEngine - multi-stage run', function () {
     killBoss(engine);
     engine.advanceStage();
     assert.equal(engine.toJSON().scene, getStageConfig(2).scene);
+  });
+});
+
+describe('GameEngine - freeNextCard powerup', function () {
+  it('skips the draw-as-cost step for one card, then resets the flag', function () {
+    const engine = freshEngine();
+    const card = new ShortSword();
+    engine.hand.push(card);
+
+    engine.grantFreeNextCard();
+    const deckSizeBefore = engine.deck.length;
+
+    engine.drawCost(card.uniqueId);
+    assert.equal(engine.deck.length, deckSizeBefore, 'no cards drawn as cost');
+
+    engine.executeCard(card.uniqueId, []);
+    assert.isFalse(engine.freeNextCard, 'the powerup is consumed after one card');
   });
 });
 
