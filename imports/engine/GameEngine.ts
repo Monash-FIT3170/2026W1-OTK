@@ -4,11 +4,14 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import './card/registerAllCards';
+import './powerups/RestartStagePowerup';
 import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
 import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
+import type { Powerup } from './powerups/Powerup';
+import { powerupRegistry } from './powerups/PowerupRegistry';
 
 // A gap larger than this since the last server-side action means the player
 // closed the tab rather than sat idle - the battle screen heartbeats every 2s
@@ -27,6 +30,7 @@ export class GameEngine {
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
   public lastActiveAt: number;
+  public powerups: Powerup[];
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -42,6 +46,9 @@ export class GameEngine {
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
+    this.powerups = (userData.powerups ?? []).map((powerup) =>
+      powerupRegistry.create(powerup)
+    );
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -132,6 +139,18 @@ export class GameEngine {
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
+  }
+
+  applyPowerup(powerupId: string): void {
+    const activePowerup = this.powerups.find(
+      (powerup) => powerup.powerupId === powerupId && powerup.isAvailable()
+    );
+
+    if (!activePowerup) {
+      throw new Error(`Powerup unavailable: ${powerupId}`);
+    }
+
+    activePowerup.applyTo(this);
   }
 
   // Fresh copies of the run's locked deck. Cloning through the registry is what
@@ -234,6 +253,17 @@ export class GameEngine {
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
       lastActiveAt: Date.now(),
+      powerups: [
+        powerupRegistry.create({
+          powerupId: 'restart-stage',
+          name: 'Restart Stage',
+          description: 'Reset the current stage and redraw your starting hand.',
+          tier: 'rare',
+          maxStacks: 1,
+          currentStacks: 0,
+          available: true,
+        }).toJSON(),
+      ],
     };
 
     const engine = new GameEngine(userData);
@@ -305,6 +335,7 @@ export class GameEngine {
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
       lastActiveAt: this.lastActiveAt,
+      powerups: this.powerups.map((powerup) => powerup.toJSON()),
     };
   }
 }

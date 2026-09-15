@@ -33,6 +33,7 @@ export const App = () => {
   const [showTutorialDemo, setShowTutorialDemo] = useState(false);
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
+  const [showPowerupMenu, setShowPowerupMenu] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, userData, gameState, loading } = useTracker(() => {
@@ -193,7 +194,19 @@ export const App = () => {
     );
   }
 
-  const { hand, deck, enemy, scene, stage } = gameState;
+  const { hand, deck, enemy, scene, stage, powerups = [] } = gameState;
+  const availablePowerups = powerups.filter(
+    (powerup) => powerup.available && powerup.currentStacks < powerup.maxStacks
+  );
+
+  const handleUsePowerup = (powerupId) => {
+    Meteor.call('game.applyPowerup', { powerupId }, (err) => {
+      setShowPowerupMenu(false);
+      if (err) {
+        console.error('game.applyPowerup failed:', err);
+      }
+    });
+  };
 
   // --- Between stages: boss down (delayed screen switch) ---
   if (delayedResult === 'stageCleared') {
@@ -229,6 +242,59 @@ export const App = () => {
         />
       </div>
 
+      <div className="absolute" style={{ left: 30, top: 30, zIndex: 20 }}>
+        <button
+          className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold shadow-lg disabled:opacity-50"
+          onClick={() => setShowPowerupMenu((open) => !open)}
+          disabled={availablePowerups.length === 0}
+        >
+          {availablePowerups.length === 0 ? 'No Powerups' : 'Powerups'}
+        </button>
+      </div>
+
+      {showPowerupMenu && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-slate-950/70">
+          <div className="w-[560px] max-w-[90vw] rounded-3xl border border-violet-500/40 bg-slate-900/95 p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-2xl font-bold text-violet-300">Choose a Powerup</h2>
+              <button
+                className="text-slate-300 hover:text-white text-sm"
+                onClick={() => setShowPowerupMenu(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {availablePowerups.length === 0 ? (
+                <p className="text-slate-400">You do not currently have any usable powerups.</p>
+              ) : (
+                availablePowerups.map((powerup) => (
+                  <div
+                    key={powerup.powerupId}
+                    className="rounded-2xl border border-slate-700 bg-slate-800/80 p-4"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-lg font-semibold text-white">{powerup.name}</p>
+                        <p className="text-sm text-slate-400">{powerup.tier}</p>
+                        <p className="text-sm text-slate-300 mt-2">{powerup.description}</p>
+                      </div>
+                      <button
+                        className="px-4 py-2 rounded-xl bg-violet-500 hover:bg-violet-400 text-white font-semibold"
+                        onClick={() => handleUsePowerup(powerup.powerupId)}
+                      >
+                        Use
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
         <p className="text-white text-2xl font-semibold mb-2 drop-shadow-lg">
           Stage {stage} / {FINAL_STAGE}
@@ -258,6 +324,12 @@ export const App = () => {
         data-tutorial-target="end-turn"
       >
         <EndTurnButton disabled={showTutorial} />
+      </div>
+
+      <div
+        className="absolute"
+        style={{ left: 80, bottom: 230, zIndex: 10 }}
+      >
       </div>
 
       <div

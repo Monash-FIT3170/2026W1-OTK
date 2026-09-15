@@ -1,6 +1,8 @@
 // types.ts
 // shared data types for the game engine and API collections
 
+import type { PowerupData } from './powerups/Powerup';
+
 // data shape for a card (stored in UserData.deck and UserData.hand)
 export type cardData = {
   cardId: string;
@@ -61,4 +63,5 @@ export type UserData = {
   stageStartedAt?: number; // Date.now() timestamp when current stage began
   cardsUsedThisStage?: number; // cards executed against the current boss
   lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
+  powerups?: PowerupData[];
 };
