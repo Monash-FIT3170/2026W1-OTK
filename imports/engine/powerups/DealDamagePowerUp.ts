@@ -1,15 +1,16 @@
 import type { GameEngine } from '../GameEngine';
-import { Powerup, type PowerupData } from './Powerup';
-import { powerupRegistry } from './PowerupRegistry';
+import { PowerUp, type powerUpDataInput } from './Powerup';
+import { powerUpRegistry } from './PowerupRegistry';
 
 const DAMAGE = 20;
 
-export class DealDamagePowerUp extends Powerup {
-  constructor(data: Partial<PowerupData> = {}) {
+export class DealDamagePowerUp extends PowerUp {
+  constructor(data: powerUpDataInput = {}) {
     super({
-      powerupId: 'deal-damage-power-up',
+      powerUpId: 'deal-damage-power-up',
       name: 'Deal Damage',
       description: `Deal ${DAMAGE} damage to the enemy.`,
+      icon: '',
       tier: 'common',
       maxStacks: 1,
       currentStacks: 0,
@@ -18,7 +19,7 @@ export class DealDamagePowerUp extends Powerup {
     });
   }
 
-  applyTo(engine: GameEngine): void {
+  apply(engine: GameEngine): void {
     if (!this.isAvailable()) {
       throw new Error('Deal Damage powerup is unavailable');
     }
@@ -29,4 +30,4 @@ export class DealDamagePowerUp extends Powerup {
   }
 }
 
-powerupRegistry.register('deal-damage-power-up', DealDamagePowerUp);
+powerUpRegistry.register('deal-damage-power-up', DealDamagePowerUp);

@@ -1,15 +1,16 @@
 import type { GameEngine } from '../GameEngine';
 import { cardRegistry } from '../card/CardRegistry';
 import { getStageConfig } from '../stages';
-import { Powerup } from './Powerup';
-import { powerupRegistry } from './PowerupRegistry';
+import { PowerUp, type powerUpDataInput } from './Powerup';
+import { powerUpRegistry } from './PowerupRegistry';
 
-export class RestartStagePowerup extends Powerup {
-  constructor(data: Partial<ConstructorParameters<typeof Powerup>[0]> = {}) {
+export class RestartStagePowerup extends PowerUp {
+  constructor(data: powerUpDataInput = {}) {
     super({
-      powerupId: 'restart-stage',
+      powerUpId: 'restart-stage',
       name: 'Restart Stage',
       description: 'Reset the current stage and redraw your starting hand.',
+      icon: '',
       tier: 'rare',
       maxStacks: 1,
       currentStacks: 0,
@@ -18,7 +19,7 @@ export class RestartStagePowerup extends Powerup {
     });
   }
 
-  applyTo(engine: GameEngine): void {
+  apply(engine: GameEngine): void {
     if (!this.isAvailable()) {
       throw new Error('Restart Stage powerup is unavailable');
     }
@@ -50,4 +51,4 @@ export class RestartStagePowerup extends Powerup {
   }
 }
 
-powerupRegistry.register('restart-stage', RestartStagePowerup);
+powerUpRegistry.register('restart-stage', RestartStagePowerup);

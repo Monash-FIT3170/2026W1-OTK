@@ -10,7 +10,6 @@ import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './type
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
 import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
-import type { Powerup } from './powerups/Powerup';
 import { pickRandomPowerUps } from './powerups';
 import { powerupRegistry } from './powerups/PowerupRegistry';
 
@@ -294,7 +293,7 @@ export class GameEngine {
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
       lastActiveAt: Date.now(),
-      powerUps: ['restart-stage'],
+      powerUps: [],
       powerUpChoices: [],
     };
 

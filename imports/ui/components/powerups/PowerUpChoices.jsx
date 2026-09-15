@@ -9,13 +9,17 @@ import { powerupRegistry } from '../../../engine/powerups';
  * @param {(index: number) => void} onSelect
  */
 export function PowerUpChoices({ powerUpChoices, selectedIndex, onSelect }) {
+  const validChoices = (powerUpChoices ?? []).filter(
+    (powerUpId) => typeof powerUpId === 'string' && powerUpId.trim().length > 0
+  );
+
   return (
     <div className="flex flex-col items-center gap-3">
       <p className="text-slate-300 text-sm uppercase tracking-wide">
         Choose a Power-Up
       </p>
       <div className="flex flex-row gap-5">
-        {powerUpChoices.map((powerUpId, index) => {
+        {validChoices.map((powerUpId, index) => {
           const powerUp = powerupRegistry.create(powerUpId);
           const isSelected = index === selectedIndex;
 
