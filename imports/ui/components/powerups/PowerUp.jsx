@@ -1,5 +1,5 @@
 import React from 'react';
-import { powerUpRegistry } from '../../../engine/powerups';
+import { powerupRegistry } from '../../../engine/powerups';
 
 /**
  * A single power-up icon button. Looks up its display data from the
@@ -9,7 +9,7 @@ import { powerUpRegistry } from '../../../engine/powerups';
  * @param {() => void} onClick
  */
 export function PowerUp({ powerUpId, onClick }) {
-  const powerUp = powerUpRegistry.create(powerUpId);
+  const powerUp = powerupRegistry.create(powerUpId);
 
   return (
     <button

@@ -1,5 +1,5 @@
 import React from 'react';
-import { powerUpRegistry } from '../../../engine/powerups';
+import { powerupRegistry } from '../../../engine/powerups';
 
 /**
  * The 3 selectable power-up rewards shown on the stage-clear screen.
@@ -16,7 +16,7 @@ export function PowerUpChoices({ powerUpChoices, selectedIndex, onSelect }) {
       </p>
       <div className="flex flex-row gap-5">
         {powerUpChoices.map((powerUpId, index) => {
-          const powerUp = powerUpRegistry.create(powerUpId);
+          const powerUp = powerupRegistry.create(powerUpId);
           const isSelected = index === selectedIndex;
 
           return (

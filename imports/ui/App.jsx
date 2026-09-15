@@ -34,6 +34,7 @@ export const App = () => {
   const [showTutorialDemo, setShowTutorialDemo] = useState(false);
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
+  const [showPowerupMenu, setShowPowerupMenu] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, userData, gameState, loading } = useTracker(() => {
@@ -194,7 +195,19 @@ export const App = () => {
     );
   }
 
-  const { hand, deck, enemy, scene, stage } = gameState;
+  const { hand, deck, enemy, scene, stage, powerups = [] } = gameState;
+  const availablePowerups = powerups.filter(
+    (powerup) => powerup.available && powerup.currentStacks < powerup.maxStacks
+  );
+
+  const handleUsePowerup = (powerupId) => {
+    Meteor.call('game.applyPowerup', { powerupId }, (err) => {
+      setShowPowerupMenu(false);
+      if (err) {
+        console.error('game.applyPowerup failed:', err);
+      }
+    });
+  };
 
   // --- Between stages: boss down (delayed screen switch) ---
   if (delayedResult === 'stageCleared') {
@@ -264,6 +277,12 @@ export const App = () => {
         data-tutorial-target="end-turn"
       >
         <EndTurnButton disabled={showTutorial} />
+      </div>
+
+      <div
+        className="absolute"
+        style={{ left: 80, bottom: 230, zIndex: 10 }}
+      >
       </div>
 
       <div

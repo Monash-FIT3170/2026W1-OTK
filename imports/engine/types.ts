@@ -1,6 +1,8 @@
 // types.ts
 // shared data types for the game engine and API collections
 
+import type { PowerupData } from './powerups/Powerup';
+
 // data shape for a card (stored in UserData.deck and UserData.hand)
 export type cardData = {
   cardId: string;
