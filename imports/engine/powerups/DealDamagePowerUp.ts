@@ -11,6 +11,7 @@ export class DealDamagePowerUp extends PowerUp {
       name: 'Deal Damage',
       description: `Deal ${DAMAGE} damage to the enemy. Consumed on use.`,
       icon: '/assets/sprites/powerups/dummy-pu.png',
+      consumedOnUse: true,
       ...data,
     });
   }

@@ -140,8 +140,8 @@ export class GameEngine {
   }
 
   // Player clicked an inventory slot mid-battle to trigger its effect.
-  // Removes it from the inventory - power-ups are consumed on use, not
-  // permanent passives.
+  // Only consumable power-ups (consumedOnUse) are removed afterward -
+  // reusable ones stay in the inventory for the rest of the run.
   usePowerUp(index: number): void {
     if (this.result !== 'playing') {
       throw new Error('Cannot use a power-up outside of battle');
@@ -150,8 +150,11 @@ export class GameEngine {
     if (powerUpId === undefined) {
       throw new Error(`No power-up at inventory index ${index}`);
     }
-    powerUpRegistry.create(powerUpId).apply(this);
-    this.powerUps.splice(index, 1);
+    const powerUp = powerUpRegistry.create(powerUpId);
+    powerUp.apply(this);
+    if (powerUp.consumedOnUse) {
+      this.powerUps.splice(index, 1);
+    }
   }
 
   // Player confirmed "Next Enemy" on the stage-clear screen.

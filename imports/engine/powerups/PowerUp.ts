@@ -1,25 +1,22 @@
 // PowerUp.ts
 
 import type { GameEngine } from '../GameEngine';
-
-export type powerUpData = {
-  powerUpId: string;
-  name: string;
-  description: string;
-  icon: string; // path under public/assets/ui
-};
+import { powerUpData } from '../types';
+export type { powerUpData };
 
 export abstract class PowerUp {
   public powerUpId: string;
   public name: string;
   public description: string;
   public icon: string;
+  public consumedOnUse: boolean;
 
   constructor(data: powerUpData) {
     this.powerUpId = data.powerUpId;
     this.name = data.name;
     this.description = data.description;
     this.icon = data.icon;
+    this.consumedOnUse = data.consumedOnUse ?? true;
   }
 
   // Concrete power-ups override this to affect the player's game state.
@@ -32,6 +29,8 @@ export abstract class PowerUp {
       name: this.name,
       description: this.description,
       icon: this.icon,
+      consumedOnUse: this.consumedOnUse,
     };
   }
 }
+

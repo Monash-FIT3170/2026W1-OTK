@@ -64,3 +64,13 @@ export type UserData = {
   powerUps?: string[]; // powerUpIds chosen so far, in pick order
   powerUpChoices?: string[]; // powerUpIds currently offered on the stage-clear screen
 };
+
+// data shape for a power-up (created via powerUpRegistry from a powerUpId)
+export type powerUpData = {
+  powerUpId: string;
+  name: string;
+  description: string;
+  icon: string; // path under public/assets/ui
+  consumedOnUse?: boolean; // removed from the inventory after apply() runs
+};
+
