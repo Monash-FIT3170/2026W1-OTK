@@ -11,6 +11,7 @@ import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
 import { StageClearScreen } from './components/StageClearScreen';
+import { PowerUpInventory } from './components/PowerUpInventory';
 import { SaveGameButton } from './components/SaveGameButton';
 import { QuitToMenuButton } from './components/QuitToMenuButton';
 import { LoginForm } from './auth/LoginForm';
@@ -202,6 +203,7 @@ export const App = () => {
         stage={stage}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
+        powerUpChoices={gameState.powerUpChoices}
         onBackToMenu={() => setShowLanding(true)}
       />
     );
@@ -227,6 +229,10 @@ export const App = () => {
           saveButton={<SaveGameButton gameState={gameState} />}
           quitButton={<QuitToMenuButton onQuit={() => setShowLanding(true)} />}
         />
+      </div>
+
+      <div className="absolute" style={{ left: 20, top: 30 }}>
+        <PowerUpInventory powerUps={gameState.powerUps} />
       </div>
 
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">

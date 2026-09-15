@@ -62,4 +62,5 @@ export type UserData = {
   cardsUsedThisStage?: number; // cards executed against the current boss
   lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
   powerUps?: string[]; // powerUpIds chosen so far, in pick order
+  powerUpChoices?: string[]; // powerUpIds currently offered on the stage-clear screen
 };

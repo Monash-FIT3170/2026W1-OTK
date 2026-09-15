@@ -8,7 +8,7 @@ import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { powerUpRegistry } from './powerups';
+import { powerUpRegistry, pickRandomPowerUps } from './powerups';
 import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
 
 // A gap larger than this since the last server-side action means the player
@@ -29,6 +29,7 @@ export class GameEngine {
   public cardsUsedThisStage: number;
   public lastActiveAt: number;
   public powerUps: string[];
+  public powerUpChoices: string[];
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -45,6 +46,7 @@ export class GameEngine {
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
     this.powerUps = userData.powerUps ?? [];
+    this.powerUpChoices = userData.powerUpChoices ?? [];
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -118,16 +120,23 @@ export class GameEngine {
     this.finalizeBossRecap('win');
     this.clearTimerDebuff();
     this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
+    if (this.result === 'stageCleared') {
+      this.powerUpChoices = pickRandomPowerUps(3).map((p) => p.powerUpId);
+    }
   }
 
   // Player picked this reward on the stage-clear screen. Validated against
-  // the registry so a bogus id never ends up saved to the run.
+  // the offered choices so only an option actually shown can be saved.
   choosePowerUp(powerUpId: string): void {
     if (this.result !== 'stageCleared') {
       throw new Error('Cannot choose a power-up outside the stage-clear screen');
     }
+    if (!this.powerUpChoices.includes(powerUpId)) {
+      throw new Error(`"${powerUpId}" was not offered as a choice`);
+    }
     powerUpRegistry.create(powerUpId);
     this.powerUps.push(powerUpId);
+    this.powerUpChoices = [];
   }
 
   // Player confirmed "Next Enemy" on the stage-clear screen.
@@ -254,6 +263,7 @@ export class GameEngine {
       cardsUsedThisStage: 0,
       lastActiveAt: Date.now(),
       powerUps: [],
+      powerUpChoices: [],
     };
 
     const engine = new GameEngine(userData);
@@ -326,6 +336,7 @@ export class GameEngine {
       cardsUsedThisStage: this.cardsUsedThisStage,
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
+      powerUpChoices: this.powerUpChoices,
     };
   }
 }

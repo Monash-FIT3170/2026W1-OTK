@@ -9,7 +9,7 @@ export class DummyPowerUp extends PowerUp {
       powerUpId: 'dummy-power-up',
       name: 'Dummy Power-Up',
       description: 'Does nothing yet - for testing the power-up flow.',
-      icon: '/assets/assets/sprites/powerups/dummy-pu.png',
+      icon: '/assets/sprites/powerups/dummy-pu.png',
       ...data,
     });
   }
