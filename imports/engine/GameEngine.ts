@@ -8,6 +8,7 @@ import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
+import { powerUpRegistry } from './powerups';
 import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
 
 // A gap larger than this since the last server-side action means the player
@@ -27,6 +28,7 @@ export class GameEngine {
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
   public lastActiveAt: number;
+  public powerUps: string[];
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -42,6 +44,7 @@ export class GameEngine {
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
+    this.powerUps = userData.powerUps ?? [];
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -115,6 +118,16 @@ export class GameEngine {
     this.finalizeBossRecap('win');
     this.clearTimerDebuff();
     this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
+  }
+
+  // Player picked this reward on the stage-clear screen. Validated against
+  // the registry so a bogus id never ends up saved to the run.
+  choosePowerUp(powerUpId: string): void {
+    if (this.result !== 'stageCleared') {
+      throw new Error('Cannot choose a power-up outside the stage-clear screen');
+    }
+    powerUpRegistry.create(powerUpId);
+    this.powerUps.push(powerUpId);
   }
 
   // Player confirmed "Next Enemy" on the stage-clear screen.
@@ -240,6 +253,7 @@ export class GameEngine {
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
       lastActiveAt: Date.now(),
+      powerUps: [],
     };
 
     const engine = new GameEngine(userData);
@@ -311,6 +325,7 @@ export class GameEngine {
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
       lastActiveAt: this.lastActiveAt,
+      powerUps: this.powerUps,
     };
   }
 }
