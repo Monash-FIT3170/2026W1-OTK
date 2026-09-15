@@ -139,6 +139,21 @@ export class GameEngine {
     this.powerUpChoices = [];
   }
 
+  // Player clicked an inventory slot mid-battle to trigger its effect.
+  // Removes it from the inventory - power-ups are consumed on use, not
+  // permanent passives.
+  usePowerUp(index: number): void {
+    if (this.result !== 'playing') {
+      throw new Error('Cannot use a power-up outside of battle');
+    }
+    const powerUpId = this.powerUps[index];
+    if (powerUpId === undefined) {
+      throw new Error(`No power-up at inventory index ${index}`);
+    }
+    powerUpRegistry.create(powerUpId).apply(this);
+    this.powerUps.splice(index, 1);
+  }
+
   // Player confirmed "Next Enemy" on the stage-clear screen.
   //
   // The deck is rebuilt from this run's baseDeck and never from the player's

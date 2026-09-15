@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { BossRecapTable } from './BossRecapTable';
-import { PowerUpChoices } from './PowerUpChoices';
+import { PowerUpChoices } from './powerups/PowerUpChoices';
 import { FINAL_STAGE } from '../../engine/stages';
 
 /**

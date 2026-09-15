@@ -6,3 +6,4 @@ import './endTurn';
 import './advanceStage';
 import './applyTimerTick';
 import './choosePowerUp';
+import './usePowerUp';

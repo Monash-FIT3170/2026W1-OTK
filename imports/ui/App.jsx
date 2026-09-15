@@ -11,7 +11,7 @@ import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
 import { StageClearScreen } from './components/StageClearScreen';
-import { PowerUpInventory } from './components/PowerUpInventory';
+import { PowerUpInventory } from './components/powerups/PowerUpInventory';
 import { SaveGameButton } from './components/SaveGameButton';
 import { QuitToMenuButton } from './components/QuitToMenuButton';
 import { LoginForm } from './auth/LoginForm';

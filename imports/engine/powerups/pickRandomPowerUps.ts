@@ -1,4 +1,4 @@
-import './DummyPowerUp';
+import './DealDamagePowerUp';
 import type { PowerUp } from './PowerUp';
 import { powerUpRegistry } from './PowerUpRegistry';
 

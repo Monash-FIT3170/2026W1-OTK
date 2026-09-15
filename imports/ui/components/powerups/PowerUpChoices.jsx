@@ -1,5 +1,5 @@
 import React from 'react';
-import { powerUpRegistry } from '../../engine/powerups';
+import { powerUpRegistry } from '../../../engine/powerups';
 
 /**
  * The 3 selectable power-up rewards shown on the stage-clear screen.
