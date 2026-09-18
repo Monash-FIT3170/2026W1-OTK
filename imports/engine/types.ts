@@ -29,7 +29,6 @@ export type EnemyData = {
   timerDebuffDeadline?: number;
   timerDebuffInterval?: number;
   timerDebuffTickAmount?: number;
-  attacksTaken?: number;
 };
 
 // Where a run currently sits.

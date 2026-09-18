@@ -15,7 +15,6 @@ export abstract class Enemy {
   public timerDebuffDeadline: number | null;
   public timerDebuffInterval: number;
   public timerDebuffTickAmount: number;
-  public attacksTaken: number;
 
   constructor(data: {
     enemyId: string;
@@ -29,7 +28,6 @@ export abstract class Enemy {
     timerDebuffDeadline?: number;
     timerDebuffInterval?: number;
     timerDebuffTickAmount?: number;
-    attacksTaken?: number;
   }) {
     this.enemyId = data.enemyId;
     this.name = data.name;
@@ -42,12 +40,10 @@ export abstract class Enemy {
     this.timerDebuffDeadline = data.timerDebuffDeadline ?? null;
     this.timerDebuffInterval = data.timerDebuffInterval ?? 5000;
     this.timerDebuffTickAmount = data.timerDebuffTickAmount ?? 5;
-    this.attacksTaken = data.attacksTaken ?? 0;
   }
 
   takeDamage(amount: number): void {
     this.currentHealth = Math.max(0, this.currentHealth - amount);
-    this.attacksTaken += 1;
   }
 
   toJSON(): EnemyData {
@@ -63,7 +59,6 @@ export abstract class Enemy {
       timerDebuffDeadline: this.timerDebuffDeadline ?? undefined,
       timerDebuffInterval: this.timerDebuffInterval,
       timerDebuffTickAmount: this.timerDebuffTickAmount,
-      attacksTaken: this.attacksTaken,
     };
   }
 }

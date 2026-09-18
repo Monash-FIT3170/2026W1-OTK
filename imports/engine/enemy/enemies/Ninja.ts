@@ -8,13 +8,11 @@ export class Ninja extends Enemy {
   static enemyId = 'ninja';
 
   constructor(data: Partial<EnemyData> = {}) {
-    const health = data.health ?? 100;
-    console.log('NINJA CONSTRUCTOR');
     super({
       enemyId: Ninja.enemyId,
       name: data.name ?? 'Ninja',
-      health,
-      currentHealth: data.currentHealth ?? health,
+      health: data.health ?? 100,
+      currentHealth: data.currentHealth ?? data.health ?? 100,
       debuffs: data.debuffs ?? [],
       entryAnimation: data.entryAnimation ?? 'drop',
       hitAnimation: data.hitAnimation ?? 'squish',
@@ -22,12 +20,11 @@ export class Ninja extends Enemy {
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
-      attacksTaken: data.attacksTaken,
     });
   }
 
   override takeDamage(amount: number): void {
-    if (this.attacksTaken % 3 === 0 && this.attacksTaken !== 0) {
+    if (Math.random() < 0.33) {
         super.takeDamage(0)
     } else {
         super.takeDamage(amount)
