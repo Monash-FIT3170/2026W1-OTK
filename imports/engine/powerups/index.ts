@@ -12,3 +12,4 @@ export {
 export { pickRandomPowerUps } from './pickRandomPowerUps';
 export { DealDamagePowerUp } from './DealDamagePowerUp';
 export { RestartStagePowerup } from './RestartStagePowerup';
+export { DuplicateCardsPowerUp } from './DuplicateCardsPowerUp';
