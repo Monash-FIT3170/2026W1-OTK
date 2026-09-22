@@ -1,6 +1,7 @@
 import './DealDamagePowerUp';
 import './RestartStagePowerup';
 import './DuplicateCardsPowerUp';
+import './StockUpPowerUp';
 import type { PowerUp } from './Powerup';
 import { powerupRegistry } from './PowerupRegistry';
 
