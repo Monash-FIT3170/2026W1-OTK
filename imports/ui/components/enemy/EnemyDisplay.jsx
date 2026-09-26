@@ -8,6 +8,7 @@ const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
   frostwarden: 'dragon',
   timekeeper: 'lion',
+  merchant: 'goblin', // TODO; update with asset
 };
 
 const ENEMY_SPRITE_SIZES = {
@@ -111,48 +112,48 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
         style={{ opacity: healFlash ? 0.6 : 0 }}
       />
       <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          ref={scope}
-          key={enemy.enemyId}
-          initial={initial}
-          animate={animateProps}
-          exit={exit}
-          transition={transition}
-        >
-          <div className="relative inline-block">
-            <img
-              src={`/assets/sprites/enemies/${spriteId}${suffix}-enemy.gif`}
-              alt={enemy.name}
-              className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
-              style={{ imageRendering: 'pixelated' }}
-              onError={(e) => {
-                const target = e.currentTarget;
-                const idleGif = `/assets/sprites/enemies/${spriteId}-enemy.gif`;
-                const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
+        {isVisible && (
+          <motion.div
+            ref={scope}
+            key={enemy.enemyId}
+            initial={initial}
+            animate={animateProps}
+            exit={exit}
+            transition={transition}
+          >
+            <div className="relative inline-block">
+              <img
+                src={`/assets/sprites/enemies/${spriteId}${suffix}-enemy.gif`}
+                alt={enemy.name}
+                className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
+                style={{ imageRendering: 'pixelated' }}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  const idleGif = `/assets/sprites/enemies/${spriteId}-enemy.gif`;
+                  const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
 
-                // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
-                if (
-                  !target.src.endsWith(`${spriteId}-enemy.gif`) &&
-                  !target.src.endsWith(`${spriteId}-enemy.png`)
-                ) {
-                  target.src = idleGif;
-                  return;
-                }
-                // Fall back to PNG if GIF is missing
-                if (target.src.endsWith('.gif')) {
-                  target.src = idlePng;
-                  return;
-                }
+                  // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
+                  if (
+                    !target.src.endsWith(`${spriteId}-enemy.gif`) &&
+                    !target.src.endsWith(`${spriteId}-enemy.png`)
+                  ) {
+                    target.src = idleGif;
+                    return;
+                  }
+                  // Fall back to PNG if GIF is missing
+                  if (target.src.endsWith('.gif')) {
+                    target.src = idlePng;
+                    return;
+                  }
 
-                target.onerror = null;
-                target.src = '/assets/sprites/enemies/placeholder-enemy.png';
-              }}
-            />
-            <TimerDebuff enemy={enemy} />
-          </div>
-        </motion.div>
-      )}
+                  target.onerror = null;
+                  target.src = '/assets/sprites/enemies/placeholder-enemy.png';
+                }}
+              />
+              <TimerDebuff enemy={enemy} />
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </>
   );
