@@ -18,6 +18,7 @@ import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
 import { TutorialOverlay } from './components/TutorialOverlay';
 import { TutorialDemoScreen } from './components/TutorialDemoScreen';
+import { TrainingModeScreen } from './components/TrainingModeScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
@@ -31,6 +32,12 @@ export const App = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showTutorialDemo, setShowTutorialDemo] = useState(false);
+
+  // Training Mode (landing page button) is a fully separate, ephemeral
+  // screen — like showTutorialDemo, it never touches the player's real
+  // save. See TrainingModeScreen / useTrainingEngine.
+  const [showTrainingMode, setShowTrainingMode] = useState(false);
+
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
 
@@ -81,7 +88,12 @@ export const App = () => {
   }, [loading, user, gameState, showLanding, justStartedNewGame]);
 
   const onGameScreen =
-    !loading && !!user && !showLanding && !showDeckBuilder && !showTutorialDemo;
+    !loading &&
+    !!user &&
+    !showLanding &&
+    !showDeckBuilder &&
+    !showTutorialDemo &&
+    !showTrainingMode;
 
   useGameSounds(gameState?.result, onGameScreen);
 
@@ -115,6 +127,21 @@ export const App = () => {
     });
   };
 
+  // Training Mode is opened from the landing page and runs entirely on a
+  // local, ephemeral GameEngine instance (see useTrainingEngine) — no
+  // game.newGame call, no UserDataCollection read/write. Exiting just
+  // returns to the landing page; there's no save to touch, no result to
+  // resolve, and nothing to mark as seen.
+  const handleOpenTrainingMode = () => {
+    setShowLanding(false);
+    setShowTrainingMode(true);
+  };
+
+  const handleExitTrainingMode = () => {
+    setShowTrainingMode(false);
+    setShowLanding(true);
+  };
+
   const handleStart = (isNewGame = false) => {
     setShowLanding(false);
     if (isNewGame) setJustStartedNewGame(true);
@@ -144,6 +171,19 @@ export const App = () => {
     return <TutorialDemoScreen onClose={handleCloseTutorialDemo} />;
   }
 
+  if (showTrainingMode) {
+    // Uses the player's real saved deck (their latest Deck Builder save
+    // — the same nextDeck field game.newGame reads from), falling back to
+    // the default starting deck if they haven't saved one of their own yet.
+    return (
+      <TrainingModeScreen
+        savedDeck={userData?.nextDeck}
+        personalBest={userData?.trainingHighScore ?? 0}
+        onExit={handleExitTrainingMode}
+      />
+    );
+  }
+
   if (showLanding) {
     return (
       <LandingPage
@@ -153,6 +193,7 @@ export const App = () => {
         }
         onStart={handleStart}
         onOpenTutorial={handleOpenTutorial}
+        onOpenTrainingMode={handleOpenTrainingMode}
         onEditDeck={() => {
           setShowLanding(false);
           setShowDeckBuilder(true);
@@ -249,7 +290,11 @@ export const App = () => {
         style={{ right: 400, bottom: 540 }}
         data-tutorial-target="enemy"
       >
-        <EnemyDisplay enemy={enemy} isVisible={true} />
+        <EnemyDisplay
+          enemy={enemy}
+          isVisible={true}
+          lastActiveAt={gameState.lastActiveAt}
+        />
       </div>
 
       <div
