@@ -41,3 +41,7 @@ import '../imports/ui/components/TutorialOverlay.tests.jsx';
 import '../imports/ui/components/TutorialDemoScreen.tests.jsx';
 import '../imports/ui/hooks/useTutorialEngine.tests.js';
 import '../imports/api/auth/methods/markTutorialSeen.tests.js';
+
+// TRAINING TESTS
+import '../imports/ui/hooks/useTrainingEngine.tests.js';
+import '../imports/api/user-data/methods/saveTrainingHighScore.tests.js';
