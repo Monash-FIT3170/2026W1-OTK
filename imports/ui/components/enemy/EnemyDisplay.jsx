@@ -2,6 +2,7 @@ import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
+import ShieldLayers from './ShieldDisplay';
 import { soundManager } from '../../soundManager';
 
 const ENEMY_SPRITE_IDS = {
@@ -151,6 +152,7 @@ export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
               }}
             />
             <TimerDebuff enemy={enemy} />
+            <ShieldLayers enemy= {enemy}/>
           </div>
         </motion.div>
       )}
