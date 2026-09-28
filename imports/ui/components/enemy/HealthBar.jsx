@@ -1,4 +1,5 @@
 import React from 'react';
+import { Undying } from '../../../engine/enemy/enemies/Undying';
 
 export const HealthBar = ({ current, max, name }) => {
   const healthPercentage = (current / max) * 100;
@@ -30,4 +31,20 @@ export const HealthBar = ({ current, max, name }) => {
       </div>
     </div>
   );
+};
+
+//implementation to be generalised in the future if 
+// more enemies with shields is planned
+//avoiding overengineering for now
+const getBarValues = (enemy) => {
+  if (enemy.enemyId === Undying.enemyId) { 
+    const threshold = enemy.health - Undying.shieldLayers;
+    return { current: Math.min(enemy.currentHealth, threshold), max: threshold };
+  }
+  return { current: enemy.currentHealth, max: enemy.health };
+};
+
+export const EnemyHealthBar = ({ enemy }) => {
+  const { current, max } = getBarValues(enemy);
+  return <HealthBar current={current} max={max} name={enemy.name} />;
 };
