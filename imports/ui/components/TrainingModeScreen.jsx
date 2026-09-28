@@ -26,6 +26,11 @@ export const TrainingModeScreen = ({
     deck,
     enemy,
     totalDamageDealt,
+    currentCycleDamage,
+    bestCycleDamage,
+    lastCycleDamage,
+    restartCycle,
+    deckRefillCount,
     pendingSelection,
     playCard,
     confirmSelection,
@@ -80,7 +85,17 @@ export const TrainingModeScreen = ({
 
   return (
     <GameBackground backgroundScene="underpass-overlaid">
-      <div className="absolute" style={{ right: 20, top: 30 }}>
+      <div className="absolute flex gap-3 z-[70]" style={{ right: 20, top: 30 }}>
+        <button
+          onClick={() => {
+            restartCycle();
+            setSelectedTargets([]);
+          }}
+          title="Start a fresh shuffled cycle. Keeps your session best and total damage."
+          className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors"
+        >
+          Restart Cycle
+        </button>
         <button
           onClick={handleExit}
           className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-600 text-white font-semibold transition-colors"
@@ -89,27 +104,37 @@ export const TrainingModeScreen = ({
         </button>
       </div>
 
-      {/* Live damage tracker. This is the same total that gets saved as
-          the player's personal best on exit — surfacing it here so the
-          number they see during play is exactly the one that will be
-          recorded, with no surprise at the door. */}
+      {/* Cycle records are local to this session; the saved personal best
+          remains the cumulative session total. */}
       <div
         className="absolute flex flex-col items-start gap-1 rounded-lg bg-slate-900/70 px-4 py-3"
         style={{ left: 20, top: 30 }}
       >
         <p className="text-slate-300 text-xs uppercase tracking-wide">
-          Damage Dealt
+          Cycle {deckRefillCount + 1} damage
         </p>
         <p className="text-white text-3xl font-bold leading-none">
-          {totalDamageDealt}
+          {currentCycleDamage}
+        </p>
+        <p className="text-emerald-400 text-sm font-semibold">
+          Best cycle this session: {bestCycleDamage}
+        </p>
+        <p className="text-slate-300 text-sm">
+          Last cycle damage: {lastCycleDamage ?? '—'}
+        </p>
+        <p className="text-slate-400 text-xs">
+          Refilling or restarting begins a new cycle.
+        </p>
+        <p className="text-slate-300 text-sm mt-2">
+          Session total: {totalDamageDealt}
         </p>
         {isNewPersonalBest ? (
           <p className="text-emerald-400 text-xs font-semibold">
-            New personal best!
+            New session-total personal best!
           </p>
         ) : (
           <p className="text-slate-400 text-xs">
-            Personal best: {personalBest}
+            Session-total personal best: {personalBest}
           </p>
         )}
       </div>

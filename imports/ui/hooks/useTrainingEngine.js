@@ -44,23 +44,52 @@ export function useTrainingEngine(savedDeck) {
   // otherwise be lost. This state just mirrors that counter so React
   // re-renders when it changes.
   const [totalDamageDealt, setTotalDamageDealt] = useState(0);
+  const cycleStartingDamage = useRef(0);
+  const [currentCycleDamage, setCurrentCycleDamage] = useState(0);
+  const [bestCycleDamage, setBestCycleDamage] = useState(0);
+  const [lastCycleDamage, setLastCycleDamage] = useState(null);
 
   // Mirrors usePlayCard's pendingSelection shape so the real, presentational
   // SelectionPanel component can be reused as-is.
   const [pendingSelection, setPendingSelection] = useState(null);
 
-  // If nothing left in hand can still be played (out of cards, or not
-  // enough left in the deck to pay any remaining card's cost), reshuffle a
-  // fresh copy of the starting deck back in. Training Mode has no win/loss
-  // condition, so running out of cards should never end the session.
-  const refillIfExhausted = useCallback((engine) => {
-    if (engine.hasPlayableCards()) return;
+  // Both exhaustion and a manual restart end the current cycle. On a
+  // restart, last-cycle damage is the damage achieved before stopping.
+  const startNextCycle = useCallback((engine) => {
+    const total = engine.enemy.trainingDamageDealt;
+    setLastCycleDamage(total - cycleStartingDamage.current);
+    cycleStartingDamage.current = total;
+    setCurrentCycleDamage(0);
+    setPendingSelection(null);
     engine.deck = engine.freshDeckFromBase();
     engine.hand = [];
     engine.shuffle();
     engine.draw(TRAINING_STARTING_HAND_SIZE);
     setDeckRefillCount((count) => count + 1);
   }, []);
+
+  const restartCycle = useCallback(() => {
+    const engine = engineRef.current;
+    startNextCycle(engine);
+    engine.enemy.currentHealth = engine.enemy.health;
+    setVersion((v) => v + 1);
+  }, [startNextCycle]);
+
+  // If nothing left in hand can still be played (out of cards, or not
+  // enough left in the deck to pay any remaining card's cost), reshuffle a
+  // fresh copy of the starting deck back in. Training Mode has no win/loss
+  // condition, so running out of cards should never end the session.
+  const finishPlay = useCallback((engine) => {
+    // Record the final hit before refilling. Dummy health resets do not
+    // end a cycle; exhaustion or a manual restart does.
+    const total = engine.enemy.trainingDamageDealt;
+    const cycleDamage = total - cycleStartingDamage.current;
+    setTotalDamageDealt(total);
+    setCurrentCycleDamage(cycleDamage);
+    setBestCycleDamage((best) => Math.max(best, cycleDamage));
+    if (engine.hasPlayableCards()) return;
+    startNextCycle(engine);
+  }, [startNextCycle]);
 
   const playCard = useCallback((uniqueId) => {
     const engine = engineRef.current;
@@ -85,12 +114,11 @@ export function useTrainingEngine(savedDeck) {
 
     soundManager.playCardSound(card.cardId);
     engine.executeCard(uniqueId, []);
-    setTotalDamageDealt(engine.enemy.trainingDamageDealt);
-    refillIfExhausted(engine);
+    finishPlay(engine);
 
     setCardsPlayedCount((count) => count + 1);
     setVersion((v) => v + 1);
-  }, [refillIfExhausted]);
+  }, [finishPlay]);
 
   const confirmSelection = useCallback((selectedCardIds) => {
     const engine = engineRef.current;
@@ -98,13 +126,12 @@ export function useTrainingEngine(savedDeck) {
 
     soundManager.playCardSound(pendingSelection.card.cardId);
     engine.executeCard(pendingSelection.uniqueCardId, selectedCardIds);
-    setTotalDamageDealt(engine.enemy.trainingDamageDealt);
-    refillIfExhausted(engine);
+    finishPlay(engine);
 
     setPendingSelection(null);
     setCardsPlayedCount((count) => count + 1);
     setVersion((v) => v + 1);
-  }, [pendingSelection, refillIfExhausted]);
+  }, [pendingSelection, finishPlay]);
 
   const engine = engineRef.current;
 
@@ -115,6 +142,10 @@ export function useTrainingEngine(savedDeck) {
     cardsPlayedCount,
     deckRefillCount,
     totalDamageDealt,
+    currentCycleDamage,
+    bestCycleDamage,
+    lastCycleDamage,
+    restartCycle,
     pendingSelection,
     playCard,
     confirmSelection,

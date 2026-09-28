@@ -123,6 +123,109 @@ if (Meteor.isClient) {
     it('starts with zero damage dealt', function () {
       const { result } = renderHook(() => useTrainingEngine());
       assert.equal(result.current.totalDamageDealt, 0);
+      assert.equal(result.current.currentCycleDamage, 0);
+      assert.equal(result.current.bestCycleDamage, 0);
+      assert.isNull(result.current.lastCycleDamage);
+    });
+
+    it('records the last hit before refilling and keeps cycles separate', function () {
+      const deck = Array.from({ length: 10 }, () => new FogClearing().toJSON());
+      const { result } = renderHook(() => useTrainingEngine(deck));
+      const play = () => act(() => {
+        result.current.playCard(result.current.hand[0].uniqueId);
+      });
+
+      play();
+      assert.equal(result.current.currentCycleDamage, 12);
+      assert.equal(result.current.bestCycleDamage, 12);
+      assert.equal(result.current.deckRefillCount, 0);
+
+      play();
+      assert.equal(result.current.currentCycleDamage, 0);
+      assert.equal(result.current.bestCycleDamage, 24);
+      assert.equal(result.current.deckRefillCount, 1);
+      assert.equal(result.current.lastCycleDamage, 24);
+
+      play();
+      assert.equal(result.current.currentCycleDamage, 12);
+      assert.equal(result.current.bestCycleDamage, 24);
+      assert.equal(result.current.lastCycleDamage, 24);
+      play();
+      assert.equal(result.current.currentCycleDamage, 0);
+      assert.equal(result.current.bestCycleDamage, 24);
+      assert.equal(result.current.totalDamageDealt, 48);
+      assert.equal(result.current.deckRefillCount, 2);
+    });
+
+    it('restarts with a fresh hand and healthy dummy while preserving session records', function () {
+      const deck = Array.from({ length: 10 }, () => new FogClearing().toJSON());
+      const { result } = renderHook(() => useTrainingEngine(deck));
+      act(() => result.current.playCard(result.current.hand[0].uniqueId));
+      act(() => result.current.restartCycle());
+
+      assert.equal(result.current.currentCycleDamage, 0);
+      assert.equal(result.current.lastCycleDamage, 12);
+      assert.equal(result.current.bestCycleDamage, 12);
+      assert.equal(result.current.totalDamageDealt, 12);
+      assert.equal(result.current.deckRefillCount, 1);
+      assert.equal(result.current.hand.length, 5);
+      assert.equal(result.current.deck.length, 5);
+      assert.equal(result.current.enemy.currentHealth, result.current.enemy.health);
+
+      act(() => result.current.playCard(result.current.hand[0].uniqueId));
+      assert.equal(result.current.currentCycleDamage, 12);
+      assert.equal(result.current.totalDamageDealt, 24);
+      act(() => result.current.playCard(result.current.hand[0].uniqueId));
+      assert.equal(result.current.lastCycleDamage, 24);
+      assert.equal(result.current.bestCycleDamage, 24);
+      assert.equal(result.current.deckRefillCount, 2);
+
+      act(() => result.current.restartCycle());
+      assert.equal(result.current.lastCycleDamage, 0);
+      assert.equal(result.current.bestCycleDamage, 24);
+      assert.equal(result.current.totalDamageDealt, 36);
+    });
+
+    it('restart cancels pending selection without executing the card', function () {
+      const deck = Array.from({ length: 10 }, () => new FogClearing({
+        cardAmountToSelect: { min: 1, max: 1 },
+      }).toJSON());
+      const { result } = renderHook(() => useTrainingEngine(deck));
+      act(() => result.current.playCard(result.current.hand[0].uniqueId));
+      assert.isNotNull(result.current.pendingSelection);
+      act(() => result.current.restartCycle());
+      assert.isNull(result.current.pendingSelection);
+      assert.equal(result.current.hand.length, 5);
+      assert.equal(result.current.deck.length, 5);
+      act(() => result.current.confirmSelection([]));
+      assert.equal(result.current.totalDamageDealt, 0);
+      assert.equal(result.current.cardsPlayedCount, 0);
+      assert.equal(result.current.lastCycleDamage, 0);
+    });
+
+    it('counts selection-card damage only on confirmation, including a cycle-ending hit', function () {
+      // A controlled damage card with selection metadata exercises the
+      // same deferred execution path without depending on random draws.
+      const deck = Array.from({ length: 10 }, () => new FogClearing({
+        cardAmountToSelect: { min: 1, max: 1 },
+      }).toJSON());
+      const { result } = renderHook(() => useTrainingEngine(deck));
+
+      for (let i = 0; i < 2; i++) {
+        act(() => result.current.playCard(result.current.hand[0].uniqueId));
+        assert.equal(result.current.currentCycleDamage, i * 12);
+        assert.equal(result.current.bestCycleDamage, i * 12);
+        assert.equal(result.current.deckRefillCount, 0);
+        const target = result.current.hand.find(
+          (card) => card.uniqueId !== result.current.pendingSelection.uniqueCardId
+        );
+        act(() => result.current.confirmSelection([target.uniqueId]));
+      }
+
+      assert.equal(result.current.currentCycleDamage, 0);
+      assert.equal(result.current.bestCycleDamage, 24);
+      assert.equal(result.current.totalDamageDealt, 24);
+      assert.equal(result.current.deckRefillCount, 1);
     });
 
     it('playing a card increases totalDamageDealt by the amount of damage dealt', function () {
@@ -161,6 +264,9 @@ if (Meteor.isClient) {
       // exactly 90 * 12, with nothing lost to the dummy's health clamping
       // at 0 or resetting back to full partway through.
       assert.equal(result.current.totalDamageDealt, HITS * 12);
+      assert.equal(result.current.currentCycleDamage, HITS * 12);
+      assert.equal(result.current.bestCycleDamage, HITS * 12);
+      assert.equal(result.current.deckRefillCount, 0);
     });
 
     it('never calls a real Meteor method when playing a card', function () {
