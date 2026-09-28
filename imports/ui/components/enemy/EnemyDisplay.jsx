@@ -8,6 +8,7 @@ const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
   frostwarden: 'dragon',
   timekeeper: 'lion',
+  undying: 'dragon'
 };
 
 const ENEMY_SPRITE_SIZES = {
