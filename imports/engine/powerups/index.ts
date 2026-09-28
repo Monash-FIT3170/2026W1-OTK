@@ -16,3 +16,5 @@ export { DealDamagePowerUp } from './DealDamagePowerUp';
 export { RestartStagePowerup } from './RestartStagePowerup';
 export { DuplicateCardsPowerUp } from './DuplicateCardsPowerUp';
 export { StockUpPowerUp } from './StockUpPowerUp';
+export { GiantSlayerPowerUp } from './GiantSlayerPowerUp'
+export { OneMorePullPowerUp } from './OneMorePullPowerUp'
