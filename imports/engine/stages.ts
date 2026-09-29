@@ -10,6 +10,7 @@ import { Enemy } from './enemy/Enemy';
 import { Goblin } from './enemy/enemies/Goblin';
 import { Frostwarden } from './enemy/enemies/Frostwarden';
 import { Timekeeper } from './enemy/enemies/Timekeeper';
+import { Undying } from './enemy/enemies/Undying';
 
 // Not part of any stage, but kept registered so enemyRegistry can still
 // reconstruct it - GameEngine used to carry this side-effect import.
@@ -30,6 +31,7 @@ export const STAGES: StageConfig[] = [
   { stage: 3, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
   { stage: 4, BossClass: Merchant, scene: 'underpass-overlaid' },
   { stage: 5, BossClass: Ninja, scene: 'underpass-overlaid' },
+  { stage: 6, BossClass: Undying, scene: 'underpass-overlaid'}
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
