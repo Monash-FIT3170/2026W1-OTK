@@ -18,50 +18,56 @@ export function formatTime(ms) {
  *
  * @param {BossRecapEntry[]} bossRecap - accumulated recap entries for the run
  * @param {string} title - heading shown above the table
+ * @param {boolean} compact - tighter padding/text, for screens sharing width
+ *   with other content (e.g. StageClearScreen's power-up choices)
  */
-export function BossRecapTable({ bossRecap = [], title = 'Result' }) {
+export function BossRecapTable({ bossRecap = [], title = 'Result', compact = false }) {
   if (bossRecap.length === 0) return null;
 
   const totalTimeMs = bossRecap.reduce((sum, entry) => sum + entry.timeMs, 0);
   const totalCards = bossRecap.reduce((sum, entry) => sum + entry.cardsUsed, 0);
 
+  const colWidth = compact ? 'w-20' : 'w-36';
+  const cellText = compact ? 'text-xs' : 'text-sm';
+  const cellPad = compact ? 'px-2 py-1' : 'px-4 py-1.5';
+
   return (
     <div
-      className="border border-slate-500 rounded-lg px-8 py-6 w-full max-w-2xl"
+      className={`border border-slate-500 rounded-lg w-full max-w-2xl ${compact ? 'px-4 py-3' : 'px-8 py-6'}`}
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
     >
       {/* Header row */}
       <div className="flex items-baseline mb-1">
-        <span className="text-slate-200 text-lg font-semibold">{title}</span>
+        <span className={`text-slate-200 font-semibold ${compact ? 'text-sm' : 'text-lg'}`}>{title}</span>
       </div>
-      <div className="border-t border-slate-500 mb-4" />
+      <div className={`border-t border-slate-500 ${compact ? 'mb-2' : 'mb-4'}`} />
 
       {/* Column headers */}
-      <div className="flex items-center mb-3">
+      <div className={`flex items-center ${compact ? 'mb-2' : 'mb-3'}`}>
         <div className="flex-1" />
-        <div className="w-36 text-center text-slate-300 text-sm font-semibold">
+        <div className={`${colWidth} text-center text-slate-300 ${cellText} font-semibold`}>
           Time
         </div>
-        <div className="w-36 text-center text-slate-300 text-sm font-semibold">
+        <div className={`${colWidth} text-center text-slate-300 ${cellText} font-semibold`}>
           Cards Used
         </div>
       </div>
 
       {/* Boss rows */}
       {bossRecap.map((entry, idx) => (
-        <div key={idx} className="flex items-center mb-3">
+        <div key={idx} className={`flex items-center ${compact ? 'mb-2' : 'mb-3'}`}>
           <div className="flex-1">
-            <span className="inline-block border border-slate-400 rounded px-4 py-1.5 text-slate-200 text-sm">
+            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {entry.bossName}
             </span>
           </div>
-          <div className="w-36 flex justify-center">
-            <span className="inline-block border border-slate-400 rounded px-4 py-1.5 text-slate-200 text-sm">
+          <div className={`${colWidth} flex justify-center`}>
+            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {formatTime(entry.timeMs)}
             </span>
           </div>
-          <div className="w-36 flex justify-center">
-            <span className="inline-block border border-slate-400 rounded px-4 py-1.5 text-slate-200 text-sm">
+          <div className={`${colWidth} flex justify-center`}>
+            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {entry.cardsUsed}
             </span>
           </div>
@@ -69,27 +75,28 @@ export function BossRecapTable({ bossRecap = [], title = 'Result' }) {
       ))}
 
       {/* Divider before totals */}
-      <div className="border-t border-slate-500 my-4" />
+      <div className={`border-t border-slate-500 ${compact ? 'my-2' : 'my-4'}`} />
 
       {/* Totals row */}
       <div className="flex items-center">
         <div className="flex-1">
-          <span className="text-slate-200 text-sm font-semibold">Total</span>
+          <span className={`text-slate-200 font-semibold ${cellText}`}>Total</span>
         </div>
-        <div className="w-36 flex justify-center">
-          <span className="inline-block border border-slate-400 rounded px-4 py-1.5 text-slate-200 text-sm">
+        <div className={`${colWidth} flex justify-center`}>
+          <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
             {formatTime(totalTimeMs)}
           </span>
         </div>
-        <div className="w-36 flex justify-center">
-          <span className="inline-block border border-slate-400 rounded px-4 py-1.5 text-slate-200 text-sm">
+        <div className={`${colWidth} flex justify-center`}>
+          <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
             {totalCards}
           </span>
         </div>
       </div>
 
       {/* Bottom divider */}
-      <div className="border-t border-slate-500 mt-4" />
+      <div className={`border-t border-slate-500 ${compact ? 'mt-2' : 'mt-4'}`} />
     </div>
   );
 }
+

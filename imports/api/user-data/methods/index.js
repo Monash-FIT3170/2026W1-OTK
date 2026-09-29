@@ -5,4 +5,7 @@ import './newGame';
 import './endTurn';
 import './advanceStage';
 import './applyTimerTick';
+import './applyPowerup';
+import './choosePowerUp';
+import './usePowerUp';
 import './saveTrainingHighScore';

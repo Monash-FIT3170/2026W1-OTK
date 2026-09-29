@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+.meteor/local
+_build
+*/build-assets
+*/build-chunks
+.rsdoctor
+docs
+npm-debug.log
+.vscode
