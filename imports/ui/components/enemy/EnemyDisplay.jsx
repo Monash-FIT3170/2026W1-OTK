@@ -9,7 +9,9 @@ const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
   frostwarden: 'dragon',
   timekeeper: 'lion',
-  undying: 'dragon'
+  undying: 'dragon' // TODO: update with asset
+  ninja: 'goblin' //TODO: update with asset
+  merchant: 'goblin', // TODO; update with asset
 };
 
 const ENEMY_SPRITE_SIZES = {

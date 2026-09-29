@@ -16,6 +16,8 @@ import { Undying } from './enemy/enemies/Undying';
 // reconstruct it - GameEngine used to carry this side-effect import.
 import './enemy/enemies/IceCube';
 import { Dragon } from './enemy/enemies/Dragon';
+import { Ninja } from './enemy/enemies/Ninja';
+import { Merchant } from './enemy/enemies/Merchant';
 
 export type StageConfig = {
   stage: number;
@@ -24,13 +26,12 @@ export type StageConfig = {
 };
 
 export const STAGES: StageConfig[] = [
-  { stage: 1, BossClass: Undying, scene: 'underpass-overlaid' }, // TODO: CHANGE BACK TO GOBLIN, ONLY THIS WAY FOR TESTING
-  // Each scene resolves to public/assets/environments/<scene>-background.png.
-  // Bosses still borrow sprites from other enemies - see the id aliases in
-  // ui/components/enemy/EnemyDisplay.jsx.
+  { stage: 1, BossClass: Goblin, scene: 'underpass-overlaid' },
   { stage: 2, BossClass: Frostwarden, scene: 'otkclone_bg_temple' },
   { stage: 3, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
-  { stage: 5, BossClass: Undying, scene: 'otkclone_bg_temple'}
+  { stage: 4, BossClass: Merchant, scene: 'underpass-overlaid' },
+  { stage: 5, BossClass: Ninja, scene: 'underpass-overlaid' },
+  { stage: 6, BossClass: Undying, scene: 'underpass-overlaid'}
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
