@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import { GameEngine } from './GameEngine';
-import { FINAL_STAGE, getStageConfig } from './stages';
+import { FINAL_STAGE, STAGES, getStageConfig } from './stages';
 
 const USER_ID = 'stage-test-user';
 
@@ -104,7 +104,7 @@ describe('GameEngine - multi-stage run', function () {
     assert.equal(engine.bossRecap.length, FINAL_STAGE);
     assert.deepEqual(
       engine.bossRecap.map((entry) => entry.stage),
-      [1, 2, 3]
+      STAGES.map((entry) => entry.stage)
     );
   });
 

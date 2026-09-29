@@ -10,11 +10,14 @@ import { Enemy } from './enemy/Enemy';
 import { Goblin } from './enemy/enemies/Goblin';
 import { Frostwarden } from './enemy/enemies/Frostwarden';
 import { Timekeeper } from './enemy/enemies/Timekeeper';
+import { Undying } from './enemy/enemies/Undying';
 
 // Not part of any stage, but kept registered so enemyRegistry can still
 // reconstruct it - GameEngine used to carry this side-effect import.
 import './enemy/enemies/IceCube';
 import { Dragon } from './enemy/enemies/Dragon';
+import { Ninja } from './enemy/enemies/Ninja';
+import { Merchant } from './enemy/enemies/Merchant';
 
 export type StageConfig = {
   stage: number;
@@ -24,11 +27,11 @@ export type StageConfig = {
 
 export const STAGES: StageConfig[] = [
   { stage: 1, BossClass: Goblin, scene: 'underpass-overlaid' },
-  // Each scene resolves to public/assets/environments/<scene>-background.png.
-  // Bosses still borrow sprites from other enemies - see the id aliases in
-  // ui/components/enemy/EnemyDisplay.jsx.
   { stage: 2, BossClass: Frostwarden, scene: 'otkclone_bg_temple' },
-  { stage: 3, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
+  { stage: 3, BossClass: Undying, scene: 'underpass-overlaid' },
+  { stage: 4, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
+  { stage: 5, BossClass: Ninja, scene: 'underpass-overlaid' },
+  { stage: 6, BossClass: Merchant, scene: 'underpass-overlaid' },
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;

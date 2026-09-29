@@ -2,12 +2,16 @@ import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
+import ShieldLayers from './ShieldDisplay';
 import { soundManager } from '../../soundManager';
 
 const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
   frostwarden: 'dragon',
   timekeeper: 'lion',
+  undying: 'dragon', // TODO: update with asset
+  ninja: 'goblin', //TODO: update with asset
+  merchant: 'goblin', // TODO; update with asset
 };
 
 const ENEMY_SPRITE_SIZES = {
@@ -154,7 +158,8 @@ export function EnemyDisplay({
                 target.src = '/assets/sprites/enemies/placeholder-enemy.png';
               }}
             />
-            <TimerDebuff enemy={enemy} lastActiveAt={lastActiveAt} />
+            <TimerDebuff enemy={enemy} />
+            <ShieldLayers enemy= {enemy}/>
           </div>
         </motion.div>
       )}
