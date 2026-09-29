@@ -9,8 +9,8 @@ const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
   frostwarden: 'dragon',
   timekeeper: 'lion',
-  undying: 'dragon' // TODO: update with asset
-  ninja: 'goblin' //TODO: update with asset
+  undying: 'dragon', // TODO: update with asset
+  ninja: 'goblin', //TODO: update with asset
   merchant: 'goblin', // TODO; update with asset
 };
 
