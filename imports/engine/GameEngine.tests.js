@@ -11,8 +11,17 @@ function freshEngine() {
 // Kills the current boss and settles the stage, exactly as game.executeCard
 // does once the enemy's health hits zero.
 function killBoss(engine) {
-  engine.enemy.takeDamage(engine.enemy.health);
+  while (engine.enemy.currentHealth > 0) {
+    engine.enemy.takeDamage(engine.enemy.health);
+  }
   engine.clearStage();
+}
+
+function advanceTo(engine, stage) {
+  while (engine.stage < stage) {
+    killBoss(engine);
+    engine.advanceStage();
+  }
 }
 
 describe('GameEngine - multi-stage run', function () {
@@ -70,14 +79,21 @@ describe('GameEngine - multi-stage run', function () {
     );
   });
 
-  it('advances to the stage 3 timer boss', function () {
+  it('advances to the stage 3 undying boss', function () {
     const engine = freshEngine();
-    killBoss(engine);
-    engine.advanceStage();
-    killBoss(engine);
-    engine.advanceStage();
+    advanceTo(engine, 3);
 
     assert.equal(engine.stage, 3);
+    assert.equal(engine.enemy.enemyId, 'undying');
+    assert.deepEqual(engine.enemy.debuffs, []);
+    assert.equal(engine.enemy.shieldRemaining, 3);
+  });
+
+  it('advances to the stage 4 timer boss', function () {
+    const engine = freshEngine();
+    advanceTo(engine, 4);
+
+    assert.equal(engine.stage, 4);
     assert.equal(engine.enemy.enemyId, 'timekeeper');
     assert.include(engine.enemy.debuffs, 'timer');
     assert.isFalse(
@@ -89,6 +105,26 @@ describe('GameEngine - multi-stage run', function () {
     engine.enemy.takeDamage(20);
     engine.executeEnemyDebuffs();
     assert.isTrue(engine.enemy.timerDebuffActive);
+  });
+
+  it('advances to the stage 5 ninja boss', function () {
+    const engine = freshEngine();
+    advanceTo(engine, 5);
+
+    assert.equal(engine.stage, 5);
+    assert.equal(engine.enemy.enemyId, 'ninja');
+    assert.deepEqual(engine.enemy.debuffs, []);
+    assert.equal(engine.enemy.attacksReceived, 0);
+  });
+
+  it('advances to the stage 6 inflation boss', function () {
+    const engine = freshEngine();
+    advanceTo(engine, 6);
+
+    assert.equal(engine.stage, 6);
+    assert.equal(engine.stage, FINAL_STAGE);
+    assert.equal(engine.enemy.enemyId, 'merchant');
+    assert.include(engine.enemy.debuffs, 'inflation');
   });
 
   it('ends the run in a win once the final stage is cleared', function () {
@@ -184,10 +220,7 @@ describe('GameEngine - multi-stage run', function () {
 describe('GameEngine - resume after time away', function () {
   function timerEngine() {
     const engine = freshEngine();
-    killBoss(engine);
-    engine.advanceStage();
-    killBoss(engine);
-    engine.advanceStage(); // stage 3: the timer boss
+    advanceTo(engine, 4);
 
     // The countdown only arms once the boss has damage to heal.
     engine.enemy.takeDamage(20);
