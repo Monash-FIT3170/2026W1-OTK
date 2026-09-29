@@ -15,6 +15,7 @@ import { Timekeeper } from './enemy/enemies/Timekeeper';
 // reconstruct it - GameEngine used to carry this side-effect import.
 import './enemy/enemies/IceCube';
 import { Dragon } from './enemy/enemies/Dragon';
+import { Ninja } from './enemy/enemies/Ninja';
 import { Merchant } from './enemy/enemies/Merchant';
 
 export type StageConfig = {
