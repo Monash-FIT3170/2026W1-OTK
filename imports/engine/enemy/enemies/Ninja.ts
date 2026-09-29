@@ -7,6 +7,8 @@ import { EnemyData } from '../../types';
 export class Ninja extends Enemy {
   static enemyId = 'ninja';
 
+  public attacksReceived: number;
+
   constructor(data: Partial<EnemyData> = {}) {
     super({
       enemyId: Ninja.enemyId,
@@ -21,14 +23,20 @@ export class Ninja extends Enemy {
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
     });
+    this.attacksReceived = data.attacksReceived ?? 0;
   }
 
   override takeDamage(amount: number): void {
-    if (Math.random() < 0.33) {
+    this.attacksReceived++;
+    if (this.attacksReceived % 3 === 0) {
         super.takeDamage(0)
     } else {
         super.takeDamage(amount)
     }
+  }
+
+  override toJSON(): EnemyData {
+    return { ...super.toJSON(), attacksReceived: this.attacksReceived };
   }
 }
 
