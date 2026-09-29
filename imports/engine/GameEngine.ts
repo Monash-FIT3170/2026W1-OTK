@@ -4,12 +4,14 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import './card/registerAllCards';
+import './powerups/RestartStagePowerup';
 import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { powerUpRegistry, pickRandomPowerUps } from './powerups';
 import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
+import { pickRandomPowerUps } from './powerups';
+import { powerupRegistry } from './powerups/PowerupRegistry';
 
 // A gap larger than this since the last server-side action means the player
 // closed the tab rather than sat idle - the battle screen heartbeats every 2s
@@ -121,7 +123,7 @@ export class GameEngine {
     this.clearTimerDebuff();
     this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
     if (this.result === 'stageCleared') {
-      this.powerUpChoices = pickRandomPowerUps(3).map((p) => p.powerUpId);
+      this.powerUpChoices = pickRandomPowerUps(3).map((p) => p.powerupId);
     }
   }
 
@@ -134,7 +136,7 @@ export class GameEngine {
     if (!this.powerUpChoices.includes(powerUpId)) {
       throw new Error(`"${powerUpId}" was not offered as a choice`);
     }
-    powerUpRegistry.create(powerUpId);
+    powerupRegistry.create(powerUpId);
     this.powerUps.push(powerUpId);
     this.powerUpChoices = [];
   }
@@ -150,11 +152,8 @@ export class GameEngine {
     if (powerUpId === undefined) {
       throw new Error(`No power-up at inventory index ${index}`);
     }
-    const powerUp = powerUpRegistry.create(powerUpId);
-    powerUp.apply(this);
-    if (powerUp.consumedOnUse) {
-      this.powerUps.splice(index, 1);
-    }
+    powerupRegistry.create(powerUpId).applyTo(this);
+    this.powerUps.splice(index, 1);
   }
 
   // Player confirmed "Next Enemy" on the stage-clear screen.
@@ -178,6 +177,20 @@ export class GameEngine {
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
+  }
+
+  applyPowerup(powerupId: string): void {
+    if (!this.powerUps.includes(powerupId)) {
+      throw new Error(`Powerup unavailable: ${powerupId}`);
+    }
+
+    const activePowerup = powerupRegistry.create(powerupId);
+    if (!activePowerup.isAvailable()) {
+      throw new Error(`Powerup unavailable: ${powerupId}`);
+    }
+
+    activePowerup.applyTo(this);
+    this.powerUps = this.powerUps.filter((id) => id !== powerupId);
   }
 
   // Fresh copies of the run's locked deck. Cloning through the registry is what
