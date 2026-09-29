@@ -1,20 +1,17 @@
 import type { GameEngine } from '../GameEngine';
-import { cardRegistry } from '../card/CardRegistry';
 import { Card } from '../card/Card';
-import { PowerUp, type powerUpDataInput } from './Powerup';
+import { PowerUp, powerUpData } from './PowerUp';
 import { powerUpRegistry } from './PowerupRegistry';
 
 export class OneMorePullPowerUp extends PowerUp {
-  constructor(data: powerUpDataInput = {}) {
+  constructor(data?: Partial<powerUpData>) {
     super({
       powerUpId: 'one-more-pull',
       name: 'One More Pull',
       description: 'Draws one card',
       icon: '',
-      tier: 'common',
-      maxStacks: 1,
-      currentStacks: 1,
       available: true,
+      consumedOnUse: false,
       ...data,
     });
   }

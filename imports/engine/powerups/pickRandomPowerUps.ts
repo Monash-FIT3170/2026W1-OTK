@@ -2,7 +2,7 @@ import './DealDamagePowerUp';
 import './RestartStagePowerup';
 import './DuplicateCardsPowerUp';
 import './StockUpPowerUp';
-import type { PowerUp } from './Powerup';
+import type { PowerUp } from './PowerUp';
 import { powerupRegistry } from './PowerupRegistry';
 
 // Picks `count` power-ups to offer on the stage-clear screen. Cycles through

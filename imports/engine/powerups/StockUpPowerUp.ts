@@ -1,20 +1,20 @@
 import type { GameEngine } from '../GameEngine';
 import { cardRegistry } from '../card/CardRegistry';
-import { PowerUp, type powerUpDataInput } from './Powerup';
+import { PowerUp, powerUpData } from './PowerUp';
 import { powerUpRegistry } from './PowerupRegistry';
 import { Blank } from '../card/Blank';
 
+const NUM_CARDS_ADDED = 5;
+
 export class StockUpPowerUp extends PowerUp {
-  constructor(data: powerUpDataInput = {}) {
+  constructor(data?: Partial<powerUpData>) {
     super({
       powerUpId: 'stock-up',
       name: 'Stock Up',
-      description: 'Add 5 copies of "Blank" to your deck.',
+      description: `Add ${NUM_CARDS_ADDED} copies of "Blank" to your deck.`,
       icon: '',
-      tier: 'common',
-      maxStacks: 1,
-      currentStacks: 1,
       available: true,
+      consumedOnUse: false,
       ...data,
     });
   }
@@ -24,7 +24,6 @@ export class StockUpPowerUp extends PowerUp {
       throw new Error('Stock Up powerup is unavailable');
     }
 
-    const NUM_CARDS_ADDED = 5;
     const CARD = new Blank();
 
     for (let i = 0; i < NUM_CARDS_ADDED; i++) {
@@ -33,6 +32,8 @@ export class StockUpPowerUp extends PowerUp {
         uniqueId: undefined,
       }));
     }
+
+    this.available = false;
   }
 }
 

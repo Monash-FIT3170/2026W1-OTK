@@ -1,21 +1,18 @@
 import type { GameEngine } from '../GameEngine';
-import { cardRegistry } from '../card/CardRegistry';
 import { Card } from '../card/Card';
-import { PowerUp, type powerUpDataInput } from './Powerup';
+import { PowerUp, powerUpData } from './PowerUp';
 import { powerUpRegistry } from './PowerupRegistry';
 
 export class GiantSlayerPowerUp extends PowerUp {
-  constructor(data: powerUpDataInput = {}) {
+  constructor(data?: Partial<powerUpData>) {
     super({
       powerUpId: 'giant-slayer',
       name: 'Giant Slayer',
       description:
         'Multiplies the highest damage dealing card based on % remaining health of enemy',
       icon: '',
-      tier: 'rare',
-      maxStacks: 1,
-      currentStacks: 1,
       available: true,
+      consumedOnUse: true,
       ...data,
     });
   }
