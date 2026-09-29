@@ -1,8 +1,8 @@
 // PowerUpRegistry.ts
 
-import type { PowerUp, powerupData } from './Powerup';
+import type { PowerUp, powerUpData } from './PowerUp';
 
-type PowerUpCtor = new (data?: Partial<powerupData>) => PowerUp;
+type PowerUpCtor = new (data?: Partial<powerUpData>) => PowerUp;
 
 export class PowerUpRegistry {
   // stores the power-up class constructor per powerUpId
@@ -19,7 +19,7 @@ export class PowerUpRegistry {
     this.registry.set(powerUpId, PowerUpClass);
   }
 
-  create(powerUpIdOrData: string | Partial<powerupData> | null | undefined): PowerUp {
+  create(powerUpIdOrData: string | Partial<powerUpData> | null | undefined): PowerUp {
     const id =
       typeof powerUpIdOrData === 'string'
         ? powerUpIdOrData

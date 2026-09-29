@@ -2,9 +2,11 @@ import './DealDamagePowerUp';
 import './RestartStagePowerup';
 import './DuplicateCardsPowerUp';
 import './StockUpPowerUp';
+import './GiantSlayerPowerUp';
+import './OneMorePullPowerUp';
 
-export { PowerUp } from './Powerup';
-export type { powerUpData, powerUpDataInput } from './Powerup';
+export { PowerUp } from './PowerUp';
+export type { powerUpData } from './PowerUp';
 export {
   PowerUpRegistry,
   PowerUpRegistry as PowerupRegistry,
@@ -12,6 +14,7 @@ export {
   powerupRegistry,
 } from './PowerupRegistry';
 export { pickRandomPowerUps } from './pickRandomPowerUps';
+
 export { DealDamagePowerUp } from './DealDamagePowerUp';
 export { RestartStagePowerup } from './RestartStagePowerup';
 export { DuplicateCardsPowerUp } from './DuplicateCardsPowerUp';
