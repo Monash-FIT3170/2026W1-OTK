@@ -26,6 +26,7 @@ export function BossRecapTable({ bossRecap = [], title = 'Result', compact = fal
 
   const totalTimeMs = bossRecap.reduce((sum, entry) => sum + entry.timeMs, 0);
   const totalCards = bossRecap.reduce((sum, entry) => sum + entry.cardsUsed, 0);
+  const totalPowerUps = bossRecap.reduce((sum, entry) => sum + entry.powerUpsUsed, 0);
 
   const colWidth = compact ? 'w-20' : 'w-36';
   const cellText = compact ? 'text-xs' : 'text-sm';
@@ -51,6 +52,9 @@ export function BossRecapTable({ bossRecap = [], title = 'Result', compact = fal
         <div className={`${colWidth} text-center text-slate-300 ${cellText} font-semibold`}>
           Cards Used
         </div>
+        <div className={`${colWidth} text-center text-slate-300 ${cellText} font-semibold`}>
+          Power Ups Used
+        </div>
       </div>
 
       {/* Boss rows */}
@@ -69,6 +73,11 @@ export function BossRecapTable({ bossRecap = [], title = 'Result', compact = fal
           <div className={`${colWidth} flex justify-center`}>
             <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {entry.cardsUsed}
+            </span>
+          </div>
+          <div className={`${colWidth} flex justify-center`}>
+            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+              {entry.powerUpsUsed}
             </span>
           </div>
         </div>
@@ -90,6 +99,11 @@ export function BossRecapTable({ bossRecap = [], title = 'Result', compact = fal
         <div className={`${colWidth} flex justify-center`}>
           <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
             {totalCards}
+          </span>
+        </div>
+        <div className={`${colWidth} flex justify-center`}>
+          <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+            {totalPowerUps}
           </span>
         </div>
       </div>

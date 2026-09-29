@@ -29,6 +29,7 @@ export class GameEngine {
   public bossRecap: BossRecapEntry[];
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
+  public powerUpsUsedThisStage: number;
   public lastActiveAt: number;
   public powerUps: PowerUp[];
   public powerUpChoices: string[];
@@ -46,6 +47,7 @@ export class GameEngine {
     this.bossRecap = userData.bossRecap ?? [];
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
+    this.powerUpsUsedThisStage = userData.powerUpsUsedThisStage ?? 0;
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
     const powerUpList = userData.powerUps ?? []
     this.powerUps = powerUpList.map((powerUp) => powerUpRegistry.create(powerUp)) ?? [];
@@ -107,6 +109,7 @@ export class GameEngine {
       stage: this.stage,
       timeMs: Date.now() - this.stageStartedAt,
       cardsUsed: this.cardsUsedThisStage,
+      powerUpsUsed: this.powerUpsUsedThisStage,
       result: bossResult,
     });
   }
@@ -161,6 +164,8 @@ export class GameEngine {
 
     powerUp.applyTo(this);
 
+    this.powerUpsUsedThisStage += 1;
+
     // isAvailable is set and managed by the powerUp itself
     if (powerUp.consumedOnUse ?? false) {
       this.removePowerUp(powerUp.powerUpId);
@@ -196,10 +201,11 @@ export class GameEngine {
     this.result = 'playing';
     this.stageStartedAt = Date.now();
     this.cardsUsedThisStage = 0;
+    this.powerUpsUsedThisStage = 0;
     this.powerUps.forEach(powerUp => {
       powerUp.available = true;
     });
-
+    
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
@@ -304,6 +310,7 @@ export class GameEngine {
       bossRecap: [],
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
+      powerUpsUsedThisStage: 0,
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
@@ -377,6 +384,7 @@ export class GameEngine {
       bossRecap: this.bossRecap,
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
+      powerUpsUsedThisStage: this.powerUpsUsedThisStage,
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
       powerUpChoices: this.powerUpChoices,
