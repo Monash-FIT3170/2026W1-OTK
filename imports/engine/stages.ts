@@ -16,6 +16,7 @@ import { Timekeeper } from './enemy/enemies/Timekeeper';
 import './enemy/enemies/IceCube';
 import { Dragon } from './enemy/enemies/Dragon';
 import { Ninja } from './enemy/enemies/Ninja';
+import { Merchant } from './enemy/enemies/Merchant';
 
 export type StageConfig = {
   stage: number;
@@ -25,12 +26,10 @@ export type StageConfig = {
 
 export const STAGES: StageConfig[] = [
   { stage: 1, BossClass: Goblin, scene: 'underpass-overlaid' },
-  // Each scene resolves to public/assets/environments/<scene>-background.png.
-  // Bosses still borrow sprites from other enemies - see the id aliases in
-  // ui/components/enemy/EnemyDisplay.jsx.
   { stage: 2, BossClass: Frostwarden, scene: 'otkclone_bg_temple' },
   { stage: 3, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
-  { stage: 4, BossClass: Ninja, scene: 'underpass-overlaid' },
+  { stage: 4, BossClass: Merchant, scene: 'underpass-overlaid' },
+  { stage: 5, BossClass: Ninja, scene: 'underpass-overlaid' },
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
