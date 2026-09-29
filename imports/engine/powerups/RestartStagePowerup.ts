@@ -9,7 +9,7 @@ export class RestartStagePowerup extends PowerUp {
     super({
       powerUpId: 'restart-stage',
       name: 'Restart Stage',
-      description: 'Reset the current stage and redraw your starting hand.',
+      description: 'Reset the current stage and redraw your starting hand. One use per run.',
       icon: '',
       available: true,
       consumedOnUse: true,

@@ -8,7 +8,7 @@ export class OneMorePullPowerUp extends PowerUp {
     super({
       powerUpId: 'one-more-pull',
       name: 'One More Pull',
-      description: 'Draws one card',
+      description: 'Draws one card.',
       icon: '',
       available: true,
       consumedOnUse: false,
