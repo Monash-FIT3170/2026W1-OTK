@@ -28,10 +28,10 @@ export type StageConfig = {
 export const STAGES: StageConfig[] = [
   { stage: 1, BossClass: Goblin, scene: 'underpass-overlaid' },
   { stage: 2, BossClass: Frostwarden, scene: 'otkclone_bg_temple' },
-  { stage: 3, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
-  { stage: 4, BossClass: Merchant, scene: 'underpass-overlaid' },
+  { stage: 3, BossClass: Undying, scene: 'underpass-overlaid' },
+  { stage: 4, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
   { stage: 5, BossClass: Ninja, scene: 'underpass-overlaid' },
-  { stage: 6, BossClass: Undying, scene: 'underpass-overlaid'}
+  { stage: 6, BossClass: Merchant, scene: 'underpass-overlaid' },
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
