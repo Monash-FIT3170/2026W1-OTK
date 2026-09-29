@@ -15,6 +15,7 @@ import { Timekeeper } from './enemy/enemies/Timekeeper';
 // reconstruct it - GameEngine used to carry this side-effect import.
 import './enemy/enemies/IceCube';
 import { Dragon } from './enemy/enemies/Dragon';
+import { Ninja } from './enemy/enemies/Ninja';
 
 export type StageConfig = {
   stage: number;
@@ -29,6 +30,7 @@ export const STAGES: StageConfig[] = [
   // ui/components/enemy/EnemyDisplay.jsx.
   { stage: 2, BossClass: Frostwarden, scene: 'otkclone_bg_temple' },
   { stage: 3, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
+  { stage: 4, BossClass: Ninja, scene: 'underpass-overlaid' },
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
