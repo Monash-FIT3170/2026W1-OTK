@@ -5,7 +5,7 @@ import { UserDataCollection } from '../api/user-data/collections/UserDataCollect
 import CardHand from './cards/CardHand';
 import { EnemyDisplay } from './components/enemy/EnemyDisplay';
 import { PlayerDisplay } from './components/PlayerDisplay';
-import { HealthBar } from './components/enemy/HealthBar';
+import { EnemyHealthBar } from './components/enemy/HealthBar';
 import { EndTurnButton } from './components/EndTurnButton';
 import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
@@ -274,11 +274,12 @@ export const App = () => {
         <p className="text-white text-2xl font-semibold mb-2 drop-shadow-lg">
           Stage {stage} / {FINAL_STAGE}
         </p>
-        <HealthBar
+        {/* <HealthBar
           current={enemy.currentHealth}
           max={enemy.health}
           name={enemy.name}
-        />
+        /> */}
+        <EnemyHealthBar enemy = {enemy}/>
       </div>
 
       <div className="absolute " style={{ left: 400, bottom: 540 }}>

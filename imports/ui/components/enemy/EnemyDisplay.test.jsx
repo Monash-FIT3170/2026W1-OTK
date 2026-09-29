@@ -24,31 +24,32 @@ if (Meteor.isClient) {
     });
 
     // 1. Initial entry state & timer transition to idle using scoped fake timers
-    it('renders entry sprite initially and switches to idle after timer', async () => {
-      render(
-        <EnemyDisplay
-          enemy={goblin}
-          isVisible={true}
-          _useAnimate={fakeUseAnimate}
-        />
-      );
+    it('renders entry sprite initially and switches to idle after timer', () => {
+      const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        render(
+          <EnemyDisplay
+            enemy={goblin}
+            isVisible={true}
+            _useAnimate={fakeUseAnimate}
+          />
+        );
 
-      const img = screen.getByRole('img');
-      
-      // Verify initial entry sprite
-      expect(img.getAttribute('src')).to.equal(
-        '/assets/sprites/enemies/goblin-entry-enemy.gif'
-      );
+        const img = screen.getByRole('img');
 
-      // Poll until the 1000ms setTimeout fires and updates the component state
-      await waitFor(
-        () => {
-          expect(img.getAttribute('src')).to.equal(
-            '/assets/sprites/enemies/goblin-enemy.gif'
-          );
-        },
-        { timeout: 1500 }
-      );
+        // Verify initial entry sprite
+        expect(img.getAttribute('src')).to.equal(
+          '/assets/sprites/enemies/goblin-entry-enemy.gif'
+        );
+
+        act(() => clock.tick(1500));
+
+        expect(img.getAttribute('src')).to.equal(
+          '/assets/sprites/enemies/goblin-enemy.gif'
+        );
+      } finally {
+        clock.restore();
+      }
     });
 
     // 2. Renders nothing when isVisible is false

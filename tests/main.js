@@ -14,6 +14,8 @@ import '../imports/api/enemy/index.js';
 import '../imports/api/enemy/enemy.tests.js';
 import '../imports/engine/debuffs/Freeze.tests.js';
 import '../imports/engine/debuffs/Timer.tests.js';
+import '../imports/engine/enemy/Undying.tests.ts';
+import '../imports/engine/debuffs/Inflation.tests.js';
 
 // GAME ENGINE / STAGE TESTS
 import '../imports/engine/GameEngine.tests.js';
