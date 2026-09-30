@@ -63,6 +63,7 @@ export type UserData = {
   stageStartedAt?: number; // Date.now() timestamp when current stage began
   cardsUsedThisStage?: number; // cards executed against the current boss
   powerUpsUsedThisStage?: number  // power ups applied against the current boss
+  debuffsFaced?: string[]  // debuffs faced in the current run
   lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
   powerUps?: powerUpData[]; // powerUpIds chosen so far, in pick order
   powerUpChoices?: string[]; // powerUpIds currently offered on the stage-clear screen
@@ -77,4 +78,3 @@ export type powerUpData = {
   available?: boolean;
   consumedOnUse?: boolean; // removed from the inventory after apply() runs
 };
-
