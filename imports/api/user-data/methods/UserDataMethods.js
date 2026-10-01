@@ -67,10 +67,8 @@ Meteor.methods({
       );
     }
     // Initialise a fresh game state for the new user
-    const gameState = GameEngine.newGame(userId);
     return UserDataCollection.insertAsync({
-      userId: userId,
-      gameState,
+      userId: userId
     });
   },
 
@@ -155,7 +153,7 @@ Meteor.methods({
    *
    * @throws {Meteor.Error} userData.notAuthorized
    * Thrown when an unauthenticated user attempts to update GameState
-   * 
+   *
    * @throws {Meteor.Error} userData.notFound
    * Thrown when no user data exists for the authenticated user
    *
@@ -190,5 +188,5 @@ Meteor.methods({
         },
       }
     );
-  }
+  },
 });
