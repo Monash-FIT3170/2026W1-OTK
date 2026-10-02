@@ -14,6 +14,9 @@ export function DraggableCard({
   isInSelectionMode = false,
   affordable = true,
   playable = true,
+  zIndex,
+  shiftX = 0,
+  onHoverChange,
 }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -59,9 +62,15 @@ export function DraggableCard({
   return (
     <motion.div
       initial={{ y: 80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      style={{ marginLeft, flexShrink: 0 }}
+      animate={{ x: shiftX, y: 0, opacity: 1 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 20,
+        // Hover fan-out slide
+        x: { type: 'spring', stiffness: 300, damping: 40 },
+      }}
+      style={{ marginLeft, flexShrink: 0, position: 'relative', zIndex }}
     >
       <motion.div
         ref={cardRef}
@@ -72,9 +81,13 @@ export function DraggableCard({
           touchAction: 'none',
           cursor: !playable ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
         }}
-        whileHover={!isDragging ? { scale: 1.1 } : { }}
+        whileHover={!isDragging ? { scale: 1.1 } : {}}
         onClick={onClick}
-        onHoverStart={() => !isDragging && soundManager.playCardHover()}
+        onHoverStart={() => {
+          if (!isDragging) soundManager.playCardHover();
+          onHoverChange?.(true);
+        }}
+        onHoverEnd={() => onHoverChange?.(false)}
         onPanStart={handlePanStart}
         onPan={handlePan}
         onPanEnd={handlePanEnd}

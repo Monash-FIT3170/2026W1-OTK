@@ -6,6 +6,7 @@ import Card from './Card';
 
 export default function CardHand({ cards, deckSize }) {
   const [selectedTargets, setSelectedTargets] = useState([]);
+  const [hoveredId, setHoveredId] = useState(null);
   const handRef = useRef(null);
 
   const { onPlay, pendingSelection, confirmSelection } = usePlayCard();
@@ -27,6 +28,12 @@ export default function CardHand({ cards, deckSize }) {
       : 0;
 
   const inSelectionMode = pendingSelection !== null;
+
+  // Hover fan-out: hovered card goes on top, others stack by distance from it,
+  // and neighbours slide away (only as far as the cards actually overlap).
+  const ordered = [...hand].reverse();
+  const hoveredIdx = ordered.findIndex((c) => c.uniqueId === hoveredId);
+  const spread = Math.min(-marginLeft, 60); // px; 0 when cards don't overlap
 
   const onDragPlay = (uniqueId) => {
     const card = hand.find((c) => c.uniqueId === uniqueId);
@@ -95,7 +102,9 @@ export default function CardHand({ cards, deckSize }) {
               />
             </div>
           )}
-          {[...hand].reverse().map((card, idx) => (
+          {ordered.map((card, idx) => {
+            const dist = hoveredIdx === -1 ? 0 : idx - hoveredIdx;
+            return (
             <DraggableCard
               key={card.uniqueId}
               cardProps={card}
@@ -106,8 +115,18 @@ export default function CardHand({ cards, deckSize }) {
               isInSelectionMode={inSelectionMode}
               affordable={card.currentCost <= deckSize}
               playable={!card.isFrozen}
+              zIndex={
+                hoveredIdx === -1 ? undefined : dist === 0 ? 100 : 50 - Math.abs(dist)
+              }
+              shiftX={dist === 0 ? 0 : (Math.sign(dist) * spread) / Math.abs(dist)}
+              onHoverChange={(isOver) =>
+                setHoveredId((cur) =>
+                  isOver ? card.uniqueId : cur === card.uniqueId ? null : cur
+                )
+              }
             />
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
