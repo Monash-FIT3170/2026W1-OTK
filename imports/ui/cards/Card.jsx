@@ -15,7 +15,7 @@ function Card({ cardProps, width = 300 }) {
   const descriptionFontSize =
     descriptionLength > 70 ? 19 : descriptionLength > 50 ? 23 : 27;
   return (
-    <div style={{ fontFamily: '"Micro 5", monospace' }} className="relative inline-block">
+    <div style={{ fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)' }} className="relative inline-block">
       <img
         draggable={false}
         src={`/assets/sprites/cards/${cardProps.cardId}.png`}

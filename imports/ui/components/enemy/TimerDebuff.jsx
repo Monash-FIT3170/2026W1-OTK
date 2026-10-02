@@ -30,7 +30,7 @@ export default function TimerDebuff({ enemy }) {
         <span
           className="absolute inset-0 flex items-center justify-center text-white text-6xl leading-none"
           style={{
-            fontFamily: '"Micro 5", monospace',
+            fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)',
             transform: 'translateY(-5%)',
           }}
         >

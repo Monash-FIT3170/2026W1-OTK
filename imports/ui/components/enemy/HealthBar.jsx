@@ -15,7 +15,7 @@ export const HealthBar = ({ current, max, name }) => {
       <div className="flex justify-center items-center mb-2">
         <span
           style={{
-            fontFamily: '"Micro 5", monospace',
+            fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)',
             textShadow: '1px 1px 0 #000',
           }}
           className="text-white text-4xl leading-none tracking-wide bg-black/60 px-4 py-1 border-2 border-black/80"
@@ -30,7 +30,7 @@ export const HealthBar = ({ current, max, name }) => {
         />
         <div className="absolute inset-0 flex items-center justify-center">
           <span
-            style={{ fontFamily: '"Micro 5", monospace', textShadow: '1px 1px 0 #000' }}
+            style={{ fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)', textShadow: '1px 1px 0 #000' }}
             className="text-white text-3xl leading-none"
           >
             {current}/{max}
