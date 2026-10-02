@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react';
 import { usePlayCard } from '../hooks/usePlayCard';
 import { SelectionPanel } from './SelectionPanel';
-import { DraggableCard } from './DraggableCard';
+import { HandLayout } from './HandLayout';
 import Card from './Card';
 
 export default function CardHand({ cards, deckSize }) {
   const [selectedTargets, setSelectedTargets] = useState([]);
-  const [hoveredId, setHoveredId] = useState(null);
   const handRef = useRef(null);
 
   const { onPlay, pendingSelection, confirmSelection } = usePlayCard();
@@ -19,21 +18,7 @@ export default function CardHand({ cards, deckSize }) {
     // Remove card being played during selection from hand display
   );
 
-  const numCards = hand.length;
-  const cardWidth = 300;
-  const containerWidth = 1410; // design canvas width (1920) minus padding
-  const marginLeft =
-    numCards > 1
-      ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
-      : 0;
-
   const inSelectionMode = pendingSelection !== null;
-
-  // Hover fan-out: hovered card goes on top, others stack by distance from it,
-  // and neighbours slide away (only as far as the cards actually overlap).
-  const ordered = [...hand].reverse();
-  const hoveredIdx = ordered.findIndex((c) => c.uniqueId === hoveredId);
-  const spread = Math.min(-marginLeft, 60); // px; 0 when cards don't overlap
 
   const onDragPlay = (uniqueId) => {
     const card = hand.find((c) => c.uniqueId === uniqueId);
@@ -102,31 +87,14 @@ export default function CardHand({ cards, deckSize }) {
               />
             </div>
           )}
-          {ordered.map((card, idx) => {
-            const dist = hoveredIdx === -1 ? 0 : idx - hoveredIdx;
-            return (
-            <DraggableCard
-              key={card.uniqueId}
-              cardProps={card}
-              marginLeft={idx !== 0 ? `${marginLeft}px` : '0px'}
-              onClick={() => onHandCardClick(card)}
-              handRef={handRef}
-              onPlay={onDragPlay}
-              isInSelectionMode={inSelectionMode}
-              affordable={card.currentCost <= deckSize}
-              playable={!card.isFrozen}
-              zIndex={
-                hoveredIdx === -1 ? undefined : dist === 0 ? 100 : 50 - Math.abs(dist)
-              }
-              shiftX={dist === 0 ? 0 : (Math.sign(dist) * spread) / Math.abs(dist)}
-              onHoverChange={(isOver) =>
-                setHoveredId((cur) =>
-                  isOver ? card.uniqueId : cur === card.uniqueId ? null : cur
-                )
-              }
-            />
-            );
-          })}
+          <HandLayout
+            cards={hand}
+            handRef={handRef}
+            onPlay={onDragPlay}
+            onCardClick={onHandCardClick}
+            isInSelectionMode={inSelectionMode}
+            isAffordable={(card) => card.currentCost <= deckSize}
+          />
         </div>
       </div>
     </div>
