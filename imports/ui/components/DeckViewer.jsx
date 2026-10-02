@@ -34,7 +34,7 @@ export function DeckViewer({ cards }) {
         type="button"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        style={{ fontFamily: '"Micro 5", monospace', width: '2ch', textAlign: 'center' }}
+        style={{ fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)', width: '2ch', textAlign: 'center' }}
         className="bg-transparent border-0 p-0 cursor-pointer text-white text-[5.5rem] pointer-events-auto"
         onClick={() => setIsOpen(true)}
       >

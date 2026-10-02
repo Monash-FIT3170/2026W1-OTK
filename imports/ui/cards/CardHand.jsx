@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { usePlayCard } from '../hooks/usePlayCard';
 import { SelectionPanel } from './SelectionPanel';
-import { DraggableCard } from './DraggableCard';
+import { HandLayout } from './HandLayout';
 import Card from './Card';
 
 export default function CardHand({ cards, deckSize }) {
@@ -17,14 +17,6 @@ export default function CardHand({ cards, deckSize }) {
       c.uniqueId !== pendingSelection?.uniqueCardId
     // Remove card being played during selection from hand display
   );
-
-  const numCards = hand.length;
-  const cardWidth = 300;
-  const containerWidth = 1410; // design canvas width (1920) minus padding
-  const marginLeft =
-    numCards > 1
-      ? -Math.max(0, (cardWidth * numCards - containerWidth) / (numCards - 1))
-      : 0;
 
   const inSelectionMode = pendingSelection !== null;
 
@@ -95,19 +87,14 @@ export default function CardHand({ cards, deckSize }) {
               />
             </div>
           )}
-          {[...hand].reverse().map((card, idx) => (
-            <DraggableCard
-              key={card.uniqueId}
-              cardProps={card}
-              marginLeft={idx !== 0 ? `${marginLeft}px` : '0px'}
-              onClick={() => onHandCardClick(card)}
-              handRef={handRef}
-              onPlay={onDragPlay}
-              isInSelectionMode={inSelectionMode}
-              affordable={card.currentCost <= deckSize}
-              playable={!card.isFrozen}
-            />
-          ))}
+          <HandLayout
+            cards={hand}
+            handRef={handRef}
+            onPlay={onDragPlay}
+            onCardClick={onHandCardClick}
+            isInSelectionMode={inSelectionMode}
+            isAffordable={(card) => card.currentCost <= deckSize}
+          />
         </div>
       </div>
     </div>

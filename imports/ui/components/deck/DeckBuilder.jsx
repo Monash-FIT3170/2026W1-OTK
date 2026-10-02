@@ -65,7 +65,7 @@ export function DeckBuilder({
   return (
     <div
       className="flex h-screen w-full flex-col bg-slate-950 text-white"
-      style={{ fontFamily: '"Micro 5", monospace' }}
+      style={{ fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)' }}
     >
       <div className="flex items-center justify-between border-b border-slate-700 px-8 py-5">
         <div>
