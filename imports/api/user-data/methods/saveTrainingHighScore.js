@@ -5,15 +5,17 @@ import { UserDataCollection } from '../collections/UserDataCollection';
 /**
  * Records the authenticated user's best single Training Mode session —
  * the most damage they've dealt to the Training Dummy before choosing to
- * exit. This is the minimum persistence needed to eventually rank players
- * on a "Most Damage Dealt" leaderboard; the leaderboard read side (a
- * publication sorted across all users' trainingHighScore) is a separate,
- * later piece of work.
+ * exit. Also keeps a denormalised copy of their username on the same
+ * document (see leaderboard.topTrainingScores in UserDataPublications.js),
+ * so the leaderboard can be served from a single UserDataCollection cursor
+ * instead of a reactive join against Meteor.users.
  *
  * Called once, when the player exits Training Mode, with that session's
  * final damage total. Only ever raises the stored score — a lower or
  * equal total for this session is silently ignored, so a player can never
- * lose their existing best by training again and doing worse.
+ * lose their existing best by training again and doing worse. The
+ * username is kept in sync on every call regardless (cheap, and covers
+ * both a changed username and a score saved before this field existed).
  *
  * @method userData.saveTrainingHighScore
  *
@@ -54,15 +56,29 @@ Meteor.methods({
       );
     }
 
+    const user = await Meteor.users.findOneAsync(
+      { _id: this.userId },
+      { fields: { username: 1 } }
+    );
+    const username = user?.username ?? 'Player';
+
     const currentBest = existingUserData.trainingHighScore ?? 0;
     if (sessionDamage <= currentBest) {
-      // Not a new personal best - nothing to update.
+      // Not a new personal best, but keep the leaderboard-facing username
+      // field current (it may not exist yet on an older document, or the
+      // player may have changed their username since it was last set).
+      if (existingUserData.username !== username) {
+        await UserDataCollection.updateAsync(
+          { userId: this.userId },
+          { $set: { username } }
+        );
+      }
       return currentBest;
     }
 
     await UserDataCollection.updateAsync(
       { userId: this.userId },
-      { $set: { trainingHighScore: sessionDamage } }
+      { $set: { trainingHighScore: sessionDamage, username } }
     );
 
     return sessionDamage;
