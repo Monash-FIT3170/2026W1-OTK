@@ -7,6 +7,7 @@ export const LandingPage = ({
   onStart,
   onOpenTutorial,
   onOpenTrainingMode,
+  onOpenLeaderboard,
   onEditDeck,
 }) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
@@ -115,6 +116,13 @@ export const LandingPage = ({
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
             >
               Training Mode
+            </button>
+
+            <button
+              onClick={onOpenLeaderboard}
+              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+            >
+              Leaderboard
             </button>
 
             <button
