@@ -23,6 +23,7 @@ export class Merchant extends Enemy {
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
+      damageTakenCount: data.damageTakenCount,
     });
 
     // Only fresh spawns receive their default debuffs. Saved enemies restore

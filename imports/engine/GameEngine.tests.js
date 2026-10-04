@@ -113,8 +113,8 @@ describe('GameEngine - multi-stage run', function () {
 
     assert.equal(engine.stage, 5);
     assert.equal(engine.enemy.enemyId, 'ninja');
-    assert.deepEqual(engine.enemy.debuffs, []);
-    assert.equal(engine.enemy.attacksReceived, 0);
+    assert.deepEqual(engine.enemy.debuffs, ['evasion']);
+    assert.equal(engine.enemy.damageTakenCount, 0);
   });
 
   it('advances to the stage 6 inflation boss', function () {

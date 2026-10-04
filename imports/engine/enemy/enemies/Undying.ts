@@ -26,6 +26,7 @@ export class Undying extends Enemy {
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
+      damageTakenCount: data.damageTakenCount,
     });
   }
   get shieldTreshold(): number {

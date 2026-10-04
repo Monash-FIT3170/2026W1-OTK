@@ -15,6 +15,7 @@ export class IceCube extends Enemy {
       debuffs?: string[];
       entryAnimation?: string;
       hitAnimation?: string;
+      damageTakenCount?: number;
     } = {}
   ) {
     const health = data.health ?? 120;
@@ -26,6 +27,7 @@ export class IceCube extends Enemy {
       debuffs: data.debuffs ?? [],
       entryAnimation: data.entryAnimation ?? 'spin',
       hitAnimation: data.hitAnimation ?? 'squish',
+      damageTakenCount: data.damageTakenCount,
     });
 
     // Freeze debuff is added to all ice cubes

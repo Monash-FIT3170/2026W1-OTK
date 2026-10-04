@@ -29,6 +29,8 @@ export type EnemyData = {
   timerDebuffDeadline?: number;
   timerDebuffInterval?: number;
   timerDebuffTickAmount?: number;
+  damageTakenCount?: number;
+  // Legacy Ninja save field; migrated to damageTakenCount.
   attacksReceived?: number;
 };
 
