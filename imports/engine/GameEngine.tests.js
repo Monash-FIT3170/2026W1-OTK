@@ -85,7 +85,7 @@ describe('GameEngine - multi-stage run', function () {
 
     assert.equal(engine.stage, 3);
     assert.equal(engine.enemy.enemyId, 'undying');
-    assert.deepEqual(engine.enemy.debuffs, []);
+    assert.deepEqual(engine.enemy.debuffs, ['shield']);
     assert.equal(engine.enemy.shieldRemaining, 3);
   });
 

@@ -23,6 +23,7 @@ export class Goblin extends Enemy {
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
       damageTakenCount: data.damageTakenCount,
+      shieldLayers: data.shieldLayers,
     });
 
     // The stage 1 boss is deliberately debuff-free - it is the run's tutorial

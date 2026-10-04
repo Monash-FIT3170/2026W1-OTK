@@ -17,6 +17,7 @@ export abstract class Enemy {
   public timerDebuffInterval: number;
   public timerDebuffTickAmount: number;
   public damageTakenCount: number;
+  public shieldLayers: number;
 
   constructor(data: {
     enemyId: string;
@@ -31,6 +32,7 @@ export abstract class Enemy {
     timerDebuffInterval?: number;
     timerDebuffTickAmount?: number;
     damageTakenCount?: number;
+    shieldLayers?: number;
   }) {
     this.enemyId = data.enemyId;
     this.name = data.name;
@@ -44,6 +46,7 @@ export abstract class Enemy {
     this.timerDebuffInterval = data.timerDebuffInterval ?? 5000;
     this.timerDebuffTickAmount = data.timerDebuffTickAmount ?? 5;
     this.damageTakenCount = data.damageTakenCount ?? 0;
+    this.shieldLayers = data.shieldLayers ?? 0;
   }
 
   takeDamage(amount: number): void {
@@ -70,6 +73,7 @@ export abstract class Enemy {
       timerDebuffInterval: this.timerDebuffInterval,
       timerDebuffTickAmount: this.timerDebuffTickAmount,
       damageTakenCount: this.damageTakenCount,
+      shieldLayers: this.shieldLayers,
     };
   }
 }

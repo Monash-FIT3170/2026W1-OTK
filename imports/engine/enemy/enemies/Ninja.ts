@@ -22,6 +22,7 @@ export class Ninja extends Enemy {
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
       damageTakenCount: data.damageTakenCount ?? data.attacksReceived,
+      shieldLayers: data.shieldLayers,
     });
 
     // Migrate existing saves, which stored attacksReceived without a debuff ID.

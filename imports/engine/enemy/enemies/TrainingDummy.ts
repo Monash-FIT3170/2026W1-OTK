@@ -23,6 +23,7 @@ export class TrainingDummy extends Enemy {
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
       damageTakenCount: data.damageTakenCount,
+      shieldLayers: data.shieldLayers,
     });
   }
 

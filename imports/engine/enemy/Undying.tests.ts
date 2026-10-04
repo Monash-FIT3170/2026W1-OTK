@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { Undying } from './enemies/Undying';
+import { Shield } from '../debuffs/Shield';
 
 const BASE = Undying.baseHealth; // 140
 const LAYERS = Undying.shieldLayers; // 3
@@ -11,15 +12,33 @@ describe('Undying', () => {
       expect(u.health).to.equal(BASE + LAYERS);
       expect(u.currentHealth).to.equal(BASE + LAYERS);
       expect(u.shieldRemaining).to.equal(LAYERS);
+      expect(u.debuffs).to.include('shield');
     });
 
     it('restores shield state from saved health', () => {
       const u = new Undying({ currentHealth: BASE + 1 });
       expect(u.shieldRemaining).to.equal(1);
     });
+
+    it('migrates saved enemies to the Shield debuff', () => {
+      const saved = new Undying({
+        currentHealth: BASE + 1,
+        debuffs: [],
+      }).toJSON();
+      const restored = new Undying(saved);
+
+      expect(restored.debuffs).to.deep.equal(['shield']);
+      expect(restored.shieldRemaining).to.equal(1);
+    });
   });
 
   describe('while shielded', () => {
+    it('uses the reusable Shield debuff', () => {
+      const u = new Undying();
+
+      expect(new Shield().modifyIncomingDamage(u, 100)).to.equal(1);
+    });
+
     it('removes exactly 1 per hit regardless of damage', () => {
       const u = new Undying();
       u.takeDamage(100);
