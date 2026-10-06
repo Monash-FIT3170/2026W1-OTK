@@ -23,7 +23,7 @@ import { TrainingModeScreen } from './components/TrainingModeScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
-import { FINAL_STAGE } from '../engine/stages';
+import { getFinalStageFromDifficulty } from '../engine/stages';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -255,6 +255,7 @@ export const App = () => {
     return (
       <StageClearScreen
         stage={stage}
+        difficulty={gameState.difficulty}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
         powerUpChoices={gameState.powerUpChoices}
@@ -268,6 +269,7 @@ export const App = () => {
     return (
       <ResultScreen
         result={delayedResult}
+        difficulty={gameState.difficulty}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
         onBackToMenu={() => setShowLanding(true)}
@@ -291,7 +293,7 @@ export const App = () => {
 
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
         <p className="text-white text-2xl font-semibold mb-2 drop-shadow-lg">
-          Stage {stage} / {FINAL_STAGE}
+          Stage {stage} / {getFinalStageFromDifficulty(gameState.difficulty)}
         </p>
         {/* <HealthBar
           current={enemy.currentHealth}

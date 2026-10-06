@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { BossRecapTable } from './BossRecapTable';
 import { PowerUpChoices } from './powerups/PowerUpChoices';
-import { FINAL_STAGE } from '../../engine/stages';
+import { getFinalStageFromDifficulty } from '../../engine/stages';
 
 /**
  * Shown between bosses, once a stage is cleared but the run is not over.
@@ -21,6 +21,7 @@ import { FINAL_STAGE } from '../../engine/stages';
  */
 export function StageClearScreen({
   stage,
+  difficulty,
   enemyName,
   bossRecap = [],
   powerUpChoices = [],
@@ -74,7 +75,7 @@ export function StageClearScreen({
           Stage {stage} Cleared!
         </h1>
         <p className="text-slate-300 text-base mt-1">
-          You defeated {enemyName}. {FINAL_STAGE - stage} to go.
+          You defeated {enemyName}. {getFinalStageFromDifficulty(difficulty) - stage} to go.
         </p>
       </div>
 

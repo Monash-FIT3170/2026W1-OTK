@@ -1,10 +1,11 @@
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
 import { BossRecapTable } from './BossRecapTable';
-import { FINAL_STAGE } from '../../engine/stages';
+import { getFinalStageFromDifficulty } from '../../engine/stages';
 
 export function ResultScreen({
   result,
+  difficulty,
   enemyName,
   bossRecap = [],
   onBackToMenu,
@@ -17,7 +18,7 @@ export function ResultScreen({
         <>
           <h1 className="text-5xl font-bold text-yellow-400">Victory!</h1>
           <p className="text-slate-300 text-lg">
-            You cleared all {FINAL_STAGE} stages and defeated {enemyName}!
+            You cleared all {getFinalStageFromDifficulty(difficulty)} stages and defeated {enemyName}!
           </p>
         </>
       ) : (
