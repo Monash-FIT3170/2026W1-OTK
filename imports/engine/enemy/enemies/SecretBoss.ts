@@ -1,22 +1,23 @@
-// Goblin.ts
-// Stage 1 boss. No debuff.
+// SecretBoss.ts
+// Stage 7 boss. Carries all debuffs of enemies faced beforehand in the run
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
 import { EnemyData } from '../../types';
+import { debuffRegistry } from '../../debuffs';
 
-export class Goblin extends Enemy {
-  static enemyId = 'goblin';
+export class SecretBoss extends Enemy {
+  static enemyId = 'secretboss';
 
   constructor(data: Partial<EnemyData> = {}) {
-    const health = data.health ?? 100;
+    const health = data.health ?? 200;
 
     super({
-      enemyId: Goblin.enemyId,
-      name: data.name ?? 'Goblin',
+      enemyId: SecretBoss.enemyId,
+      name: data.name ?? 'Reflection of You',
       health,
       currentHealth: data.currentHealth ?? health,
-      debuffs: data.debuffs ?? [],
+      debuffs: data.debuffs ?? [],      // Need to pass debuffs to this enemy, as it may vary
       entryAnimation: data.entryAnimation ?? 'drop',
       hitAnimation: data.hitAnimation ?? 'squish',
       timerDebuffActive: data.timerDebuffActive,
@@ -27,9 +28,10 @@ export class Goblin extends Enemy {
       shieldLayers: data.shieldLayers,
     });
 
-    // The stage 1 boss is deliberately debuff-free - it is the run's tutorial
-    // fight. Debuffs are a per-enemy property; see Frostwarden and Timekeeper.
+    (data.debuffs ?? []).forEach(debuff => {
+      debuffRegistry.create(debuff).applyTo(this);
+    });
   }
 }
 
-enemyRegistry.register(Goblin.enemyId, Goblin);
+enemyRegistry.register(SecretBoss.enemyId, SecretBoss);

@@ -1,8 +1,14 @@
 import { expect } from 'chai';
+import { Enemy } from './Enemy';
 import { Undying } from './enemies/Undying';
+import { Shield } from '../debuffs/Shield';
 
-const BASE = Undying.baseHealth; // 140
-const LAYERS = Undying.shieldLayers; // 3
+const LAYERS = Shield.SHIELD_LAYERS; // 3
+const BASE = new Undying().health - LAYERS; // 140
+
+function shieldsRemaining(enemy: Enemy) {
+  return Shield.getRemainingLayers(enemy);
+}
 
 describe('Undying', () => {
   describe('spawning', () => {
@@ -10,35 +16,62 @@ describe('Undying', () => {
       const u = new Undying();
       expect(u.health).to.equal(BASE + LAYERS);
       expect(u.currentHealth).to.equal(BASE + LAYERS);
-      expect(u.shieldRemaining).to.equal(LAYERS);
+      expect(shieldsRemaining(u)).to.equal(LAYERS);
+      expect(u.debuffs).to.include('shield');
     });
 
     it('restores shield state from saved health', () => {
-      const u = new Undying({ currentHealth: BASE + 1 });
-      expect(u.shieldRemaining).to.equal(1);
+      const u = new Undying({
+        health: BASE + LAYERS,
+        currentHealth: BASE + 1,
+        shieldLayers: LAYERS
+      });
+      expect(shieldsRemaining(u)).to.equal(1);
+    });
+
+    it('migrates saved enemies to the Shield debuff', () => {
+      const saved = new Undying({
+        health: BASE + LAYERS, 
+        currentHealth: BASE + 1,
+        debuffs: [],
+        shieldLayers: LAYERS 
+      }).toJSON();
+      const restored = new Undying(saved);
+
+      expect(restored.debuffs).to.deep.equal(['shield']);
+      expect(shieldsRemaining(restored)).to.equal(1);
     });
   });
 
   describe('while shielded', () => {
+    it('uses the reusable Shield debuff', () => {
+      const u = new Undying();
+
+      expect(new Shield().modifyIncomingDamage(u, 100)).to.equal(1);
+    });
+
     it('removes exactly 1 per hit regardless of damage', () => {
       const u = new Undying();
       u.takeDamage(100);
       expect(u.currentHealth).to.equal(BASE + LAYERS - 1);
-      expect(u.shieldRemaining).to.equal(LAYERS - 1);
+      expect(shieldsRemaining(u)).to.equal(LAYERS - 1);
     });
 
     it('does not carry overflow damage into real health', () => {
-      const u = new Undying({ currentHealth: BASE + 1 }); // last layer
+      const u = new Undying({
+        health: BASE + LAYERS, 
+        currentHealth: BASE + 1,
+        shieldLayers: LAYERS  }); // last layer
       u.takeDamage(50);
       expect(u.currentHealth).to.equal(BASE);
-      expect(u.shieldRemaining).to.equal(0);
+      expect(shieldsRemaining(u)).to.equal(0);
     });
 
     it('ignores zero and negative damage', () => {
       const u = new Undying();
       u.takeDamage(0);
       u.takeDamage(-5);
-      expect(u.shieldRemaining).to.equal(LAYERS);
+      expect(shieldsRemaining(u)).to.equal(LAYERS);
     });
   });
 
@@ -46,7 +79,7 @@ describe('Undying', () => {
     it('takes full damage normally', () => {
       const u = new Undying();
       for (let i = 0; i < LAYERS; i++) u.takeDamage(1);
-      expect(u.shieldRemaining).to.equal(0);
+      expect(shieldsRemaining(u)).to.equal(0);
 
       u.takeDamage(30);
       expect(u.currentHealth).to.equal(BASE - 30);

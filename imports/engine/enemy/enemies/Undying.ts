@@ -1,18 +1,16 @@
 // Undying.ts
-// Stage ?? boss, basically has a shield that negates all damage.
+// Stage 3 boss. Has a shield that negates all damage.
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
 import { EnemyData } from '../../types';
+import { debuffRegistry, Shield } from '../../debuffs';
 
 export class Undying extends Enemy {
   static enemyId = 'undying';
-  static shieldLayers = 3; //player should use 3 low-damage damaging cards to clear shield
-  static baseHealth = 140;
-
 
   constructor(data: Partial<EnemyData> = {}) {
-    const health = data.health ?? Undying.baseHealth+Undying.shieldLayers;
+    const health = data.health ?? 140;
 
     super({
       enemyId: Undying.enemyId,
@@ -26,22 +24,12 @@ export class Undying extends Enemy {
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
+      damageTakenCount: data.damageTakenCount,
+      shieldLayers: data.shieldLayers,
     });
-  }
-  get shieldTreshold(): number {
-    return this.health-Undying.shieldLayers;
-  }
-  get shieldRemaining(): number {
-    return Math.max(0, this.currentHealth-this.shieldTreshold);
-  }
 
-  override takeDamage(amount: number): void {
-    if (amount <= 0) return;
-    if (this.shieldRemaining > 0){ //the shield clearing strategy
-      super.takeDamage(1);
-      return;
-    }
-    super.takeDamage(amount);
+    // Undying saves created before Shield was introduced have no debuff ID.
+    debuffRegistry.create('shield').applyTo(this);
   }
 }
 

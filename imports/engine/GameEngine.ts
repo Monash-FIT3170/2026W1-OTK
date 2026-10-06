@@ -9,7 +9,7 @@ import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, cardData, powerUpData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
+import { FIRST_STAGE, FINAL_STAGE, SECRET_BOSS_STAGE, getStageConfig } from './stages';
 import { pickRandomPowerUps, PowerUp } from './powerups';
 import { powerUpRegistry, powerupRegistry } from './powerups/PowerupRegistry';
 
@@ -30,6 +30,7 @@ export class GameEngine {
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
   public powerUpsUsedThisStage: number;
+  public debuffsFaced: string[];
   public lastActiveAt: number;
   public powerUps: PowerUp[];
   public powerUpChoices: string[];
@@ -48,6 +49,7 @@ export class GameEngine {
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
     this.powerUpsUsedThisStage = userData.powerUpsUsedThisStage ?? 0;
+    this.debuffsFaced = userData.debuffsFaced ?? [],
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
     const powerUpList = userData.powerUps ?? []
     this.powerUps = powerUpList.map((powerUp) => powerUpRegistry.create(powerUp)) ?? [];
@@ -125,8 +127,12 @@ export class GameEngine {
     if (this.result !== 'playing') return;
     this.finalizeBossRecap('win');
     this.clearTimerDebuff();
-    this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
-    if (this.result === 'stageCleared') {
+    
+    const continueToFinalBoss = this.stage === (SECRET_BOSS_STAGE - 1) && this.shouldContinueToSecretBoss();
+    this.result = this.stage >= FINAL_STAGE && !continueToFinalBoss ? 'win' : 'stageCleared';
+
+    // Don't provide power ups when progressing to the secret boss
+    if (this.result === 'stageCleared' && !continueToFinalBoss) {
       this.powerUpChoices = pickRandomPowerUps(3).map((p) => p.powerUpId);
     }
   }
@@ -195,7 +201,13 @@ export class GameEngine {
 
     this.stage += 1;
     const { BossClass } = getStageConfig(this.stage);
-    this.enemy = new BossClass();
+    if (this.stage !== SECRET_BOSS_STAGE) {
+      this.enemy = new BossClass();
+      
+      this.debuffsFaced = [...new Set([...this.debuffsFaced, ...this.enemy.debuffs])];
+    } else {
+      this.enemy = new BossClass({ debuffs: this.debuffsFaced });
+    }
     this.deck = this.freshDeckFromBase();
     this.hand = [];
     this.result = 'playing';
@@ -209,6 +221,16 @@ export class GameEngine {
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
+  }
+
+  /**
+   * Function to determine if the user should continue to the secret boss
+   * @returns Boolean value
+   */
+  shouldContinueToSecretBoss(): boolean {
+    const powerUpsUsedOverall = this.bossRecap.reduce((sum, recap) => sum + recap.powerUpsUsed, 0);
+
+    return powerUpsUsedOverall === 0;
   }
 
   // Fresh copies of the run's locked deck. Cloning through the registry is what
@@ -311,6 +333,7 @@ export class GameEngine {
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
       powerUpsUsedThisStage: 0,
+      debuffsFaced: [],
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
@@ -385,6 +408,7 @@ export class GameEngine {
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
       powerUpsUsedThisStage: this.powerUpsUsedThisStage,
+      debuffsFaced: this.debuffsFaced,
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
       powerUpChoices: this.powerUpChoices,

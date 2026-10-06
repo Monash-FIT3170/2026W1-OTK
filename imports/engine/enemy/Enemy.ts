@@ -1,6 +1,7 @@
 // Enemy.ts
 
 import { EnemyData } from '../types';
+import { debuffRegistry } from '../debuffs';
 
 export abstract class Enemy {
 
@@ -15,6 +16,8 @@ export abstract class Enemy {
   public timerDebuffDeadline: number | null;
   public timerDebuffInterval: number;
   public timerDebuffTickAmount: number;
+  public damageTakenCount: number;
+  public shieldLayers: number;
 
   constructor(data: {
     enemyId: string;
@@ -28,6 +31,8 @@ export abstract class Enemy {
     timerDebuffDeadline?: number;
     timerDebuffInterval?: number;
     timerDebuffTickAmount?: number;
+    damageTakenCount?: number;
+    shieldLayers?: number;
   }) {
     this.enemyId = data.enemyId;
     this.name = data.name;
@@ -40,10 +45,18 @@ export abstract class Enemy {
     this.timerDebuffDeadline = data.timerDebuffDeadline ?? null;
     this.timerDebuffInterval = data.timerDebuffInterval ?? 5000;
     this.timerDebuffTickAmount = data.timerDebuffTickAmount ?? 5;
+    this.damageTakenCount = data.damageTakenCount ?? 0;
+    this.shieldLayers = data.shieldLayers ?? 0;
   }
 
   takeDamage(amount: number): void {
-    this.currentHealth = Math.max(0, this.currentHealth - amount);
+    this.damageTakenCount++;
+    const modifiedAmount = this.debuffs.reduce(
+      (damage, debuffId) =>
+        debuffRegistry.create(debuffId).modifyIncomingDamage(this, damage),
+      amount
+    );
+    this.currentHealth = Math.max(0, this.currentHealth - modifiedAmount);
   }
 
   toJSON(): EnemyData {
@@ -59,6 +72,8 @@ export abstract class Enemy {
       timerDebuffDeadline: this.timerDebuffDeadline ?? undefined,
       timerDebuffInterval: this.timerDebuffInterval,
       timerDebuffTickAmount: this.timerDebuffTickAmount,
+      damageTakenCount: this.damageTakenCount,
+      shieldLayers: this.shieldLayers,
     };
   }
 }
