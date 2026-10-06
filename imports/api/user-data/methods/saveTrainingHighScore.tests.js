@@ -87,5 +87,37 @@ if (Meteor.isServer) {
         assert.equal(error.error, 'userData.notAuthorized');
       }
     });
+
+    // The leaderboard (see UserDataPublications.js) reads username straight
+    // off the UserDataCollection document rather than joining against
+    // Meteor.users, so this method is responsible for keeping that copy
+    // current.
+    it('stores the player\'s username alongside a new high score', async function () {
+      await Meteor.server.method_handlers['userData.saveTrainingHighScore'].apply(
+        { userId },
+        [120]
+      );
+
+      const userData = await UserDataCollection.findOneAsync({ userId });
+      assert.equal(userData.username, 'traininghighscoretestuser');
+    });
+
+    it('keeps the stored username in sync even when the score is not a new best', async function () {
+      await UserDataCollection.updateAsync(
+        { userId },
+        { $set: { trainingHighScore: 500, username: 'anOldUsername' } }
+      );
+
+      await Meteor.server.method_handlers['userData.saveTrainingHighScore'].apply(
+        { userId },
+        [50]
+      );
+
+      const userData = await UserDataCollection.findOneAsync({ userId });
+      // Score is untouched (50 < 500), but the username catches up to the
+      // account's current one.
+      assert.equal(userData.trainingHighScore, 500);
+      assert.equal(userData.username, 'traininghighscoretestuser');
+    });
   });
 }

@@ -47,3 +47,7 @@ import '../imports/api/auth/methods/markTutorialSeen.tests.js';
 // TRAINING TESTS
 import '../imports/ui/hooks/useTrainingEngine.tests.js';
 import '../imports/api/user-data/methods/saveTrainingHighScore.tests.js';
+
+// LEADERBOARD TESTS
+import '../imports/api/user-data/methods/saveTrainingHighScore.tests.js';
+import '../imports/api/user-data/methods/getMyTrainingRank.tests.js';
