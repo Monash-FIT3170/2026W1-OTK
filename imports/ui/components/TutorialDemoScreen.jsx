@@ -215,8 +215,9 @@ export const TutorialDemoScreen = ({
       </div>
 
       <div
-        className="absolute flex items-end pointer-events-none"
-        style={{ left: 87, right: 140, bottom: 163 }}
+        className="absolute pointer-events-none"
+        data-tutorial-target="deck"
+        style={{ left: 54, bottom: 162 }}
       >
         {/* Reuses the real DeckViewer component — it's purely local/
             presentational (no Meteor calls), so it's safe here and gives
@@ -226,7 +227,6 @@ export const TutorialDemoScreen = ({
             wide positioning container around it. */}
         <div
           className="inline-block pointer-events-auto"
-          data-tutorial-target="deck"
         >
           <DeckViewer cards={deck} />
         </div>

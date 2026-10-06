@@ -12,7 +12,7 @@ export class Transcode extends Card {
     super({
       cardId: 'transcode',
       name: 'Transcode',
-      description: 'Return 3 card from hand to deck.',
+      description: 'Return 3 cards from hand to deck.',
       baseCost: 4,
       currentCost: 4,
       cardAmountToSelect: { min: 3, max: 3 },
