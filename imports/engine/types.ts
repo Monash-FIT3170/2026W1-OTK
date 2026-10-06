@@ -45,6 +45,7 @@ export type BossRecapEntry = {
   stage: number;
   timeMs: number; // wall-clock milliseconds spent on this boss
   cardsUsed: number; // number of cards executed against this boss
+  powerUpsUsed: number; // number of power ups used against this boss
   result: 'win' | 'loss';
 };
 
@@ -61,6 +62,7 @@ export type UserData = {
   bossRecap?: BossRecapEntry[]; // accumulated recap entries across stages
   stageStartedAt?: number; // Date.now() timestamp when current stage began
   cardsUsedThisStage?: number; // cards executed against the current boss
+  powerUpsUsedThisStage?: number  // power ups applied against the current boss
   lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
   powerUps?: powerUpData[]; // powerUpIds chosen so far, in pick order
   powerUpChoices?: string[]; // powerUpIds currently offered on the stage-clear screen
