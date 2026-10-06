@@ -5,6 +5,7 @@ import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { expect } from 'chai';
 import { EnemyDisplay } from './EnemyDisplay';
 import { Goblin } from '/imports/engine/enemy/enemies/Goblin';
+import { Frostwarden } from '/imports/engine/enemy/enemies/FrostWarden';
 
 let goblin;
 let animateSpy;
@@ -148,14 +149,7 @@ if (Meteor.isClient) {
 
     // 6. Custom sizing and horizontal offset classes matching component definitions
     it('applies custom size and offset classes for Frostwarden/Dragon', () => {
-      const frostwarden = {
-        enemyId: 'Frostwarden',
-        name: 'Frostwarden',
-        currentHealth: 100,
-        health: 100,
-        entryAnimation: 'fade',
-        hitAnimation: 'knockback',
-      };
+      const frostwarden = new Frostwarden();
 
       render(
         <EnemyDisplay

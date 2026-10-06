@@ -3,8 +3,8 @@ import { Enemy } from './Enemy';
 import { Undying } from './enemies/Undying';
 import { Shield } from '../debuffs/Shield';
 
-const BASE = Undying.baseHealth; // 140
-const LAYERS = Undying.shieldLayers; // 3
+const LAYERS = Shield.SHIELD_LAYERS; // 3
+const BASE = new Undying().health - LAYERS; // 140
 
 function shieldsRemaining(enemy: Enemy) {
   return Shield.getRemainingLayers(enemy);
@@ -21,14 +21,20 @@ describe('Undying', () => {
     });
 
     it('restores shield state from saved health', () => {
-      const u = new Undying({ currentHealth: BASE + 1 });
+      const u = new Undying({
+        health: BASE + LAYERS,
+        currentHealth: BASE + 1,
+        shieldLayers: LAYERS
+      });
       expect(shieldsRemaining(u)).to.equal(1);
     });
 
     it('migrates saved enemies to the Shield debuff', () => {
       const saved = new Undying({
+        health: BASE + LAYERS, 
         currentHealth: BASE + 1,
         debuffs: [],
+        shieldLayers: LAYERS 
       }).toJSON();
       const restored = new Undying(saved);
 
@@ -52,7 +58,10 @@ describe('Undying', () => {
     });
 
     it('does not carry overflow damage into real health', () => {
-      const u = new Undying({ currentHealth: BASE + 1 }); // last layer
+      const u = new Undying({
+        health: BASE + LAYERS, 
+        currentHealth: BASE + 1,
+        shieldLayers: LAYERS  }); // last layer
       u.takeDamage(50);
       expect(u.currentHealth).to.equal(BASE);
       expect(shieldsRemaining(u)).to.equal(0);

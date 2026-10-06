@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import { GameEngine } from './GameEngine';
-import { FINAL_STAGE, STAGES, getStageConfig } from './stages';
+import { FINAL_STAGE, SECRET_BOSS_STAGE, STAGES, getStageConfig } from './stages';
+import { Shield } from './debuffs';
 
 const USER_ID = 'stage-test-user';
 
@@ -86,7 +87,7 @@ describe('GameEngine - multi-stage run', function () {
     assert.equal(engine.stage, 3);
     assert.equal(engine.enemy.enemyId, 'undying');
     assert.deepEqual(engine.enemy.debuffs, ['shield']);
-    assert.equal(engine.enemy.shieldRemaining, 3);
+    assert.equal(Shield.getRemainingLayers(engine.enemy), 3);
   });
 
   it('advances to the stage 4 timer boss', function () {
@@ -127,10 +128,11 @@ describe('GameEngine - multi-stage run', function () {
     assert.include(engine.enemy.debuffs, 'inflation');
   });
 
-  it('ends the run in a win once the final stage is cleared', function () {
+  it('ends the run in a win once the final stage is cleared and not advancing to the secret boss', function () {
     const engine = freshEngine();
     for (let stage = 1; stage < FINAL_STAGE; stage++) {
       killBoss(engine);
+      engine.bossRecap[stage - 1].powerUpsUsed = 1;
       engine.advanceStage();
     }
     killBoss(engine);
@@ -138,6 +140,24 @@ describe('GameEngine - multi-stage run', function () {
     assert.equal(engine.stage, FINAL_STAGE);
     assert.equal(engine.result, 'win');
     assert.equal(engine.bossRecap.length, FINAL_STAGE);
+    assert.deepEqual(
+      engine.bossRecap.map((entry) => entry.stage),
+      STAGES.slice(0, -1).map((entry) => entry.stage)
+    );
+  });
+
+  it('advances to the stage 7 secret boss', function () {
+    const engine = freshEngine();
+    for (let stage = 1; stage < SECRET_BOSS_STAGE; stage++) {
+      killBoss(engine);
+      engine.advanceStage();
+    }
+    killBoss(engine);
+
+    assert.equal(engine.stage, 7);
+    assert.equal(engine.stage, SECRET_BOSS_STAGE);
+    assert.equal(engine.enemy.enemyId, 'secretboss');
+    assert.equal(engine.enemy.debuffs, engine.debuffsFaced);
     assert.deepEqual(
       engine.bossRecap.map((entry) => entry.stage),
       STAGES.map((entry) => entry.stage)
