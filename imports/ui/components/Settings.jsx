@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { soundManager } from '../soundManager';
+import { getReadableFont, setReadableFont } from '../fontPreference';
 
 const VolumeRow = ({
   label,
@@ -46,6 +47,29 @@ const VolumeRow = ({
   );
 };
 
+const ReadableFontRow = () => {
+  const [enabled, setEnabled] = useState(getReadableFont);
+
+  const handleChange = (e) => {
+    const checked = e.target.checked;
+    setEnabled(checked);
+    setReadableFont(checked);
+  };
+
+  return (
+    <div className="flex items-center gap-4">
+      <input
+        type="checkbox"
+        className="checkbox checkbox-primary"
+        checked={enabled}
+        onChange={handleChange}
+        aria-label="Toggle readable font"
+      />
+      <span className="text-2xl font-medium">Readable font</span>
+    </div>
+  );
+};
+
 // showTrigger controls whether the gear-icon button that opens the modal is
 // rendered. Pass showTrigger={false} when some other button (e.g. an "Options"
 // button elsewhere on the page) should open the same #settings-modal dialog
@@ -86,7 +110,7 @@ const Settings = ({ saveButton, quitButton, showTrigger = true }) => {
       <dialog id="settings-modal" className="modal">
         <div
           className="modal-box"
-          style={{ fontFamily: '"Micro 5", monospace' }}
+          style={{ fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)' }}
         >
           <h3 className="font-bold text-4xl mb-6">Settings</h3>
 
@@ -112,6 +136,7 @@ const Settings = ({ saveButton, quitButton, showTrigger = true }) => {
               onVolumeChange={(v) => soundManager.setSfxVolume(v)}
               onMuteChange={(muted) => soundManager.setSfxMuted(muted)}
             />
+            <ReadableFontRow />
           </div>
 
           {(saveButton || quitButton) && (
