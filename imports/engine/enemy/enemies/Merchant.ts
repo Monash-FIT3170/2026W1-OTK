@@ -1,4 +1,5 @@
 // Merchant.ts
+// Stage 6 boss. Increases card costs.
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';

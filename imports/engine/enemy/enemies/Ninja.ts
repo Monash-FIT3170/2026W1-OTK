@@ -1,4 +1,5 @@
 // Ninja.ts
+// Stage 5 boss. Dodges attacks.
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';

@@ -22,7 +22,7 @@ export class DealDamagePowerUp extends PowerUp {
       throw new Error('Deal Damage powerup is unavailable');
     }
 
-    engine.enemy.currentHealth = Math.max(0, engine.enemy.currentHealth - DAMAGE);
+    engine.enemy.takeDamage(DAMAGE);
     this.available = false;
   }
 }

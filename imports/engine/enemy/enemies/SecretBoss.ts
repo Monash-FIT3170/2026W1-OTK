@@ -4,6 +4,7 @@
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
 import { EnemyData } from '../../types';
+import { debuffRegistry } from '../../debuffs';
 
 export class SecretBoss extends Enemy {
   static enemyId = 'secretboss';
@@ -25,6 +26,10 @@ export class SecretBoss extends Enemy {
       timerDebuffTickAmount: data.timerDebuffTickAmount,
       damageTakenCount: data.damageTakenCount,
       shieldLayers: data.shieldLayers,
+    });
+
+    (data.debuffs ?? []).forEach(debuff => {
+      debuffRegistry.create(debuff).applyTo(this);
     });
   }
 }

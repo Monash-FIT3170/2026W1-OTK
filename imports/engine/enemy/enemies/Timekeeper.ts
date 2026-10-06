@@ -1,5 +1,5 @@
 // Timekeeper.ts
-// Stage 3 boss. Carries the timer debuff.
+// Stage 4 boss. Carries the timer debuff.
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';

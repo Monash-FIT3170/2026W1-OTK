@@ -1,4 +1,5 @@
 // Goblin.ts
+// Stage 1 boss. No debuff.
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
