@@ -5,7 +5,7 @@ import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { expect } from 'chai';
 import { EnemyDisplay } from './EnemyDisplay';
 import { Goblin } from '/imports/engine/enemy/enemies/Goblin';
-import { Frostwarden } from '/imports/engine/enemy/enemies/FrostWarden';
+import { Frostwarden } from '/imports/engine/enemy/enemies/Frostwarden';
 
 let goblin;
 let animateSpy;
