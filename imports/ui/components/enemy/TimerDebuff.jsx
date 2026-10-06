@@ -1,9 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // Countdown orb that floats above the enemy's head while the timer debuff is
 // ticking. When it reaches zero the engine heals the enemy and clears the debuff.
-export default function TimerDebuff({ enemy }) {
+//
+// enemy.timerDebuffDeadline is an absolute timestamp stamped with the *server's*
+// clock. Counting it down against the browser's Date.now() breaks on deployments
+// where the two machines' clocks differ - the countdown then starts wherever the
+// offset lands (the Railway "always starts at 2, holds on 0" bug). Instead we
+// derive a clock offset from lastActiveAt, a server timestamp the battle-screen
+// heartbeat (game.applyTimerTick) refreshes every ~2s, and count down against
+// that estimated server time.
+export default function TimerDebuff({ enemy, lastActiveAt }) {
   const [now, setNow] = useState(Date.now());
+
+  // serverOffset ~= serverNow - clientNow, refreshed whenever the heartbeat
+  // delivers a new server timestamp. One-way transit latency (tens of ms) is
+  // ignored - negligible next to the multi-second clock skew this corrects.
+  const serverOffsetRef = useRef(0);
+  useEffect(() => {
+    if (typeof lastActiveAt === 'number') {
+      serverOffsetRef.current = lastActiveAt - Date.now();
+    }
+  }, [lastActiveAt]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 250);
@@ -14,7 +32,8 @@ export default function TimerDebuff({ enemy }) {
   // inactive until the boss has taken damage worth healing).
   if (!enemy.timerDebuffActive || !enemy.timerDebuffDeadline) return null;
 
-  const msLeft = Math.max(0, enemy.timerDebuffDeadline - now);
+  const serverNow = now + serverOffsetRef.current;
+  const msLeft = Math.max(0, enemy.timerDebuffDeadline - serverNow);
   const label = String(Math.ceil(msLeft / 1000));
 
   // Roughly above the lion's head; dimensions/placement to be tuned.

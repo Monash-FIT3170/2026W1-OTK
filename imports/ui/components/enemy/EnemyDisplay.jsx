@@ -31,7 +31,12 @@ const ENEMY_SPRITE_STATES = {
   lion: ['idle'],
 };
 
-export function EnemyDisplay({ enemy, isVisible, _useAnimate = useAnimate }) {
+export function EnemyDisplay({
+  enemy,
+  isVisible,
+  lastActiveAt,
+  _useAnimate = useAnimate,
+}) {
   if (!enemy) return null;
 
   const [scope, animate] = _useAnimate();

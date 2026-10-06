@@ -4,11 +4,14 @@ import { Card } from './card/Card';
 import { Enemy } from './enemy/Enemy';
 import { cardRegistry } from './card/CardRegistry';
 import './card/registerAllCards';
+import './powerups/RestartStagePowerup';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData, BossRecapEntry, RunResult, cardData } from './types';
+import { UserData, EnemyData, BossRecapEntry, RunResult, cardData, powerUpData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
 import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
+import { pickRandomPowerUps, PowerUp } from './powerups';
+import { powerUpRegistry, powerupRegistry } from './powerups/PowerupRegistry';
 
 // A gap larger than this since the last server-side action means the player
 // closed the tab rather than sat idle - the battle screen heartbeats every 2s
@@ -26,7 +29,10 @@ export class GameEngine {
   public bossRecap: BossRecapEntry[];
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
+  public powerUpsUsedThisStage: number;
   public lastActiveAt: number;
+  public powerUps: PowerUp[];
+  public powerUpChoices: string[];
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -41,7 +47,11 @@ export class GameEngine {
     this.bossRecap = userData.bossRecap ?? [];
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
+    this.powerUpsUsedThisStage = userData.powerUpsUsedThisStage ?? 0;
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
+    const powerUpList = userData.powerUps ?? []
+    this.powerUps = powerUpList.map((powerUp) => powerUpRegistry.create(powerUp)) ?? [];
+    this.powerUpChoices = userData.powerUpChoices ?? [];
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -99,6 +109,7 @@ export class GameEngine {
       stage: this.stage,
       timeMs: Date.now() - this.stageStartedAt,
       cardsUsed: this.cardsUsedThisStage,
+      powerUpsUsed: this.powerUpsUsedThisStage,
       result: bossResult,
     });
   }
@@ -115,6 +126,62 @@ export class GameEngine {
     this.finalizeBossRecap('win');
     this.clearTimerDebuff();
     this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
+    if (this.result === 'stageCleared') {
+      this.powerUpChoices = pickRandomPowerUps(3).map((p) => p.powerUpId);
+    }
+  }
+
+  // Player picked this reward on the stage-clear screen. Validated against
+  // the offered choices so only an option actually shown can be saved.
+  choosePowerUp(powerUpId: string): void {
+    if (this.result !== 'stageCleared') {
+      throw new Error('Cannot choose a power-up outside the stage-clear screen');
+    }
+    if (!this.powerUpChoices.includes(powerUpId)) {
+      throw new Error(`"${powerUpId}" was not offered as a choice`);
+    }
+    powerupRegistry.create(powerUpId);
+    this.powerUps.push(powerupRegistry.create(powerUpId));
+    this.powerUpChoices = [];
+  }
+
+  // Player clicked an inventory slot mid-battle to trigger its effect.
+  // Only consumable power-ups (consumedOnUse) are removed afterward -
+  // reusable ones stay in the inventory for the rest of the run.
+  usePowerUp(index: number): void {
+    if (this.result !== 'playing') {
+      throw new Error('Cannot use a power-up outside of battle');
+    }
+    const powerUp = this.powerUps[index];
+
+    if (powerUp === undefined) {
+      throw new Error(`No Power Up at inventory index ${index}`);
+    }
+
+    if (!powerUp.isAvailable()) {
+      throw new Error(`Power Up unavailable: ${powerUp.powerUpId}`);
+    }
+
+    powerUp.applyTo(this);
+
+    this.powerUpsUsedThisStage += 1;
+
+    // isAvailable is set and managed by the powerUp itself
+    if (powerUp.consumedOnUse ?? false) {
+      this.removePowerUp(powerUp.powerUpId);
+    }
+  }
+
+  /**
+   * Function to remove a power up from the power up list
+   * If there are multiple, removes the first one
+   * @param powerUpId ID of the power up to remove
+   */
+  removePowerUp(powerUpId: string): void {
+    const index = this.powerUps.findIndex(powerUp => powerUp.powerUpId === powerUpId);
+    if (index !== -1) {
+      this.powerUps.splice(index, 1);
+    }
   }
 
   // Player confirmed "Next Enemy" on the stage-clear screen.
@@ -134,7 +201,11 @@ export class GameEngine {
     this.result = 'playing';
     this.stageStartedAt = Date.now();
     this.cardsUsedThisStage = 0;
-
+    this.powerUpsUsedThisStage = 0;
+    this.powerUps.forEach(powerUp => {
+      powerUp.available = true;
+    });
+    
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
@@ -239,7 +310,10 @@ export class GameEngine {
       bossRecap: [],
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
+      powerUpsUsedThisStage: 0,
       lastActiveAt: Date.now(),
+      powerUps: [],
+      powerUpChoices: [],
     };
 
     const engine = new GameEngine(userData);
@@ -310,7 +384,10 @@ export class GameEngine {
       bossRecap: this.bossRecap,
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
+      powerUpsUsedThisStage: this.powerUpsUsedThisStage,
       lastActiveAt: this.lastActiveAt,
+      powerUps: this.powerUps,
+      powerUpChoices: this.powerUpChoices,
     };
   }
 }

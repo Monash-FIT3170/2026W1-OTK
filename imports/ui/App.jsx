@@ -11,6 +11,7 @@ import { DeckViewer } from './components/DeckViewer';
 import { GameBackground } from './components/GameBackground';
 import { ResultScreen } from './components/ResultScreen';
 import { StageClearScreen } from './components/StageClearScreen';
+import { PowerUpInventory } from './components/powerups/PowerUpInventory';
 import { SaveGameButton } from './components/SaveGameButton';
 import { QuitToMenuButton } from './components/QuitToMenuButton';
 import { LoginForm } from './auth/LoginForm';
@@ -40,6 +41,7 @@ export const App = () => {
 
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
+  const [showPowerupMenu, setShowPowerupMenu] = useState(false);
 
   // Subscribe to auth and game data reactively
   const { user, userData, gameState, loading } = useTracker(() => {
@@ -234,7 +236,19 @@ export const App = () => {
     );
   }
 
-  const { hand, deck, enemy, scene, stage } = gameState;
+  const { hand, deck, enemy, scene, stage, powerups = [] } = gameState;
+  const availablePowerups = powerups.filter(
+    (powerup) => powerup.available && powerup.currentStacks < powerup.maxStacks
+  );
+
+  const handleUsePowerup = (powerupId) => {
+    Meteor.call('game.applyPowerup', { powerupId }, (err) => {
+      setShowPowerupMenu(false);
+      if (err) {
+        console.error('game.applyPowerup failed:', err);
+      }
+    });
+  };
 
   // --- Between stages: boss down (delayed screen switch) ---
   if (delayedResult === 'stageCleared') {
@@ -243,6 +257,7 @@ export const App = () => {
         stage={stage}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
+        powerUpChoices={gameState.powerUpChoices}
         onBackToMenu={() => setShowLanding(true)}
       />
     );
@@ -268,6 +283,10 @@ export const App = () => {
           saveButton={<SaveGameButton gameState={gameState} />}
           quitButton={<QuitToMenuButton onQuit={() => setShowLanding(true)} />}
         />
+      </div>
+
+      <div className="absolute" style={{ left: 20, top: 30 }}>
+        <PowerUpInventory powerUps={gameState.powerUps} />
       </div>
 
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
@@ -304,6 +323,12 @@ export const App = () => {
         data-tutorial-target="end-turn"
       >
         <EndTurnButton disabled={showTutorial} />
+      </div>
+
+      <div
+        className="absolute"
+        style={{ left: 80, bottom: 230, zIndex: 10 }}
+      >
       </div>
 
       <div
