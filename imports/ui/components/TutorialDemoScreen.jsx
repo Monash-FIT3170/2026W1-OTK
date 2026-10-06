@@ -225,38 +225,32 @@ export const TutorialDemoScreen = ({
             of a custom placeholder. Wrapped tightly so the tutorial
             spotlight highlights just the visible deck number, not the
             wide positioning container around it. */}
-        <div
-          className="inline-block pointer-events-auto"
-        >
-          <DeckViewer cards={deck} />
-        </div>
+        <DeckViewer cards={deck} />
       </div>
 
       {/* Portaled straight to document.body — see the matching comment in
           TutorialOverlay.jsx for why: rendering position: fixed elements
           inside GameBackground (a possibly CSS-scaled ancestor) makes
           them relative to that scaled box instead of the true viewport. */}
-      {!rect
-        ? createPortal(
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-              <div className="w-full max-w-md mx-4">{cardContent}</div>
-            </div>,
-            document.body
-          )
-        : createPortal(
-            <>
-              <div style={computeHighlightStyle(rect)} />
-              <div
-                style={computeCardPositionStyle(rect, {
-                  pinToTop:
-                    step.target === 'hand' || step.action === 'end-turn',
-                })}
-              >
-                {cardContent}
-              </div>
-            </>,
-            document.body
-          )}
+      {createPortal(
+        !rect ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="w-full max-w-md mx-4">{cardContent}</div>
+          </div>
+        ) : (
+          <>
+            <div style={computeHighlightStyle(rect)} />
+            <div
+              style={computeCardPositionStyle(rect, {
+                pinToTop: step.target === 'hand' || step.action === 'end-turn',
+              })}
+            >
+              {cardContent}
+            </div>
+          </>
+        ),
+        document.body
+      )}
     </GameBackground>
   );
 };

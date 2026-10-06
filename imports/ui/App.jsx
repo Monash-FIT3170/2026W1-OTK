@@ -319,9 +319,7 @@ export const App = () => {
         data-tutorial-target="deck"
         style={{ left: 54, bottom: 162 }}
       >
-        <div className="inline-block">
-          <DeckViewer cards={deck} />
-        </div>
+        <DeckViewer cards={deck} />
       </div>
 
       {showTutorial && (

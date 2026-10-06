@@ -200,9 +200,7 @@ export const TrainingModeScreen = ({
         className="absolute pointer-events-none"
         style={{ left: 54, bottom: 162 }}
       >
-        <div className="inline-block pointer-events-auto">
-          <DeckViewer cards={deck} />
-        </div>
+        <DeckViewer cards={deck} />
       </div>
     </GameBackground>
   );

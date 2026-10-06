@@ -133,22 +133,22 @@ export const TutorialOverlay = ({ onClose, hand = [] }) => {
   // the spotlight to appear at the wrong size and position. Portaling
   // out of that tree entirely sidesteps the issue regardless of where
   // the scaling actually happens.
-  if (!rect) {
-    return createPortal(
+  return createPortal(
+    !rect ? (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
         <div className="w-full max-w-md mx-4">{cardContent}</div>
-      </div>,
-      document.body
-    );
-  }
-
-  return createPortal(
-    <>
-      <div style={computeHighlightStyle(rect)} />
-      <div style={computeCardPositionStyle(rect, { pinToTop: step.target === 'hand' })}>
-        {cardContent}
       </div>
-    </>,
+    ) : (
+      <>
+        <div style={computeHighlightStyle(rect)} />
+        <div
+          style={computeCardPositionStyle(rect, {
+            pinToTop: step.target === 'hand',
+          })}
+        >
+          {cardContent}
+        </div>
+      </>),
     document.body
   );
 };
