@@ -38,7 +38,7 @@ export const STAGES: StageConfig[] = [
 
 export const FIRST_STAGE = STAGES[0].stage;
 export const FINAL_STAGE = STAGES[STAGES.length - 2].stage;   // -2 as the last stage is the secret boss
-export const SECRET_BOSS_STAGE = FINAL_STAGE + 1;
+export const SECRET_BOSS_STAGE = STAGES[STAGES.length - 1].stage;
 
 export function getStageConfig(stage: number): StageConfig {
   const config = STAGES.find((entry) => entry.stage === stage);
