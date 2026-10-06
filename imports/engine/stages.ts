@@ -11,14 +11,15 @@ import { Goblin } from './enemy/enemies/Goblin';
 import { Frostwarden } from './enemy/enemies/Frostwarden';
 import { Timekeeper } from './enemy/enemies/Timekeeper';
 import { Undying } from './enemy/enemies/Undying';
-
-// Not part of any stage, but kept registered so enemyRegistry can still
-// reconstruct it - GameEngine used to carry this side-effect import.
-import './enemy/enemies/IceCube';
-import { Dragon } from './enemy/enemies/Dragon';
 import { Ninja } from './enemy/enemies/Ninja';
 import { Merchant } from './enemy/enemies/Merchant';
 import { SecretBoss } from './enemy/enemies/SecretBoss';
+import { Difficulty } from './types';
+
+// Not part of any stage, but kept registered so enemyRegistry can still
+// reconstruct it - GameEngine used to carry this side-effect import.
+import { IceCube } from './enemy/enemies/IceCube';
+import { Dragon } from './enemy/enemies/Dragon';
 
 export type StageConfig = {
   stage: number;
@@ -37,11 +38,28 @@ export const STAGES: StageConfig[] = [
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
-export const FINAL_STAGE = STAGES[STAGES.length - 2].stage;   // -2 as the last stage is the secret boss
 export const SECRET_BOSS_STAGE = STAGES[STAGES.length - 1].stage;
 
 export function getStageConfig(stage: number): StageConfig {
   const config = STAGES.find((entry) => entry.stage === stage);
   if (!config) throw new Error(`Unknown stage: ${stage}`);
   return config;
+}
+
+/**
+ * Function to determine the final stage number based on the difficulty
+ * @param difficulty String representing the difficulty: 'easy', 'medium' or 'hard'
+ * @returns The final stage number
+ */
+export function getFinalStageFromDifficulty(difficulty: Difficulty): number {
+  switch (difficulty) {
+    case 'easy':
+      return 4;
+    case 'medium':
+      return 5;
+    case 'hard':
+      return 6;
+    default:
+      throw new Error(`Unknown difficulty: ${difficulty}`)
+  }
 }

@@ -42,6 +42,8 @@ export type EnemyData = {
 // - 'loss'         run over
 export type RunResult = 'playing' | 'stageCleared' | 'win' | 'loss';
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 // per-boss recap entry recorded when a boss fight ends
 export type BossRecapEntry = {
   bossName: string;
@@ -55,6 +57,7 @@ export type BossRecapEntry = {
 // data shape stored in UserDataCollection
 export type UserData = {
   userId: string;
+  difficulty?: Difficulty;
   stage: number;
   baseDeck?: cardData[];
   deck: cardData[];

@@ -1,12 +1,12 @@
 import { assert } from 'chai';
 import { GameEngine } from './GameEngine';
-import { FINAL_STAGE, SECRET_BOSS_STAGE, STAGES, getStageConfig } from './stages';
+import { SECRET_BOSS_STAGE, STAGES, getStageConfig, getFinalStageFromDifficulty } from './stages';
 import { Shield } from './debuffs';
 
 const USER_ID = 'stage-test-user';
 
-function freshEngine() {
-  return new GameEngine(GameEngine.newGame(USER_ID));
+function freshEngine(difficulty) {
+  return new GameEngine(GameEngine.newGame(USER_ID, undefined, difficulty ?? 'hard'));
 }
 
 // Kills the current boss and settles the stage, exactly as game.executeCard
@@ -123,23 +123,61 @@ describe('GameEngine - multi-stage run', function () {
     advanceTo(engine, 6);
 
     assert.equal(engine.stage, 6);
-    assert.equal(engine.stage, FINAL_STAGE);
+    assert.equal(engine.stage, getFinalStageFromDifficulty('hard'));
     assert.equal(engine.enemy.enemyId, 'merchant');
     assert.include(engine.enemy.debuffs, 'inflation');
   });
 
+  it('final stage is 4 for easy difficulty', function () {
+    const difficulty = 'easy';
+
+    const engine = freshEngine(difficulty);
+    for (let stage = 1; stage < getFinalStageFromDifficulty(difficulty); stage++) {
+      killBoss(engine);
+      engine.advanceStage();
+    }
+
+    killBoss(engine);
+
+    assert.equal(engine.stage, 4);
+    assert.deepEqual(
+      engine.bossRecap.map((entry) => entry.stage),
+      STAGES.slice(0, 4).map((entry) => entry.stage)
+    );
+  });
+
+  it('final stage is 5 for medium difficulty', function () {
+    const difficulty = 'medium';
+
+    const engine = freshEngine(difficulty);
+    for (let stage = 1; stage < getFinalStageFromDifficulty(difficulty); stage++) {
+      killBoss(engine);
+      engine.advanceStage();
+    }
+
+    killBoss(engine);
+
+    assert.equal(engine.stage, 5);
+    assert.deepEqual(
+      engine.bossRecap.map((entry) => entry.stage),
+      STAGES.slice(0, 5).map((entry) => entry.stage)
+    );
+  });
+
   it('ends the run in a win once the final stage is cleared and not advancing to the secret boss', function () {
-    const engine = freshEngine();
-    for (let stage = 1; stage < FINAL_STAGE; stage++) {
+    const difficulty = 'hard';
+
+    const engine = freshEngine(difficulty);
+    for (let stage = 1; stage < getFinalStageFromDifficulty(difficulty); stage++) {
       killBoss(engine);
       engine.bossRecap[stage - 1].powerUpsUsed = 1;
       engine.advanceStage();
     }
     killBoss(engine);
 
-    assert.equal(engine.stage, FINAL_STAGE);
+    assert.equal(engine.stage, getFinalStageFromDifficulty(difficulty));
     assert.equal(engine.result, 'win');
-    assert.equal(engine.bossRecap.length, FINAL_STAGE);
+    assert.equal(engine.bossRecap.length, getFinalStageFromDifficulty(difficulty));
     assert.deepEqual(
       engine.bossRecap.map((entry) => entry.stage),
       STAGES.slice(0, -1).map((entry) => entry.stage)
