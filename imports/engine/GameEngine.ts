@@ -34,6 +34,7 @@ export class GameEngine {
   public lastActiveAt: number;
   public powerUps: PowerUp[];
   public powerUpChoices: string[];
+  public dialogueSeen: boolean;
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -54,6 +55,9 @@ export class GameEngine {
     const powerUpList = userData.powerUps ?? []
     this.powerUps = powerUpList.map((powerUp) => powerUpRegistry.create(powerUp)) ?? [];
     this.powerUpChoices = userData.powerUpChoices ?? [];
+    // Saves from before dialogue existed default to seen, so nobody gets a
+    // dialogue popping up mid-fight after the update.
+    this.dialogueSeen = userData.dialogueSeen ?? true;
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -214,6 +218,7 @@ export class GameEngine {
     this.stageStartedAt = Date.now();
     this.cardsUsedThisStage = 0;
     this.powerUpsUsedThisStage = 0;
+    this.dialogueSeen = false;
     this.powerUps.forEach(powerUp => {
       powerUp.available = true;
     });
@@ -221,6 +226,13 @@ export class GameEngine {
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
+  }
+
+  // Player finished or skipped the pre-battle dialogue. Restarts the stage
+  // clock so the boss recap time doesn't count time spent reading.
+  finishDialogue(now: number = Date.now()): void {
+    this.dialogueSeen = true;
+    this.stageStartedAt = now;
   }
 
   /**
@@ -337,6 +349,7 @@ export class GameEngine {
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
+      dialogueSeen: false,
     };
 
     const engine = new GameEngine(userData);
@@ -412,6 +425,7 @@ export class GameEngine {
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
       powerUpChoices: this.powerUpChoices,
+      dialogueSeen: this.dialogueSeen,
     };
   }
 }
