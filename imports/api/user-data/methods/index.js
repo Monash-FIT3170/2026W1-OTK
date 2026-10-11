@@ -4,6 +4,7 @@ import './executeCard';
 import './newGame';
 import './endTurn';
 import './advanceStage';
+import './finishDialogue';
 import './applyTimerTick';
 import './applyPowerup';
 import './choosePowerUp';

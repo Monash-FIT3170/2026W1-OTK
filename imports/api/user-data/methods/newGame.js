@@ -15,7 +15,14 @@ Meteor.methods({
     const existing = await UserDataCollection.findOneAsync({ userId: this.userId });
     const deck = existing?.nextDeck ?? null;
 
-    const gameState = GameEngine.newGame(this.userId, deck);
+    // seenDialogue is account-level (top of the document, outside gameState),
+    // so it survives the gameState overwrite below and a restarted run skips
+    // dialogue the player has already watched.
+    const gameState = GameEngine.newGame(
+      this.userId,
+      deck,
+      existing?.seenDialogue
+    );
 
     if (existing) {
       await UserDataCollection.updateAsync(
