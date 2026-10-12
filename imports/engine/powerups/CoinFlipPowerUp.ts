@@ -10,24 +10,20 @@ export class CoinFlipPowerUp extends PowerUp {
       powerUpId: 'coin-flip',
       name: 'Coin Flip',
       description: 'Flip a coin. Heads: the enemy loses half its current health. Tails: nothing happens.',
+      icon: '/assets/sprites/powerups/coin-flip-pu-sprite.png',
       available: true,
       consumedOnUse: false,
       ...data,
-      icon: '/assets/sprites/powerups/coin-flip-pu-sprite.png',
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('Coin Flip powerup is unavailable');
-    }
-
+  apply(engine: GameEngine): boolean {
     if (Math.random() < HEADS_CHANCE) {
       const damage = Math.ceil(engine.enemy.currentHealth / 2);
       engine.enemy.currentHealth = Math.max(0, engine.enemy.currentHealth - damage);
     }
 
-    this.available = false;
+    return true;
   }
 }
 

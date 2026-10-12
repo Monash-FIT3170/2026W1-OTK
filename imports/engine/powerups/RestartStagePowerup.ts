@@ -10,18 +10,14 @@ export class RestartStagePowerup extends PowerUp {
       powerUpId: 'restart-stage',
       name: 'Restart Stage',
       description: 'Reset the current stage and redraw your starting hand. One use per run.',
+      icon: '/assets/sprites/powerups/restart-pu-sprite.png',
       available: true,
       consumedOnUse: true,
       ...data,
-      icon: '/assets/sprites/powerups/restart-pu-sprite.png',
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('Restart Stage powerup is unavailable');
-    }
-
+  apply(engine: GameEngine): boolean {
     const { BossClass } = getStageConfig(engine.stage);
 
     engine.enemy = new BossClass();
@@ -44,7 +40,9 @@ export class RestartStagePowerup extends PowerUp {
     engine.activateEnemyDebuffs();
     engine.draw();
 
-    this.available = false;
+    // Once-per-stage power-ups can be used again; consumed ones stay gone
+    engine.refreshPowerUps();
+    return true;
   }
 }
 

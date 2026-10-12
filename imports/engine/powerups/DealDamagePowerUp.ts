@@ -10,20 +10,16 @@ export class DealDamagePowerUp extends PowerUp {
       powerUpId: 'deal-damage-power-up',
       name: 'Deal Damage',
       description: `Deal ${DAMAGE} damage to the enemy.`,
+      icon: '/assets/sprites/powerups/deal-damage-pu-sprite.png',
       available: true,
       consumedOnUse: false,
       ...data,
-      icon: '/assets/sprites/powerups/deal-damage-pu-sprite.png',
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('Deal Damage powerup is unavailable');
-    }
-
+  apply(engine: GameEngine): boolean {
     engine.enemy.currentHealth = Math.max(0, engine.enemy.currentHealth - DAMAGE);
-    this.available = false;
+    return true;
   }
 }
 
