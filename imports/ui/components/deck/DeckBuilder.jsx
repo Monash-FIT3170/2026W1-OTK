@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Card from '../../cards/Card';
 import DeckBuilderHandCard from './DeckBuilderHandCard';
@@ -61,6 +61,11 @@ export function DeckBuilder({
       onConfirm(deckCards);
     }
   };
+
+  const sortedDeckCards = useMemo(
+  () => [...deckCards].sort((a, b) => a.name.localeCompare(b.name)),
+  [deckCards]
+);
 
   return (
     <div
@@ -139,7 +144,7 @@ export function DeckBuilder({
             ) : (
               <div className="flex flex-col gap-2">
                 <AnimatePresence initial={false}>
-                  {deckCards.map((card) => (
+                  {sortedDeckCards.map((card) => (
                     <DeckBuilderHandCard
                       key={card.uniqueId}
                       card={card}
