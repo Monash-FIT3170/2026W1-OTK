@@ -9,10 +9,10 @@ export class OneMorePullPowerUp extends PowerUp {
       powerUpId: 'one-more-pull',
       name: 'One More Pull',
       description: 'Draws one card.',
-      icon: '',
       available: true,
       consumedOnUse: false,
       ...data,
+      icon: '/assets/sprites/powerups/one-more-pull-pu-sprite.png',
     });
   }
 

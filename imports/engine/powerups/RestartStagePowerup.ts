@@ -10,10 +10,10 @@ export class RestartStagePowerup extends PowerUp {
       powerUpId: 'restart-stage',
       name: 'Restart Stage',
       description: 'Reset the current stage and redraw your starting hand. One use per run.',
-      icon: '',
       available: true,
       consumedOnUse: true,
       ...data,
+      icon: '/assets/sprites/powerups/restart-pu-sprite.png',
     });
   }
 

@@ -10,10 +10,10 @@ export class DuplicateCardsPowerUp extends PowerUp {
       powerUpId: 'duplicate-cards',
       name: 'Duplicate Cards',
       description: 'Duplicate two cards in your hand, at random.',
-      icon: '',
       available: true,
       consumedOnUse: false,
       ...data,
+      icon: '/assets/sprites/powerups/duplicate-pu-sprite.png',
     });
   }
 

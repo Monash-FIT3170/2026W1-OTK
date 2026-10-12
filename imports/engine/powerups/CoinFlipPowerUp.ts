@@ -10,10 +10,10 @@ export class CoinFlipPowerUp extends PowerUp {
       powerUpId: 'coin-flip',
       name: 'Coin Flip',
       description: 'Flip a coin. Heads: the enemy loses half its current health. Tails: nothing happens.',
-      icon: '',
       available: true,
       consumedOnUse: false,
       ...data,
+      icon: '/assets/sprites/powerups/coin-flip-pu-sprite.png',
     });
   }
 

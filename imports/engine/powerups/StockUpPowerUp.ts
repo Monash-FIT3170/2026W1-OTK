@@ -12,10 +12,10 @@ export class StockUpPowerUp extends PowerUp {
       powerUpId: 'stock-up',
       name: 'Stock Up',
       description: `Add ${NUM_CARDS_ADDED} copies of "Blank" to your deck.`,
-      icon: '',
       available: true,
       consumedOnUse: false,
       ...data,
+      icon: '/assets/sprites/powerups/stock-pu-sprite.png',
     });
   }
 

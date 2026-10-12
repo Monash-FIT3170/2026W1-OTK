@@ -10,10 +10,10 @@ export class DealDamagePowerUp extends PowerUp {
       powerUpId: 'deal-damage-power-up',
       name: 'Deal Damage',
       description: `Deal ${DAMAGE} damage to the enemy.`,
-      icon: '',
       available: true,
       consumedOnUse: false,
       ...data,
+      icon: '/assets/sprites/powerups/deal-damage-pu-sprite.png',
     });
   }
 

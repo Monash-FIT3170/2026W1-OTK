@@ -10,10 +10,10 @@ export class GiantSlayerPowerUp extends PowerUp {
       name: 'Giant Slayer',
       description:
         'Multiplies the highest damage dealing card based on % remaining health of enemy. One use per run.',
-      icon: '',
       available: true,
       consumedOnUse: true,
       ...data,
+      icon: '/assets/sprites/powerups/giant-slayer-pu-sprite.png',
     });
   }
 
