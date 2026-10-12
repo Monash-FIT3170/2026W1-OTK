@@ -18,7 +18,7 @@ export function SaveGameButton({ gameState }) {
     return (
         <div>
             <button
-                className="px-6 py-2.5 bg-green-800 hover:bg-green-700 text-white font-semibold rounded-lg text-lg transition-colors"
+                style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-2.5 bg-green-800 hover:bg-green-700 text-white rounded-lg text-2xl transition-colors"
                 onClick={handleSaveGame}
             >
                 Save Game

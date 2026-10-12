@@ -70,10 +70,10 @@ export function StageClearScreen({
   return (
     <div className="h-screen bg-slate-900 flex flex-col items-center justify-center gap-4 overflow-hidden px-8 py-6">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-emerald-400">
+        <h1 style={{ fontFamily: 'var(--game-font)'}} className="text-7xl text-emerald-400">
           Stage {stage} Cleared!
         </h1>
-        <p className="text-slate-300 text-base mt-1">
+        <p style={{ fontFamily: 'var(--game-font)'}} className="text-slate-300 text-2xl mt-1">
           You defeated {enemyName}. {FINAL_STAGE - stage} to go.
         </p>
       </div>
@@ -95,19 +95,19 @@ export function StageClearScreen({
 
       <div className="flex flex-col items-center gap-2">
         <button
-          className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-lg transition-colors disabled:opacity-50"
+          style={{ fontFamily: 'var(--game-font)'}} className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-2xl transition-colors disabled:opacity-50"
           onClick={handleNextEnemy}
           disabled={advancing || !canContinue}
         >
           {advancing ? 'Starting...' : 'Next Enemy'}
         </button>
         <button
-          className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
+          style={{ fontFamily: 'var(--game-font)'}} className="text-slate-400 hover:text-slate-300 text-2xl transition-colors"
           onClick={onBackToMenu}
         >
           Back to Menu
         </button>
-        <p className="text-slate-500 text-xs">
+        <p style={{ fontFamily: 'var(--game-font)'}} className="text-slate-500 text-base">
           Your progress is saved - Continue from the menu returns you here.
         </p>
       </div>

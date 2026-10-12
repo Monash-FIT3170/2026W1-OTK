@@ -39,20 +39,20 @@ export function BossRecapTable({ bossRecap = [], title = 'Result', compact = fal
     >
       {/* Header row */}
       <div className="flex items-baseline mb-1">
-        <span className={`text-slate-200 font-semibold ${compact ? 'text-sm' : 'text-lg'}`}>{title}</span>
+        <span style={{ fontFamily: 'var(--game-font)'}} className={`text-slate-200  ${compact ? 'text-lg' : 'text-2xl'}`}>{title}</span>
       </div>
-      <div className={`border-t border-slate-500 ${compact ? 'mb-2' : 'mb-4'}`} />
+      <div style={{ fontFamily: 'var(--game-font)'}} className={`border-t border-slate-500 ${compact ? 'mb-2' : 'mb-4'}`} />
 
       {/* Column headers */}
       <div className={`flex items-center ${compact ? 'mb-2' : 'mb-3'}`}>
         <div className="flex-1" />
-        <div className={`${colWidth} text-center text-slate-300 ${cellText} font-semibold`}>
+        <div style={{ fontFamily: 'var(--game-font)'}} className={`${colWidth} text-center text-slate-300 ${cellText} text-xl`}>
           Time
         </div>
-        <div className={`${colWidth} text-center text-slate-300 ${cellText} font-semibold`}>
+        <div style={{ fontFamily: 'var(--game-font)'}} className={`${colWidth} text-center text-slate-300 ${cellText} text-xl`}>
           Cards Used
         </div>
-        <div className={`${colWidth} text-center text-slate-300 ${cellText} font-semibold`}>
+        <div style={{ fontFamily: 'var(--game-font)'}} className={`${colWidth} text-center text-slate-300 ${cellText} text-xl`}>
           Power Ups Used
         </div>
       </div>
@@ -61,22 +61,22 @@ export function BossRecapTable({ bossRecap = [], title = 'Result', compact = fal
       {bossRecap.map((entry, idx) => (
         <div key={idx} className={`flex items-center ${compact ? 'mb-2' : 'mb-3'}`}>
           <div className="flex-1">
-            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+            <span style={{ fontFamily: 'var(--game-font)'}} className={`text-xl inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {entry.bossName}
             </span>
           </div>
           <div className={`${colWidth} flex justify-center`}>
-            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+            <span style={{ fontFamily: 'var(--game-font)'}} className={`text-xl inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {formatTime(entry.timeMs)}
             </span>
           </div>
           <div className={`${colWidth} flex justify-center`}>
-            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+            <span style={{ fontFamily: 'var(--game-font)'}} className={`text-xl inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {entry.cardsUsed}
             </span>
           </div>
           <div className={`${colWidth} flex justify-center`}>
-            <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+            <span style={{ fontFamily: 'var(--game-font)'}} className={`text-xl inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
               {entry.powerUpsUsed}
             </span>
           </div>
@@ -89,20 +89,20 @@ export function BossRecapTable({ bossRecap = [], title = 'Result', compact = fal
       {/* Totals row */}
       <div className="flex items-center">
         <div className="flex-1">
-          <span className={`text-slate-200 font-semibold ${cellText}`}>Total</span>
+          <span style={{ fontFamily: 'var(--game-font)'}} className={`text-slate-200 text-xl ${cellText}`}>Total</span>
         </div>
         <div className={`${colWidth} flex justify-center`}>
-          <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+          <span style={{ fontFamily: 'var(--game-font)'}} className={`text-xl inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
             {formatTime(totalTimeMs)}
           </span>
         </div>
         <div className={`${colWidth} flex justify-center`}>
-          <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+          <span style={{ fontFamily: 'var(--game-font)'}} className={`text-xl inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
             {totalCards}
           </span>
         </div>
         <div className={`${colWidth} flex justify-center`}>
-          <span className={`inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
+          <span style={{ fontFamily: 'var(--game-font)'}} className={`text-xl inline-block border border-slate-400 rounded text-slate-200 ${cellText} ${cellPad}`}>
             {totalPowerUps}
           </span>
         </div>
