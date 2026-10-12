@@ -15,7 +15,7 @@ export function PowerUp({ powerUp, onClick }) {
       onClick={onClick}
       disabled={!powerUp.available}
       title={`${powerUp.name} - ${powerUp.description}${!powerUp.available ? "\n(Already used this stage)" : ""}`}
-      className={`rounded-lg border border-slate-500 bg-slate-800/80 hover:border-emerald-400 transition-colors ${!powerUp.available ? "cursor-not-allowed" : ""}`}
+      className="rounded-lg border border-slate-500 bg-slate-800/80 enabled:hover:border-emerald-400 transition disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed"
     >
       <img
         src={powerUp.icon}

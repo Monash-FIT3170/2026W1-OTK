@@ -22,7 +22,11 @@ export function PowerUpInventory({ powerUps = [] }) {
   };
 
   return (
-    <div className="flex flex-row gap-2 bg-black/40 rounded-xl p-2">
+    // At most 4 per row so the inventory doesn't reach the health bar
+    <div
+      className="grid gap-2 bg-black/40 rounded-xl p-2"
+      style={{ gridTemplateColumns: `repeat(${Math.min(powerUps.length, 4)}, auto)` }}
+    >
       {powerUps.map((powerUp, index) => (
         <PowerUp
           key={index}
