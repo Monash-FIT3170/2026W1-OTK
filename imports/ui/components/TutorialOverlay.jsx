@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { tutorialSteps } from '../tutorial/tutorialSteps';
 import {
   measureTarget,
+  isSameRect,
   computeHighlightStyle,
   computeCardPositionStyle,
 } from '../tutorial/spotlight';
@@ -53,17 +54,15 @@ export const TutorialOverlay = ({ onClose, hand = [] }) => {
   }, [hand, step.action]);
 
   useEffect(() => {
-    const measure = () => setRect(measureTarget(step.target));
-
-    measure();
-    const settleTimer = setTimeout(measure, 60);
-
-    window.addEventListener('resize', measure);
-    return () => {
-      window.removeEventListener('resize', measure);
-      clearTimeout(settleTimer);
+    let frame;
+    const tick = () => {
+      const next = measureTarget(step.target);
+      setRect((prev) => (isSameRect(prev, next) ? prev : next));
+      frame = requestAnimationFrame(tick);
     };
-  }, [stepIndex, step.target]);
+    tick();
+    return () => cancelAnimationFrame(frame);
+  }, [step.target]);
 
   const handleNext = () => {
     if (isWaitingForAction) return; // this step only advances via the real action
@@ -148,7 +147,8 @@ export const TutorialOverlay = ({ onClose, hand = [] }) => {
         >
           {cardContent}
         </div>
-      </>),
+      </>
+    ),
     document.body
   );
 };

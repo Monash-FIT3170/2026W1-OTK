@@ -10,6 +10,7 @@ import { tutorialSteps } from '../tutorial/tutorialSteps';
 import { useTutorialEngine } from '../hooks/useTutorialEngine';
 import {
   measureTarget,
+  isSameRect,
   computeHighlightStyle,
   computeCardPositionStyle,
 } from '../tutorial/spotlight';
@@ -72,15 +73,17 @@ export const TutorialDemoScreen = ({
   }, [cardsPlayedCount, step.action]);
 
   useEffect(() => {
-    const measure = () => setRect(measureTarget(step.target));
-    measure();
-    const settleTimer = setTimeout(measure, 60);
-    window.addEventListener('resize', measure);
-    return () => {
-      window.removeEventListener('resize', measure);
-      clearTimeout(settleTimer);
+    let frame;
+    const tick = () => {
+      const next = measureTarget(step.target);
+      // Only update state when something actually moved, so we don't
+      // re-render 60 times a second.
+      setRect((prev) => (isSameRect(prev, next) ? prev : next));
+      frame = requestAnimationFrame(tick);
     };
-  }, [stepIndex, step.target]);
+    tick();
+    return () => cancelAnimationFrame(frame);
+  }, [step.target]);
 
   const handleNext = () => {
     if (isWaitingForAction) return; // gated steps only advance via the real action
