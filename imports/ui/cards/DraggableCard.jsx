@@ -79,7 +79,7 @@ export function DraggableCard({
           y,
           position: 'relative',
           touchAction: 'none',
-          cursor: !playable ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
+          cursor: isInSelectionMode? 'pointer': !playable? 'not-allowed': isDragging? 'grabbing': 'grab',
         }}
         whileHover={!isDragging ? { scale: 1.1 } : {}}
         onClick={onClick}
@@ -92,6 +92,25 @@ export function DraggableCard({
         onPan={handlePan}
         onPanEnd={handlePanEnd}
       >
+        <motion.div
+          className={isInSelectionMode ? '[&_*]:!cursor-pointer' : ''}
+          animate={
+            isInSelectionMode
+              ? {
+                  filter: [
+                    'drop-shadow(0 0 0px rgba(163,230,53,0))',
+                    'drop-shadow(0 0 14px rgba(163,230,53,0.85))',
+                    'drop-shadow(0 0 0px rgba(163,230,53,0))',
+                  ],
+                }
+              : { filter: 'drop-shadow(0 0 0px rgba(163,230,53,0))' }
+          }
+          transition={
+            isInSelectionMode
+              ? { duration: 1.6, repeat: Infinity}
+              : { duration: 0.2 }
+          }
+        >
         <Card cardProps={cardProps} />
         {!affordable && !isInSelectionMode && (
           <div
@@ -109,6 +128,7 @@ export function DraggableCard({
             }}
           />
         )}
+        </motion.div>
       </motion.div>
     </motion.div>
   );

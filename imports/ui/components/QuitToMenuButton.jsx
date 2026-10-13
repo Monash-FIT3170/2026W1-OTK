@@ -16,7 +16,7 @@ export function QuitToMenuButton({ onQuit }) {
 
   return (
     <button
-      className="px-6 py-2.5 bg-red-800 hover:bg-red-700 text-white font-semibold rounded-lg text-lg transition-colors"
+      tyle={{ fontFamily: 'var(--game-font)'}} className="px-6 py-2.5 bg-red-800 hover:bg-red-700 text-white text-2xl rounded-lg text-lg transition-colors"
       onClick={handleQuit}
     >
       Quit to Menu

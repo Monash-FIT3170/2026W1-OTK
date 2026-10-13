@@ -48,17 +48,17 @@ export function LeaderboardScreen({ onBack }) {
     <div className="min-h-screen w-screen bg-slate-900">
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-emerald-400">Leaderboard</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 style={{ fontFamily: 'var(--game-font)'}} className="text-7xl font-semibold text-emerald-400">Leaderboard</h1>
+          <p style={{ fontFamily: 'var(--game-font)'}} className="text-slate-400 text-lg mt-1">
             Most damage dealt in a single Training Mode session
           </p>
         </div>
 
         <div className="w-full max-w-md rounded-2xl bg-slate-800 overflow-hidden">
           {loading ? (
-            <p className="text-slate-400 text-center py-8">Loading...</p>
+            <p style={{ fontFamily: 'var(--game-font)'}} className="text-2xl text-slate-400 text-center py-8">Loading...</p>
           ) : topScores.length === 0 ? (
-            <p className="text-slate-400 text-center py-8">
+            <p style={{ fontFamily: 'var(--game-font)'}} className="text-2xl text-slate-400 text-center py-8">
               No scores yet — be the first to set one in Training Mode!
             </p>
           ) : (
@@ -68,14 +68,14 @@ export function LeaderboardScreen({ onBack }) {
                 return (
                   <li
                     key={entry._id}
-                    className={`flex items-center justify-between px-5 py-3 ${
+                    style={{ fontFamily: 'var(--game-font)'}} className={`text-2xl flex items-center justify-between px-5 py-3 ${
                       index !== topScores.length - 1
                         ? 'border-b border-slate-700'
                         : ''
                     } ${isMe ? 'bg-emerald-900/40' : ''}`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-slate-400 w-8 text-lg font-semibold">
+                      <span style={{ fontFamily: 'var(--game-font)'}} className="text-slate-400 w-8 text-2xl">
                         {MEDALS[index] ?? `#${index + 1}`}
                       </span>
                       <span
@@ -87,7 +87,7 @@ export function LeaderboardScreen({ onBack }) {
                         {isMe ? ' (you)' : ''}
                       </span>
                     </div>
-                    <span className="text-slate-200 font-mono">
+                    <span style={{ fontFamily: 'var(--game-font)'}} className="text-2xl text-slate-200 font-mono">
                       {entry.trainingHighScore}
                     </span>
                   </li>
@@ -98,7 +98,7 @@ export function LeaderboardScreen({ onBack }) {
         </div>
 
         {!loading && !isInTopList && (
-          <p className="text-slate-400 text-sm">
+          <p style={{ fontFamily: 'var(--game-font)'}} className="text-lg text-slate-400 ">
             {myRank === undefined && 'Checking your rank...'}
             {myRank === null && "You haven't set a Training Mode score yet."}
             {myRank && (
@@ -114,7 +114,7 @@ export function LeaderboardScreen({ onBack }) {
         )}
 
         <button
-          className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
+          style={{ fontFamily: 'var(--game-font)'}} className="text-slate-400 hover:text-slate-300 text-lg transition-colors"
           onClick={onBack}
         >
           Back to Menu
