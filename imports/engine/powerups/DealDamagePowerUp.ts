@@ -18,7 +18,7 @@ export class DealDamagePowerUp extends PowerUp {
   }
 
   apply(engine: GameEngine): boolean {
-    engine.enemy.currentHealth = Math.max(0, engine.enemy.currentHealth - DAMAGE);
+    engine.enemy.takeDamage(DAMAGE);
     return true;
   }
 }
