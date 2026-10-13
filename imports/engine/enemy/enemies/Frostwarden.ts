@@ -24,6 +24,8 @@ export class Frostwarden extends Enemy {
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
+      damageTakenCount: data.damageTakenCount,
+      shieldLayers: data.shieldLayers,
     });
 
     // Only fresh spawns receive their default debuffs. Saved enemies restore

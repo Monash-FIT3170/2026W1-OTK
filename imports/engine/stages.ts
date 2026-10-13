@@ -18,6 +18,7 @@ import './enemy/enemies/IceCube';
 import { Dragon } from './enemy/enemies/Dragon';
 import { Ninja } from './enemy/enemies/Ninja';
 import { Merchant } from './enemy/enemies/Merchant';
+import { SecretBoss } from './enemy/enemies/SecretBoss';
 
 export type StageConfig = {
   stage: number;
@@ -32,10 +33,12 @@ export const STAGES: StageConfig[] = [
   { stage: 4, BossClass: Timekeeper, scene: 'otkclone_bg_palace_overlaid' },
   { stage: 5, BossClass: Ninja, scene: 'underpass-overlaid' },
   { stage: 6, BossClass: Merchant, scene: 'underpass-overlaid' },
+  { stage: 7, BossClass: SecretBoss, scene: 'underpass-overlaid' },
 ];
 
 export const FIRST_STAGE = STAGES[0].stage;
-export const FINAL_STAGE = STAGES[STAGES.length - 1].stage;
+export const FINAL_STAGE = STAGES[STAGES.length - 2].stage;   // -2 as the last stage is the secret boss
+export const SECRET_BOSS_STAGE = STAGES[STAGES.length - 1].stage;
 
 export function getStageConfig(stage: number): StageConfig {
   const config = STAGES.find((entry) => entry.stage === stage);

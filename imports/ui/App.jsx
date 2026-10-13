@@ -20,6 +20,7 @@ import { LandingPage } from './LandingPage';
 import { TutorialOverlay } from './components/TutorialOverlay';
 import { TutorialDemoScreen } from './components/TutorialDemoScreen';
 import { TrainingModeScreen } from './components/TrainingModeScreen';
+import { LeaderboardScreen } from './components/LeaderboardScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
@@ -38,6 +39,10 @@ export const App = () => {
   // screen — like showTutorialDemo, it never touches the player's real
   // save. See TrainingModeScreen / useTrainingEngine.
   const [showTrainingMode, setShowTrainingMode] = useState(false);
+
+  // Leaderboard (landing page button) is a read-only screen — no local
+  // engine, no save to touch, just a subscription + a method call.
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
@@ -95,7 +100,8 @@ export const App = () => {
     !showLanding &&
     !showDeckBuilder &&
     !showTutorialDemo &&
-    !showTrainingMode;
+    !showTrainingMode &&
+    !showLeaderboard;
 
   useGameSounds(gameState?.result, onGameScreen);
 
@@ -144,6 +150,16 @@ export const App = () => {
     setShowLanding(true);
   };
 
+  const handleOpenLeaderboard = () => {
+    setShowLanding(false);
+    setShowLeaderboard(true);
+  };
+
+  const handleCloseLeaderboard = () => {
+    setShowLeaderboard(false);
+    setShowLanding(true);
+  };
+
   const handleStart = (isNewGame = false) => {
     setShowLanding(false);
     if (isNewGame) setJustStartedNewGame(true);
@@ -186,6 +202,10 @@ export const App = () => {
     );
   }
 
+  if (showLeaderboard) {
+    return <LeaderboardScreen onBack={handleCloseLeaderboard} />;
+  }
+
   if (showLanding) {
     return (
       <LandingPage
@@ -196,6 +216,7 @@ export const App = () => {
         onStart={handleStart}
         onOpenTutorial={handleOpenTutorial}
         onOpenTrainingMode={handleOpenTrainingMode}
+        onOpenLeaderboard={handleOpenLeaderboard}
         onEditDeck={() => {
           setShowLanding(false);
           setShowDeckBuilder(true);

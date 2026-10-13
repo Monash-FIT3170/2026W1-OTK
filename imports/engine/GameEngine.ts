@@ -9,7 +9,7 @@ import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, cardData, powerUpData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { FIRST_STAGE, FINAL_STAGE, getStageConfig } from './stages';
+import { FIRST_STAGE, FINAL_STAGE, SECRET_BOSS_STAGE, getStageConfig } from './stages';
 import { pickRandomPowerUps, PowerUp } from './powerups';
 import { powerUpRegistry, powerupRegistry } from './powerups/PowerupRegistry';
 
@@ -29,6 +29,8 @@ export class GameEngine {
   public bossRecap: BossRecapEntry[];
   public stageStartedAt: number;
   public cardsUsedThisStage: number;
+  public powerUpsUsedThisStage: number;
+  public debuffsFaced: string[];
   public lastActiveAt: number;
   public powerUps: PowerUp[];
   public powerUpChoices: string[];
@@ -47,6 +49,8 @@ export class GameEngine {
     this.bossRecap = userData.bossRecap ?? [];
     this.stageStartedAt = userData.stageStartedAt ?? Date.now();
     this.cardsUsedThisStage = userData.cardsUsedThisStage ?? 0;
+    this.powerUpsUsedThisStage = userData.powerUpsUsedThisStage ?? 0;
+    this.debuffsFaced = userData.debuffsFaced ?? [],
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
     const powerUpList = userData.powerUps ?? []
     // Only `available` is run state - name, description, icon and consumedOnUse
@@ -115,6 +119,7 @@ export class GameEngine {
       stage: this.stage,
       timeMs: Date.now() - this.stageStartedAt,
       cardsUsed: this.cardsUsedThisStage,
+      powerUpsUsed: this.powerUpsUsedThisStage,
       result: bossResult,
     });
   }
@@ -130,8 +135,12 @@ export class GameEngine {
     if (this.result !== 'playing') return;
     this.finalizeBossRecap('win');
     this.clearTimerDebuff();
-    this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
-    if (this.result === 'stageCleared') {
+    
+    const continueToFinalBoss = this.stage === (SECRET_BOSS_STAGE - 1) && this.shouldContinueToSecretBoss();
+    this.result = this.stage >= FINAL_STAGE && !continueToFinalBoss ? 'win' : 'stageCleared';
+
+    // Don't provide power ups when progressing to the secret boss
+    if (this.result === 'stageCleared' && !continueToFinalBoss) {
       this.powerUpChoices = pickRandomPowerUps(3, this.selectedPowerUps).map((p) => p.powerUpId);
     }
   }
@@ -170,6 +179,8 @@ export class GameEngine {
 
     if (!powerUp.applyTo(this)) return;
 
+    this.powerUpsUsedThisStage += 1;
+
     if (powerUp.consumedOnUse ?? false) {
       // Remove by slot (not id) so the clicked copy is the one removed
       this.powerUps.splice(index, 1);
@@ -196,17 +207,35 @@ export class GameEngine {
 
     this.stage += 1;
     const { BossClass } = getStageConfig(this.stage);
-    this.enemy = new BossClass();
+    if (this.stage !== SECRET_BOSS_STAGE) {
+      this.enemy = new BossClass();
+      
+      this.debuffsFaced = [...new Set([...this.debuffsFaced, ...this.enemy.debuffs])];
+    } else {
+      this.enemy = new BossClass({ debuffs: this.debuffsFaced });
+    }
     this.deck = this.freshDeckFromBase();
     this.hand = [];
     this.result = 'playing';
     this.stageStartedAt = Date.now();
     this.cardsUsedThisStage = 0;
+    this.powerUpsUsedThisStage = 0;
+    
     this.refreshPowerUps();
-
+    
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
+  }
+
+  /**
+   * Function to determine if the user should continue to the secret boss
+   * @returns Boolean value
+   */
+  shouldContinueToSecretBoss(): boolean {
+    const powerUpsUsedOverall = this.bossRecap.reduce((sum, recap) => sum + recap.powerUpsUsed, 0);
+
+    return powerUpsUsedOverall === 0;
   }
 
   // Fresh copies of the run's locked deck. Cloning through the registry is what
@@ -308,6 +337,8 @@ export class GameEngine {
       bossRecap: [],
       stageStartedAt: Date.now(),
       cardsUsedThisStage: 0,
+      powerUpsUsedThisStage: 0,
+      debuffsFaced: [],
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
@@ -382,6 +413,8 @@ export class GameEngine {
       bossRecap: this.bossRecap,
       stageStartedAt: this.stageStartedAt,
       cardsUsedThisStage: this.cardsUsedThisStage,
+      powerUpsUsedThisStage: this.powerUpsUsedThisStage,
+      debuffsFaced: this.debuffsFaced,
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
       powerUpChoices: this.powerUpChoices,

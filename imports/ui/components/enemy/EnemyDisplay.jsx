@@ -11,7 +11,8 @@ const ENEMY_SPRITE_IDS = {
   timekeeper: 'lion',
   undying: 'dragon', // TODO: update with asset
   ninja: 'goblin', //TODO: update with asset
-  merchant: 'goblin', // TODO; update with asset
+  merchant: 'goblin', // TODO: update with asset
+  secretboss: 'goblin', // TODO: update with asset
 };
 
 const ENEMY_SPRITE_SIZES = {
@@ -159,7 +160,7 @@ export function EnemyDisplay({
               }}
             />
             <TimerDebuff enemy={enemy} />
-            <ShieldLayers enemy= {enemy}/>
+            <ShieldLayers enemy={enemy} />
           </div>
         </motion.div>
       )}
