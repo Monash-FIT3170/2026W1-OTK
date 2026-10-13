@@ -32,6 +32,7 @@ export class GameEngine {
   public lastActiveAt: number;
   public powerUps: PowerUp[];
   public powerUpChoices: string[];
+  public selectedPowerUps: string[];
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -56,6 +57,7 @@ export class GameEngine {
       return powerUp;
     });
     this.powerUpChoices = userData.powerUpChoices ?? [];
+    this.selectedPowerUps = userData.selectedPowerUps ?? [];
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -130,7 +132,7 @@ export class GameEngine {
     this.clearTimerDebuff();
     this.result = this.stage >= FINAL_STAGE ? 'win' : 'stageCleared';
     if (this.result === 'stageCleared') {
-      this.powerUpChoices = pickRandomPowerUps(3).map((p) => p.powerUpId);
+      this.powerUpChoices = pickRandomPowerUps(3, this.selectedPowerUps).map((p) => p.powerUpId);
     }
   }
 
@@ -145,6 +147,7 @@ export class GameEngine {
     }
     this.powerUps.push(powerupRegistry.create(powerUpId));
     this.powerUpChoices = [];
+    this.selectedPowerUps = [...new Set([...this.selectedPowerUps, powerUpId])];
   }
 
   // Player clicked an inventory slot mid-battle to trigger its effect.
@@ -308,6 +311,7 @@ export class GameEngine {
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
+      selectedPowerUps: [],
     };
 
     const engine = new GameEngine(userData);
@@ -381,6 +385,7 @@ export class GameEngine {
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
       powerUpChoices: this.powerUpChoices,
+      selectedPowerUps: this.selectedPowerUps,
     };
   }
 }
