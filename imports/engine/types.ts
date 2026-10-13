@@ -70,6 +70,7 @@ export type UserData = {
   lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
   powerUps?: powerUpData[]; // powerUpIds chosen so far, in pick order
   powerUpChoices?: string[]; // powerUpIds currently offered on the stage-clear screen
+  selectedPowerUps?: string[];
 };
 
 // data shape for a power-up (created via powerUpRegistry from a powerUpId)

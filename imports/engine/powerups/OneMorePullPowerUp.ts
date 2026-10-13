@@ -9,22 +9,18 @@ export class OneMorePullPowerUp extends PowerUp {
       powerUpId: 'one-more-pull',
       name: 'One More Pull',
       description: 'Draws one card.',
-      icon: '',
+      icon: '/assets/sprites/powerups/one-more-pull-pu-sprite.png',
       available: true,
       consumedOnUse: false,
       ...data,
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('One More Pull powerup is unavailable');
-    }
+  apply(engine: GameEngine): boolean {
+    if (engine.deck.length === 0) return false;
 
-    if (engine.deck.length > 1) {
-      this.oneMorePull(engine, engine.hand);
-      this.available = false;
-    }
+    this.oneMorePull(engine, engine.hand);
+    return true;
   }
 
   private oneMorePull(engine: GameEngine, hand: Card[]): void {

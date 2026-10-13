@@ -34,6 +34,7 @@ export class GameEngine {
   public lastActiveAt: number;
   public powerUps: PowerUp[];
   public powerUpChoices: string[];
+  public selectedPowerUps: string[];
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -52,8 +53,15 @@ export class GameEngine {
     this.debuffsFaced = userData.debuffsFaced ?? [],
     this.lastActiveAt = userData.lastActiveAt ?? Date.now();
     const powerUpList = userData.powerUps ?? []
-    this.powerUps = powerUpList.map((powerUp) => powerUpRegistry.create(powerUp)) ?? [];
+    // Only `available` is run state - name, description, icon and consumedOnUse
+    // come from the power-up class, so balance changes reach existing saves.
+    this.powerUps = powerUpList.map(({ powerUpId, available }) => {
+      const powerUp = powerUpRegistry.create(powerUpId);
+      powerUp.available = available ?? true;
+      return powerUp;
+    });
     this.powerUpChoices = userData.powerUpChoices ?? [];
+    this.selectedPowerUps = userData.selectedPowerUps ?? [];
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -133,7 +141,7 @@ export class GameEngine {
 
     // Don't provide power ups when progressing to the secret boss
     if (this.result === 'stageCleared' && !continueToFinalBoss) {
-      this.powerUpChoices = pickRandomPowerUps(3).map((p) => p.powerUpId);
+      this.powerUpChoices = pickRandomPowerUps(3, this.selectedPowerUps).map((p) => p.powerUpId);
     }
   }
 
@@ -146,14 +154,15 @@ export class GameEngine {
     if (!this.powerUpChoices.includes(powerUpId)) {
       throw new Error(`"${powerUpId}" was not offered as a choice`);
     }
-    powerupRegistry.create(powerUpId);
     this.powerUps.push(powerupRegistry.create(powerUpId));
     this.powerUpChoices = [];
+    this.selectedPowerUps = [...new Set([...this.selectedPowerUps, powerUpId])];
   }
 
   // Player clicked an inventory slot mid-battle to trigger its effect.
-  // Only consumable power-ups (consumedOnUse) are removed afterward -
-  // reusable ones stay in the inventory for the rest of the run.
+  // Consumable power-ups (consumedOnUse) are removed for the rest of the run;
+  // the rest are disabled until the next stage. A power-up that had nothing
+  // to do (e.g. empty hand) is left unspent.
   usePowerUp(index: number): void {
     if (this.result !== 'playing') {
       throw new Error('Cannot use a power-up outside of battle');
@@ -168,26 +177,23 @@ export class GameEngine {
       throw new Error(`Power Up unavailable: ${powerUp.powerUpId}`);
     }
 
-    powerUp.applyTo(this);
+    if (!powerUp.applyTo(this)) return;
 
     this.powerUpsUsedThisStage += 1;
 
-    // isAvailable is set and managed by the powerUp itself
     if (powerUp.consumedOnUse ?? false) {
-      this.removePowerUp(powerUp.powerUpId);
+      // Remove by slot (not id) so the clicked copy is the one removed
+      this.powerUps.splice(index, 1);
+    } else {
+      powerUp.available = false;
     }
   }
 
-  /**
-   * Function to remove a power up from the power up list
-   * If there are multiple, removes the first one
-   * @param powerUpId ID of the power up to remove
-   */
-  removePowerUp(powerUpId: string): void {
-    const index = this.powerUps.findIndex(powerUp => powerUp.powerUpId === powerUpId);
-    if (index !== -1) {
-      this.powerUps.splice(index, 1);
-    }
+  // Once-per-stage power-ups become usable again at the start of a stage.
+  refreshPowerUps(): void {
+    this.powerUps.forEach((powerUp) => {
+      powerUp.available = true;
+    });
   }
 
   // Player confirmed "Next Enemy" on the stage-clear screen.
@@ -214,9 +220,8 @@ export class GameEngine {
     this.stageStartedAt = Date.now();
     this.cardsUsedThisStage = 0;
     this.powerUpsUsedThisStage = 0;
-    this.powerUps.forEach(powerUp => {
-      powerUp.available = true;
-    });
+    
+    this.refreshPowerUps();
     
     this.shuffle();
     this.activateEnemyDebuffs();
@@ -337,6 +342,7 @@ export class GameEngine {
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
+      selectedPowerUps: [],
     };
 
     const engine = new GameEngine(userData);
@@ -412,6 +418,7 @@ export class GameEngine {
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
       powerUpChoices: this.powerUpChoices,
+      selectedPowerUps: this.selectedPowerUps,
     };
   }
 }
