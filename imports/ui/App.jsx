@@ -19,6 +19,7 @@ import { AccountRegistrationForm } from './AccountRegistrationForm';
 import { LandingPage } from './LandingPage';
 import { TutorialOverlay } from './components/TutorialOverlay';
 import { TutorialDemoScreen } from './components/TutorialDemoScreen';
+import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
 import { TrainingModeScreen } from './components/TrainingModeScreen';
 import { LeaderboardScreen } from './components/LeaderboardScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
@@ -86,10 +87,13 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding]);
 
-  // Auto-show the tutorial every time the player starts a brand-new game
+  // Auto-show the tutorial when a player starts a new game, but only if
+  // they haven't seen it yet (profile.hasSeenTutorial, set by
+  // user.markTutorialSeen). The Tutorial button on the landing page still
+  // lets them replay it at any time.
   useEffect(() => {
     if (!loading && user && gameState && !showLanding && justStartedNewGame) {
-      setShowTutorial(true);
+      if (shouldAutoShowTutorial(user)) setShowTutorial(true);
       setJustStartedNewGame(false);
     }
   }, [loading, user, gameState, showLanding, justStartedNewGame]);
