@@ -18,7 +18,8 @@ import './enemy/enemies/IceCube';
 import { Ninja } from './enemy/enemies/Ninja';
 import { Merchant } from './enemy/enemies/Merchant';
 import { SecretBoss } from './enemy/enemies/SecretBoss';
-import type { DialogueKind, DialogueLine, SeenDialogue } from './types';
+import type { DialogueLine, SeenDialogue } from './types';
+import { SEVENTH_SHARD_REVELATION } from './endings';
 
 export type StageDialogue = {
   intro: DialogueLine[]; // plays before the player can touch the fight
@@ -41,6 +42,24 @@ export const STAGES: StageConfig[] = [
     scene: 'underpass-overlaid',
     dialogue: {
       intro: [
+        // Opening sequence, followed by the Goblin encounter.
+        { speaker: 'narrator', text: '11:59:59.' },
+        { speaker: 'narrator', text: 'One second before midnight.' },
+        { speaker: 'narrator', text: 'And for longer than anyone remembers… that second has never passed.' },
+        { speaker: 'narrator', text: 'The player wakes beside a shattered glowing Clock.' },
+        { speaker: 'player', text: 'Where am I…?' },
+        { speaker: 'player', text: 'I remember another place.' },
+        { speaker: 'player', text: 'Another life.' },
+        { speaker: 'player', text: 'But not how I got here.' },
+        { speaker: 'narrator', text: 'The shattered Clock pulses.' },
+        { speaker: 'player', text: 'That Clock…' },
+        { speaker: 'player', text: 'Maybe it can get me home.' },
+        { speaker: 'narrator', text: 'Six fragments of the ancient Clock remain scattered across the world, frozen in time.' },
+        { speaker: 'narrator', text: 'Chronoshards.' },
+        { speaker: 'narrator', text: 'Each is guarded by one of the powerful ancient demigods known as the Guardians of Time.' },
+        { speaker: 'narrator', text: 'Six pieces.' },
+        { speaker: 'narrator', text: 'Fix the Clock.' },
+        { speaker: 'narrator', text: 'Find a way home.' },
         { speaker: 'enemy', text: 'HEY! You moved!' },
         { speaker: 'player', text: 'So did you.'},
         { speaker: 'enemy', text: 'Yeah, but I\'m supposed to! Why aren\'t you frozen like the others? '},
@@ -122,12 +141,56 @@ export const STAGES: StageConfig[] = [
     scene: 'otkclone_bg_palace_overlaid',
     dialogue: {
       intro: [
-        { speaker: 'enemy', text: 'Every second you spend here belongs to me.' },
-        { speaker: 'player', text: 'Then I will not waste a single one.' },
+        { speaker: 'enemy', text: 'You have returned.' },
+        { speaker: 'player', text: 'There it is again.' },
+        { speaker: 'player', text: "Everyone keeps telling me I've been here before." },
+        { speaker: 'enemy', text: 'You have.' },
+        { speaker: 'player', text: 'Who am I?' },
+        { speaker: 'enemy', text: 'A Vessel.' },
+        { speaker: 'player', text: 'A vessel for what?' },
+        { speaker: 'enemy', text: 'The Clock.' },
+        { speaker: 'player', text: 'No.' },
+        { speaker: 'player', text: 'I came from another world.' },
+        { speaker: 'enemy', text: 'There was no other world.' },
+        { speaker: 'player', text: 'I remember it.' },
+        { speaker: 'enemy', text: 'You remember what the Clock gave you.' },
+        { speaker: 'player', text: 'Why would it do that?' },
+        { speaker: 'enemy', text: 'Because a Vessel requires purpose.' },
+        { speaker: 'enemy', text: 'A reason to move forward.' },
+        { speaker: 'player', text: 'So my memories are fake?' },
+        { speaker: 'enemy', text: 'Fragments.' },
+        { speaker: 'enemy', text: 'A past created to lead you here.' },
+        { speaker: 'player', text: 'And this has happened before.' },
+        { speaker: 'enemy', text: 'Countless times.' },
+        { speaker: 'player', text: 'Then why is the world frozen?' },
+        { speaker: 'enemy', text: 'Because I froze it.' },
+        { speaker: 'player', text: 'You did this?' },
+        { speaker: 'enemy', text: 'To save it.' },
+        { speaker: 'player', text: 'From what?' },
+        { speaker: 'enemy', text: 'The Chronosphere once surrounded this world.' },
+        { speaker: 'enemy', text: 'A barrier between our reality and something beyond time.' },
+        { speaker: 'enemy', text: 'An entity powerful enough to tear through it.' },
+        { speaker: 'enemy', text: 'When the Chronosphere broke, it began crossing into our world.' },
+        { speaker: 'enemy', text: 'It was one second away.' },
+        { speaker: 'player', text: 'So you shattered the Clock.' },
+        { speaker: 'enemy', text: 'Yes.' },
+        { speaker: 'enemy', text: 'And froze that second forever.' },
+        { speaker: 'player', text: 'You trapped everyone.' },
+        { speaker: 'enemy', text: 'I kept them alive.' },
+        { speaker: 'player', text: "This isn't living." },
+        { speaker: 'enemy', text: 'No.' },
+        { speaker: 'enemy', text: 'It is survival.' },
+        { speaker: 'player', text: "Then I'll restore the Clock." },
+        { speaker: 'player', text: "I'll fix the Chronosphere." },
+        { speaker: 'enemy', text: 'You have said that before.' },
+        { speaker: 'player', text: "Then maybe this time I'll actually do it." },
+        { speaker: 'enemy', text: 'Come, Vessel.' },
+        { speaker: 'enemy', text: 'Let us see.' },
       ],
       outro: [
-        { speaker: 'enemy', text: 'Time itself... slipping from my grasp.' },
-        { speaker: 'player', text: 'It was never yours to keep.' },
+        { speaker: 'narrator', text: 'The Timekeeper is defeated.' },
+        { speaker: 'enemy', text: 'So…' },
+        { speaker: 'enemy', text: 'You might reach the end of the cycle this time after all...' },
       ],
     },
   },
@@ -138,7 +201,7 @@ export const STAGES: StageConfig[] = [
     dialogue: {
       intro: [
         { speaker: 'enemy', text: 'Your stance has changed.' },
-        { speaker: 'player', text: 'You know me too?' },
+        { speaker: 'player', text: 'I\'m guessing you know me too?' },
         { speaker: 'enemy', text: 'I know your patterns.' },
         { speaker: 'player', text: 'I don\'t have patterns.' },
         { speaker: 'enemy', text: 'Nonsense. Everyone does.' },
@@ -147,11 +210,10 @@ export const STAGES: StageConfig[] = [
       outro: [
         { speaker: 'enemy', text: 'Fast... faster than a shadow.' },
         { speaker: 'enemy', text: 'How is this possible? I can predict your every move.' },
-        { speaker: 'player', text: 'That\'s the flaw in your programming. Machines look for patterns. We humans break them.' },
+        { speaker: 'player', text: 'Heh... I guess I\'ve had my fair share of practice' },
         { speaker: 'enemy', text: 'So you say... Your past versions weren\'t like you. They were so predictable.' },
-        { speaker: 'player', text: 'You keep acting like you have met me before.' },
-        { speaker: 'enemy', text: 'Because we have.' },
-        { speaker: 'player', text: 'How? How is that possible?' },
+        { speaker: 'player', text: 'What happens to me after I fix the clock?' },
+        { speaker: 'player', text: 'What lies beyond the Chronosphere? What lies beyond time itself?' },
         { speaker: 'enemy', text: 'Ask the Merchant. He remembers more than most.' },
       ],
     },
@@ -165,7 +227,7 @@ export const STAGES: StageConfig[] = [
         { speaker: 'enemy', text: 'Welcome back.' },
         { speaker: 'player', text: 'Of course. You\'ve been expecting me. You\'re going to tell me we\'ve met before too.' },
         { speaker: 'enemy', text: 'Many times.' },
-        { speaker: 'player', text: 'Then tell me who I am.' },
+        { speaker: 'player', text: 'Then tell me what happens to me after I fix the Clock?' },
         { speaker: 'enemy', text: 'That is an expensive question.' },
         { speaker: 'player', text: 'I don\'t have money.' },
         { speaker: 'enemy', text: 'Fool! Money is worthless. I trade in something much more valuable.' },
@@ -196,6 +258,25 @@ export const STAGES: StageConfig[] = [
     scene: 'underpass-overlaid',
     dialogue: {
       intro: [
+        ...SEVENTH_SHARD_REVELATION,
+        { speaker: 'narrator', text: 'The Clock begins pulling at the player.' },
+        { speaker: 'narrator', text: 'Nothing happens.' },
+        { speaker: 'player', text: "…That's new." },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'Impossible.' },
+        { speaker: 'player', text: 'What?' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'The Clock cannot reclaim you.' },
+        { speaker: 'player', text: 'Why?' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'You refused its power.' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'You never traded yourself away.' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'The seventh Chronoshard remains within you…' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'But you are no longer merely a piece of the Clock.' },
+        { speaker: 'player', text: 'Then what am I?' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'Something no Vessel has ever become.' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'Independent.' },
+        { speaker: 'narrator', text: 'The Clocktower shakes violently.' },
+        { speaker: 'player', text: "What's happening?" },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'The Chronosphere…' },
+        { speaker: 'enemy', speakerName: 'Timekeeper', text: 'Something is crossing through.' },
         { speaker: 'enemy', text: 'At last we meet.' },
         { speaker: 'player', text: 'You\'re the entity beyond the chronosphere!' },
         { speaker: 'enemy', text: 'You have carried me through every cycle. ' },
@@ -213,12 +294,8 @@ export const STAGES: StageConfig[] = [
         { speaker: 'player', text: 'This one!' },
 
       ],
-      outro: [
-        { speaker: 'enemy', text: 'How...?' },
-        { speaker: 'player', text: 'You knew every version of me that followed the Clock.' },
-        { speaker: 'player', text: 'But you never knew the one who would defy it.' },
-
-      ],
+      // The defeat dialogue is part of SECRET_ENDING in endings.ts.
+      outro: [],
     },
   },
 ];
@@ -233,7 +310,7 @@ export function getStageConfig(stage: number): StageConfig {
   return config;
 }
 
-export function getStageDialogue(stage: number, kind: DialogueKind): DialogueLine[] {
+export function getStageDialogue(stage: number, kind: 'intro' | 'outro'): DialogueLine[] {
   return getStageConfig(stage).dialogue[kind];
 }
 
@@ -248,7 +325,7 @@ export function dialogueKey(stage: number): string {
 // stage has lines for it and the account has not seen them yet.
 export function shouldShowDialogue(
   stage: number,
-  kind: DialogueKind,
+  kind: 'intro' | 'outro',
   seen?: SeenDialogue | null
 ): boolean {
   if (getStageDialogue(stage, kind).length === 0) return false;

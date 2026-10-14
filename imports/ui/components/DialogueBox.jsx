@@ -33,7 +33,7 @@ const SPEAKER_STYLES = {
  *
  * onFinish is called at most once, however fast the player clicks.
  *
- * @param {{ speaker: 'player' | 'enemy' | 'narrator', text: string }[]} lines
+ * @param {{ speaker: 'player' | 'enemy' | 'narrator', speakerName?: string, text: string }[]} lines
  * @param {string} enemyName - shown as the name of every 'enemy' line
  * @param {string} finishHint - prompt shown on the last line ("Click to begin"
  *   suits an intro; an outro wants something like "Click to continue")
@@ -119,7 +119,8 @@ export function DialogueBox({
       ? line.speaker
       : 'narrator';
   const style = SPEAKER_STYLES[speaker];
-  const speakerName = speaker === 'enemy' ? enemyName : style.name;
+  const speakerName =
+    line.speakerName ?? (speaker === 'enemy' ? enemyName : style.name);
 
   // Fills whatever box the parent gives it (w-full h-full), edge to edge. Sizes
   // are in design-canvas pixels (the game canvas is 1920x1080 and scaled), so

@@ -59,17 +59,18 @@ export type DialogueSpeaker = 'player' | 'enemy' | 'narrator';
 
 export type DialogueLine = {
   speaker: DialogueSpeaker;
+  speakerName?: string; // named speakers outside the current boss encounter
   text: string;
 };
 
-// Dialogue plays before the fight ('intro') and after the boss dies ('outro').
-export type DialogueKind = 'intro' | 'outro';
+// Dialogue plays before/after fights, or as a victory ending.
+export type DialogueKind = 'intro' | 'outro' | 'ending';
 
 // Account-level record of which stage dialogue the player has already seen,
 // keyed by dialogueKey(stage). It lives at the top level of the user's
 // document - not inside gameState - so starting a new run does not reset it.
 export type SeenDialogue = {
-  [stageKey: string]: { intro?: boolean; outro?: boolean };
+  [stageKey: string]: { intro?: boolean; outro?: boolean; ending?: boolean };
 };
 
 // data shape stored in UserDataCollection
@@ -92,6 +93,8 @@ export type UserData = {
   powerUpChoices?: string[]; // powerUpIds currently offered on the stage-clear screen
   dialogueSeen?: boolean; // pre-battle dialogue finished (or not needed) for the current stage
   outroSeen?: boolean; // post-battle dialogue finished (or not needed) for the current stage
+  endingSeen?: boolean; // normal ending finished (or already watched on this account)
+  secretEndingSeen?: boolean; // secret ending tracked independently of normal victory
 };
 
 // data shape for a power-up (created via powerUpRegistry from a powerUpId)

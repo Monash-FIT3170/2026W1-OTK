@@ -9,7 +9,7 @@ import { enemyRegistry } from './enemy/EnemyRegistry';
 import { UserData, EnemyData, BossRecapEntry, RunResult, SeenDialogue, cardData, powerUpData } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { FIRST_STAGE, FINAL_STAGE, SECRET_BOSS_STAGE, getStageConfig, shouldShowDialogue } from './stages';
+import { FIRST_STAGE, FINAL_STAGE, SECRET_BOSS_STAGE, getStageConfig, shouldShowDialogue, dialogueKey } from './stages';
 import { pickRandomPowerUps, PowerUp } from './powerups';
 import { powerUpRegistry, powerupRegistry } from './powerups/PowerupRegistry';
 
@@ -40,6 +40,8 @@ export class GameEngine {
   public dialogueSeen: boolean;
   // Post-battle dialogue for the current stage is finished (or not needed).
   public outroSeen: boolean;
+  public endingSeen: boolean;
+  public secretEndingSeen: boolean;
 
   constructor(userData: UserData) {
     this.userId = userData.userId;
@@ -64,6 +66,8 @@ export class GameEngine {
     // dialogue popping up mid-fight after the update.
     this.dialogueSeen = userData.dialogueSeen ?? true;
     this.outroSeen = userData.outroSeen ?? true;
+    this.endingSeen = userData.endingSeen ?? false;
+    this.secretEndingSeen = userData.secretEndingSeen ?? false;
   }
 
   // draws cards equal to the card's cost into hand, returns selection info
@@ -269,6 +273,23 @@ export class GameEngine {
     this.outroSeen = true;
   }
 
+  isEndingPending(): boolean {
+    return (
+      this.result === 'win' &&
+      this.outroSeen &&
+      ((this.stage === FINAL_STAGE && !this.endingSeen) ||
+        (this.stage === SECRET_BOSS_STAGE && !this.secretEndingSeen))
+    );
+  }
+
+  finishEnding(): void {
+    if (this.stage === SECRET_BOSS_STAGE) {
+      this.secretEndingSeen = true;
+    } else {
+      this.endingSeen = true;
+    }
+  }
+
   /**
    * Function to determine if the user should continue to the secret boss
    * @returns Boolean value
@@ -391,6 +412,8 @@ export class GameEngine {
       powerUpChoices: [],
       dialogueSeen: !shouldShowDialogue(stage, 'intro', seen),
       outroSeen: !shouldShowDialogue(stage, 'outro', seen),
+      endingSeen: !!seen?.[dialogueKey(FINAL_STAGE)]?.ending,
+      secretEndingSeen: !!seen?.[dialogueKey(SECRET_BOSS_STAGE)]?.ending,
     };
 
     const engine = new GameEngine(userData);
@@ -468,6 +491,8 @@ export class GameEngine {
       powerUpChoices: this.powerUpChoices,
       dialogueSeen: this.dialogueSeen,
       outroSeen: this.outroSeen,
+      endingSeen: this.endingSeen,
+      secretEndingSeen: this.secretEndingSeen,
     };
   }
 }

@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { assert } from 'chai';
 import { UserDataCollection } from '../collections/UserDataCollection';
 import { GameEngine } from '../../../engine/GameEngine';
+import { FINAL_STAGE, SECRET_BOSS_STAGE } from '../../../engine/stages';
 
 /**
  * Unit tests for the game.finishDialogue method and the dialogue guards on
@@ -48,6 +49,59 @@ if (Meteor.isServer) {
   });
 
   describe('game.finishDialogue', function () {
+    it('records the normal ending and skips it on a restarted run', async function () {
+      const engine = new GameEngine(GameEngine.newGame(userId));
+      engine.stage = FINAL_STAGE;
+      engine.result = 'win';
+      engine.finishOutro();
+      await UserDataCollection.insertAsync({ userId, gameState: engine.toJSON() });
+      await callFinish('ending');
+      let doc = await UserDataCollection.findOneAsync({ userId });
+      assert.isTrue(doc.gameState.endingSeen);
+      assert.isTrue(doc.seenDialogue[`stage${FINAL_STAGE}`].ending);
+      await callFinish('ending');
+      await call('game.newGame');
+      doc = await UserDataCollection.findOneAsync({ userId });
+      assert.isTrue(doc.gameState.endingSeen);
+    });
+
+    it('rejects the ending before the outro, during battle, and on non-final stages', async function () {
+      for (const [stage, result, outroSeen] of [
+        [FINAL_STAGE, 'win', false],
+        [FINAL_STAGE, 'playing', true],
+        [1, 'win', true],
+      ]) {
+        await UserDataCollection.removeAsync({ userId });
+        const gameState = { ...GameEngine.newGame(userId), stage, result, outroSeen };
+        await UserDataCollection.insertAsync({ userId, gameState });
+        try {
+          await callFinish('ending');
+          assert.fail('Expected ending to be rejected');
+        } catch (error) {
+          assert.equal(error.error, 'game.finishDialogue.notPending');
+        }
+      }
+    });
+
+    it('records secret victory separately and preserves it on restart', async function () {
+      const engine = new GameEngine(GameEngine.newGame(userId));
+      engine.stage = SECRET_BOSS_STAGE;
+      engine.result = 'win';
+      engine.finishOutro();
+      await UserDataCollection.insertAsync({ userId, gameState: engine.toJSON() });
+      await callFinish('ending');
+      await callFinish('ending');
+      let doc = await UserDataCollection.findOneAsync({ userId });
+      assert.isTrue(doc.gameState.secretEndingSeen);
+      assert.isFalse(doc.gameState.endingSeen);
+      assert.isTrue(doc.seenDialogue[`stage${SECRET_BOSS_STAGE}`].ending);
+      assert.isUndefined(doc.seenDialogue[`stage${FINAL_STAGE}`]);
+      await call('game.newGame');
+      doc = await UserDataCollection.findOneAsync({ userId });
+      assert.isTrue(doc.gameState.secretEndingSeen);
+      assert.isFalse(doc.gameState.endingSeen);
+    });
+
     it('rejects unauthenticated callers', async function () {
       await seedRun();
 

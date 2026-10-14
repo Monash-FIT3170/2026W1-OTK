@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { UserDataCollection } from '../collections/UserDataCollection';
 import { GameEngine } from '../../../engine/GameEngine';
-import { dialogueKey } from '../../../engine/stages';
+import { dialogueKey, FINAL_STAGE, SECRET_BOSS_STAGE } from '../../../engine/stages';
 
 Meteor.methods({
   /**
@@ -11,6 +11,7 @@ Meteor.methods({
    * - 'intro': the fight begins now. Until this runs, the stage is parked and
    *   every battle action is rejected (see GameEngine.isIntroPending).
    * - 'outro': releases the stage-clear / result screen.
+   * - 'ending': releases normal or secret victory after its story sequence.
    *
    * Besides flipping the run's own flag, this records the dialogue in the
    * account-level seenDialogue map, so a restarted run does not show it again.
@@ -19,7 +20,7 @@ Meteor.methods({
    * already marked seen is a no-op rather than an error.
    */
   'game.finishDialogue': async function ({ kind } = {}) {
-    check(kind, Match.OneOf('intro', 'outro'));
+    check(kind, Match.OneOf('intro', 'outro', 'ending'));
 
     if (!this.userId) {
       throw new Meteor.Error(
@@ -48,7 +49,7 @@ Meteor.methods({
         );
       }
       if (!engine.dialogueSeen) engine.finishDialogue();
-    } else {
+    } else if (kind === 'outro') {
       if (engine.result !== 'stageCleared' && engine.result !== 'win') {
         throw new Meteor.Error(
           'game.finishDialogue.notPending',
@@ -56,6 +57,18 @@ Meteor.methods({
         );
       }
       if (!engine.outroSeen) engine.finishOutro();
+    } else {
+      if (
+        engine.result !== 'win' ||
+        !engine.outroSeen ||
+        (engine.stage !== FINAL_STAGE && engine.stage !== SECRET_BOSS_STAGE)
+      ) {
+        throw new Meteor.Error(
+          'game.finishDialogue.notPending',
+          'There is no victory ending to finish.'
+        );
+      }
+      engine.finishEnding();
     }
 
     engine.touch();

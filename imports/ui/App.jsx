@@ -24,8 +24,9 @@ import { LeaderboardScreen } from './components/LeaderboardScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
-import { FINAL_STAGE, getStageDialogue } from '../engine/stages';
+import { FINAL_STAGE, SECRET_BOSS_STAGE, getStageDialogue } from '../engine/stages';
 import { DialogueBox } from './components/DialogueBox';
+import { NORMAL_ENDING, SECRET_ENDING } from '../engine/endings';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -71,6 +72,12 @@ export const App = () => {
   // timer heartbeat is off, and (server-side) every battle action is refused.
   const introPending =
     gameState?.result === 'playing' && gameState?.dialogueSeen === false;
+  const unseenEnding =
+    (gameState?.stage === FINAL_STAGE && gameState?.endingSeen !== true) ||
+    (gameState?.stage === SECRET_BOSS_STAGE && gameState?.secretEndingSeen !== true);
+  const victoryStoryPending =
+    gameState?.result === 'win' &&
+    (gameState?.outroSeen === false || unseenEnding);
 
   // Delayed result state to allow death/hit animations to finish playing before switching screens
   const [delayedResult, setDelayedResult] = useState(gameState?.result);
@@ -235,7 +242,8 @@ export const App = () => {
       <LandingPage
         hasSave={
           gameState?.result === 'playing' ||
-          gameState?.result === 'stageCleared'
+          gameState?.result === 'stageCleared' ||
+          victoryStoryPending
         }
         onStart={handleStart}
         onOpenTutorial={handleOpenTutorial}
@@ -307,6 +315,13 @@ export const App = () => {
     isClearedResult(delayedResult) &&
     gameState.outroSeen === false;
 
+  const isSecretEnding = stage === SECRET_BOSS_STAGE;
+  const endingPending =
+    gameState.result === 'win' &&
+    delayedResult === 'win' &&
+    !outroPending &&
+    unseenEnding;
+
   const dialogueKind = introPending ? 'intro' : outroPending ? 'outro' : null;
 
   const handleFinishDialogue = (kind) => {
@@ -329,6 +344,21 @@ export const App = () => {
   }
 
   // --- Victory / Defeat screens (delayed screen switch) ---
+  if (endingPending) {
+    return (
+      <GameBackground backgroundScene={scene}>
+        <div className="absolute inset-0 bg-black" data-testid={isSecretEnding ? 'secret-ending' : 'normal-ending'}>
+          <DialogueBox
+            key={isSecretEnding ? 'secret-ending' : 'normal-ending'}
+            lines={isSecretEnding ? SECRET_ENDING : NORMAL_ENDING}
+            finishHint="Click to view results"
+            onFinish={() => handleFinishDialogue('ending')}
+          />
+        </div>
+      </GameBackground>
+    );
+  }
+
   if ((delayedResult === 'win' || delayedResult === 'loss') && !outroPending) {
     return (
       <ResultScreen

@@ -414,14 +414,86 @@ describe('GameEngine - boss dialogue', function () {
     assert.isTrue(engine.outroSeen);
   });
 
-  it('gives every stage some intro and outro copy', function () {
+  it('gives each stage dialogue, with the secret outro handled by its ending', function () {
     STAGES.forEach(({ stage, dialogue }) => {
       assert.isAbove(dialogue.intro.length, 0, `stage ${stage} intro`);
-      assert.isAbove(dialogue.outro.length, 0, `stage ${stage} outro`);
+      if (stage === SECRET_BOSS_STAGE) {
+        assert.lengthOf(dialogue.outro, 0, 'secret ending includes the defeat dialogue');
+      } else {
+        assert.isAbove(dialogue.outro.length, 0, `stage ${stage} outro`);
+      }
       [...dialogue.intro, ...dialogue.outro].forEach((line) => {
         assert.oneOf(line.speaker, ['player', 'enemy', 'narrator']);
         assert.isNotEmpty(line.text);
       });
     });
+  });
+});
+
+describe('GameEngine - normal ending', function () {
+  it('waits for normal victory and the final boss outro', function () {
+    const engine = freshEngine();
+    engine.stage = FINAL_STAGE;
+    engine.result = 'playing';
+    assert.isFalse(engine.isEndingPending());
+    engine.result = 'stageCleared';
+    assert.isFalse(engine.isEndingPending(), 'secret route continues to another fight');
+    engine.result = 'win';
+    assert.isFalse(engine.isEndingPending(), 'boss outro comes first');
+    engine.finishOutro();
+    assert.isTrue(engine.isEndingPending());
+    engine.finishEnding();
+    assert.isFalse(engine.isEndingPending());
+    assert.isTrue(new GameEngine(engine.toJSON()).endingSeen);
+  });
+
+  it('does not play an ending after a loss', function () {
+    const engine = freshEngine();
+    engine.finishOutro();
+    engine.stage = FINAL_STAGE;
+    engine.result = 'loss';
+    assert.isFalse(engine.isEndingPending());
+  });
+
+  it('tracks the ending separately from previously watched boss dialogue', function () {
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, {
+      [`stage${FINAL_STAGE}`]: { outro: true },
+    }));
+    assert.isFalse(engine.endingSeen);
+    const watched = new GameEngine(GameEngine.newGame(USER_ID, null, {
+      [`stage${FINAL_STAGE}`]: { ending: true },
+    }));
+    assert.isTrue(watched.endingSeen);
+  });
+});
+
+describe('GameEngine - secret ending', function () {
+  it('plays after secret victory even when the normal ending was watched', function () {
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, {
+      [`stage${FINAL_STAGE}`]: { ending: true },
+    }));
+    engine.stage = SECRET_BOSS_STAGE;
+    engine.outroSeen = true;
+    engine.result = 'playing';
+    assert.isFalse(engine.isEndingPending());
+    engine.result = 'win';
+    assert.isTrue(engine.isEndingPending());
+    engine.finishEnding();
+    assert.isFalse(engine.isEndingPending());
+    assert.isTrue(new GameEngine(engine.toJSON()).secretEndingSeen);
+  });
+
+  it('skips a watched secret ending without skipping an unseen normal ending', function () {
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, {
+      [`stage${SECRET_BOSS_STAGE}`]: { ending: true },
+    }));
+    assert.isTrue(engine.secretEndingSeen);
+    assert.isFalse(engine.endingSeen);
+    engine.stage = SECRET_BOSS_STAGE;
+    engine.outroSeen = true;
+    engine.result = 'win';
+    assert.isFalse(engine.isEndingPending());
+    engine.stage = FINAL_STAGE;
+    assert.isTrue(engine.isEndingPending());
   });
 });
