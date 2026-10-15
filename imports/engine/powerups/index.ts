@@ -4,6 +4,7 @@ import './DuplicateCardsPowerUp';
 import './StockUpPowerUp';
 import './GiantSlayerPowerUp';
 import './OneMorePullPowerUp';
+import './CoinFlipPowerUp';
 
 export { PowerUp } from './PowerUp';
 export type { powerUpData } from './PowerUp';
@@ -21,3 +22,4 @@ export { DuplicateCardsPowerUp } from './DuplicateCardsPowerUp';
 export { StockUpPowerUp } from './StockUpPowerUp';
 export { GiantSlayerPowerUp } from './GiantSlayerPowerUp'
 export { OneMorePullPowerUp } from './OneMorePullPowerUp'
+export { CoinFlipPowerUp } from './CoinFlipPowerUp'

@@ -10,24 +10,19 @@ export class DuplicateCardsPowerUp extends PowerUp {
       powerUpId: 'duplicate-cards',
       name: 'Duplicate Cards',
       description: 'Duplicate two cards in your hand, at random.',
-      icon: '',
+      icon: '/assets/sprites/powerups/duplicate-pu-sprite.png',
       available: true,
       consumedOnUse: false,
       ...data,
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('Duplicate Cards powerup is unavailable');
-    }
+  apply(engine: GameEngine): boolean {
+    if (engine.hand.length === 0) return false;
 
-    if (engine.hand.length > 0) {
-      this.duplicateCard(engine, engine.hand);
-      this.duplicateCard(engine, engine.hand);
-
-      this.available = false;
-    }
+    this.duplicateCard(engine, engine.hand);
+    this.duplicateCard(engine, engine.hand);
+    return true;
   }
 
   private duplicateCard(engine: GameEngine, hand: Card[]): void {

@@ -95,6 +95,7 @@ export type UserData = {
   outroSeen?: boolean; // post-battle dialogue finished (or not needed) for the current stage
   endingSeen?: boolean; // normal ending finished (or already watched on this account)
   secretEndingSeen?: boolean; // secret ending tracked independently of normal victory
+  selectedPowerUps?: string[];
 };
 
 // data shape for a power-up (created via powerUpRegistry from a powerUpId)

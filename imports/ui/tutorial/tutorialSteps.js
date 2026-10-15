@@ -40,7 +40,7 @@ export const tutorialSteps = [
     action: 'play-card',
     title: 'Your Hand',
     description:
-      'These are the cards you can currently play. Try it now, and see what it does.',
+      'These are the cards you can currently play. Most cards have 2 attributes associated; the cost, and the damage. Try it now, and see what it does.',
   },
   {
     target: 'deck',

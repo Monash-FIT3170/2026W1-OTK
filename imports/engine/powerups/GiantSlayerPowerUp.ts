@@ -10,23 +10,18 @@ export class GiantSlayerPowerUp extends PowerUp {
       name: 'Giant Slayer',
       description:
         'Multiplies the highest damage dealing card based on % remaining health of enemy. One use per run.',
-      icon: '',
+      icon: '/assets/sprites/powerups/giant-slayer-pu-sprite.png',
       available: true,
       consumedOnUse: true,
       ...data,
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('Duplicate Cards powerup is unavailable');
-    }
+  apply(engine: GameEngine): boolean {
+    if (!engine.hand.some((card) => card.currentAttack !== undefined)) return false;
 
-    if (engine.hand.some((card) => card.currentAttack !== undefined)) {
-      this.giantslayer(engine, engine.hand);
-
-      this.available = false;
-    }
+    this.giantslayer(engine, engine.hand);
+    return true;
   }
 
   private giantslayer(engine: GameEngine, hand: Card[]): void {
