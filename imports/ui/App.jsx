@@ -24,10 +24,17 @@ import { LeaderboardScreen } from './components/LeaderboardScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
-import { FINAL_STAGE } from '../engine/stages';
+import { FINAL_STAGE, SECRET_BOSS_STAGE, getStageDialogue } from '../engine/stages';
+import { DialogueBox } from './components/DialogueBox';
+import { NORMAL_ENDING, SECRET_ENDING } from '../engine/endings';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
+
+// Where the dialogue panel starts, in the 1920x1080 design canvas: the floor
+// line at the bottom of the stage art. Everything from here down - the hand
+// tray, the deck counter - is covered while dialogue is showing.
+const DIALOGUE_PANEL_TOP = 560;
 
 export const App = () => {
   const [showRegister, setShowRegister] = useState(false);
@@ -60,6 +67,18 @@ export const App = () => {
     return { user, userData, gameState: userData?.gameState ?? null, loading };
   });
 
+  // The stage is dealt but the pre-fight dialogue hasn't been dismissed, so
+  // the fight hasn't begun: the dialogue box takes the hand's place, the
+  // timer heartbeat is off, and (server-side) every battle action is refused.
+  const introPending =
+    gameState?.result === 'playing' && gameState?.dialogueSeen === false;
+  const unseenEnding =
+    (gameState?.stage === FINAL_STAGE && gameState?.endingSeen !== true) ||
+    (gameState?.stage === SECRET_BOSS_STAGE && gameState?.secretEndingSeen !== true);
+  const victoryStoryPending =
+    gameState?.result === 'win' &&
+    (gameState?.outroSeen === false || unseenEnding);
+
   // Delayed result state to allow death/hit animations to finish playing before switching screens
   const [delayedResult, setDelayedResult] = useState(gameState?.result);
 
@@ -86,13 +105,22 @@ export const App = () => {
     }
   }, [loading, user, gameState, showLanding]);
 
-  // Auto-show the tutorial every time the player starts a brand-new game
+  // Auto-show the tutorial every time the player starts a brand-new game -
+  // after the stage 1 intro dialogue, if there is one, since the tutorial
+  // spotlights the card hand that the dialogue box is standing in for.
   useEffect(() => {
-    if (!loading && user && gameState && !showLanding && justStartedNewGame) {
+    if (
+      !loading &&
+      user &&
+      gameState &&
+      !showLanding &&
+      justStartedNewGame &&
+      !introPending
+    ) {
       setShowTutorial(true);
       setJustStartedNewGame(false);
     }
-  }, [loading, user, gameState, showLanding, justStartedNewGame]);
+  }, [loading, user, gameState, showLanding, justStartedNewGame, introPending]);
 
   const onGameScreen =
     !loading &&
@@ -105,7 +133,10 @@ export const App = () => {
 
   useGameSounds(gameState?.result, onGameScreen);
 
-  const inBattle = onGameScreen && gameState?.result === 'playing';
+  // No heartbeat until the intro is dismissed - the fight (and every clock in
+  // it) starts when the player finishes the dialogue, not when the stage loads.
+  const inBattle =
+    onGameScreen && gameState?.result === 'playing' && !introPending;
 
   useEffect(() => {
     if (!inBattle) return;
@@ -211,7 +242,8 @@ export const App = () => {
       <LandingPage
         hasSave={
           gameState?.result === 'playing' ||
-          gameState?.result === 'stageCleared'
+          gameState?.result === 'stageCleared' ||
+          victoryStoryPending
         }
         onStart={handleStart}
         onOpenTutorial={handleOpenTutorial}
@@ -271,8 +303,35 @@ export const App = () => {
     });
   };
 
+  // The boss is down and its post-fight dialogue hasn't been dismissed. Shown
+  // on the battle screen, after the same 1.8s death-animation delay as the
+  // result screens, and held in front of them. Both the live result and the
+  // delayed one must agree, so the previous stage's delayedResult can't flash
+  // an outro for the stage that has just started.
+  const isClearedResult = (result) =>
+    result === 'stageCleared' || result === 'win';
+  const outroPending =
+    isClearedResult(gameState.result) &&
+    isClearedResult(delayedResult) &&
+    gameState.outroSeen === false;
+
+  const isSecretEnding = stage === SECRET_BOSS_STAGE;
+  const endingPending =
+    gameState.result === 'win' &&
+    delayedResult === 'win' &&
+    !outroPending &&
+    unseenEnding;
+
+  const dialogueKind = introPending ? 'intro' : outroPending ? 'outro' : null;
+
+  const handleFinishDialogue = (kind) => {
+    Meteor.call('game.finishDialogue', { kind }, (err) => {
+      if (err) console.error('game.finishDialogue failed:', err);
+    });
+  };
+
   // --- Between stages: boss down (delayed screen switch) ---
-  if (delayedResult === 'stageCleared') {
+  if (delayedResult === 'stageCleared' && !outroPending) {
     return (
       <StageClearScreen
         stage={stage}
@@ -285,7 +344,22 @@ export const App = () => {
   }
 
   // --- Victory / Defeat screens (delayed screen switch) ---
-  if (delayedResult === 'win' || delayedResult === 'loss') {
+  if (endingPending) {
+    return (
+      <GameBackground backgroundScene={scene}>
+        <div className="absolute inset-0 bg-black" data-testid={isSecretEnding ? 'secret-ending' : 'normal-ending'}>
+          <DialogueBox
+            key={isSecretEnding ? 'secret-ending' : 'normal-ending'}
+            lines={isSecretEnding ? SECRET_ENDING : NORMAL_ENDING}
+            finishHint="Click to view results"
+            onFinish={() => handleFinishDialogue('ending')}
+          />
+        </div>
+      </GameBackground>
+    );
+  }
+
+  if ((delayedResult === 'win' || delayedResult === 'loss') && !outroPending) {
     return (
       <ResultScreen
         result={delayedResult}
@@ -343,7 +417,9 @@ export const App = () => {
         style={{ top: 530, right: 30 }}
         data-tutorial-target="end-turn"
       >
-        <EndTurnButton disabled={showTutorial} />
+        {/* Hidden (not just disabled) during dialogue: it sits right on the
+            edge of the dialogue panel, so it would otherwise peek out. */}
+        {!dialogueKind && <EndTurnButton disabled={showTutorial} />}
       </div>
 
       <div
@@ -357,21 +433,45 @@ export const App = () => {
         style={{ left: 370, right: 140, bottom: 20 }}
         data-tutorial-target="hand"
       >
-        <CardHand cards={hand} deckSize={deck.length} />
+        {/* No hand while dialogue is up - the dialogue panel below takes over
+            the whole lower half of the screen. */}
+        {!dialogueKind && <CardHand cards={hand} deckSize={deck.length} />}
       </div>
 
-      <div
-        className="absolute flex items-end pointer-events-none"
-        style={{
-          left: 87,
-          right: 140,
-          bottom: 163,
-        }}
-      >
-        <div className="inline-block" data-tutorial-target="deck">
-          <DeckViewer cards={deck} />
+      {dialogueKind && (
+        // Covers the entire lower half of the screen - the hand, deck counter
+        // and tray art - edge to edge, from the floor line down.
+        <div
+          className="absolute"
+          style={{ left: 0, right: 0, bottom: 0, top: DIALOGUE_PANEL_TOP, zIndex: 20 }}
+        >
+          {/* Keyed so a new stage / the outro always starts at line one. */}
+          <DialogueBox
+            key={`${stage}-${dialogueKind}`}
+            lines={getStageDialogue(stage, dialogueKind)}
+            enemyName={enemy.name}
+            finishHint={
+              dialogueKind === 'intro' ? 'Click to begin' : 'Click to continue'
+            }
+            onFinish={() => handleFinishDialogue(dialogueKind)}
+          />
         </div>
-      </div>
+      )}
+
+      {!dialogueKind && (
+        <div
+          className="absolute flex items-end pointer-events-none"
+          style={{
+            left: 87,
+            right: 140,
+            bottom: 163,
+          }}
+        >
+          <div className="inline-block" data-tutorial-target="deck">
+            <DeckViewer cards={deck} />
+          </div>
+        </div>
+      )}
 
       {showTutorial && (
         <TutorialOverlay onClose={handleCloseTutorial} hand={hand} />

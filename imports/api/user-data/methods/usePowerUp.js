@@ -30,6 +30,12 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    if (engine.isIntroPending()) {
+      throw new Meteor.Error(
+        'game.usePowerUp.dialoguePending',
+        'Finish the intro dialogue before using a power-up.'
+      );
+    }
     engine.rebaseAfterAway();
     engine.usePowerUp(index);
 
