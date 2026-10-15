@@ -41,6 +41,8 @@ export const App = () => {
 
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
+  const [showNewGameSetup, setShowNewGameSetup] = useState(false);
+  const [newGameDifficulty, setNewGameDifficulty] = useState('easy');
   const [showPowerupMenu, setShowPowerupMenu] = useState(false);
 
   // Subscribe to auth and game data reactively
@@ -146,6 +148,7 @@ export const App = () => {
 
   const handleStart = (isNewGame = false) => {
     setShowLanding(false);
+    setShowNewGameSetup(false);
     if (isNewGame) setJustStartedNewGame(true);
   };
 
@@ -194,6 +197,11 @@ export const App = () => {
           gameState?.result === 'stageCleared'
         }
         onStart={handleStart}
+        isNewGameSetup={showNewGameSetup}
+        difficulty={newGameDifficulty}
+        onDifficultyChange={setNewGameDifficulty}
+        onOpenNewGameSetup={() => setShowNewGameSetup(true)}
+        onBackToMenu={() => setShowNewGameSetup(false)}
         onOpenTutorial={handleOpenTutorial}
         onOpenTrainingMode={handleOpenTrainingMode}
         onEditDeck={() => {

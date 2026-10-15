@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import Settings from './components/Settings';
 
 export const LandingPage = ({
   hasSave,
   onStart,
+  isNewGameSetup = false,
+  difficulty = 'easy',
+  onDifficultyChange = () => {},
+  onOpenNewGameSetup = () => {},
+  onBackToMenu = () => {},
   onOpenTutorial,
   onOpenTrainingMode,
   onEditDeck,
 }) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [difficultyOpen, setDifficultyOpen] = useState(false);
+  const difficultyTriggerRef = useRef(null);
+  const difficultyLabel = difficulty[0].toUpperCase() + difficulty.slice(1);
 
   const handleContinue = () => {
     // gameState is already loaded reactively in App.jsx from the user's save —
@@ -27,7 +35,7 @@ export const LandingPage = ({
     }
 
     setStarting(true);
-    Meteor.call('game.newGame', (err) => {
+    Meteor.call('game.newGame', difficulty, (err) => {
       setStarting(false);
       if (err) {
         console.error('game.newGame failed:', err);
@@ -61,7 +69,7 @@ export const LandingPage = ({
           One Turn Kill
         </h1>
 
-        {!confirmingNewGame && (
+        {!isNewGameSetup && (
           <div className="flex flex-col gap-4 w-64">
             {hasSave && (
               <button
@@ -73,34 +81,10 @@ export const LandingPage = ({
             )}
 
             <button
-              onClick={handleNewGame}
-              disabled={starting}
+              onClick={onOpenNewGameSetup}
               className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors disabled:opacity-50"
             >
               New Game
-            </button>
-
-            <div className="flex flex-col gap-1">
-              <button
-                onClick={handleEditDeck}
-                className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
-              >
-                Edit Deck
-              </button>
-              {hasSave && (
-                // The deck is locked for the duration of a run: edits are saved
-                // to nextDeck and only picked up by game.newGame.
-                <p className="text-slate-400 text-sm text-center">
-                  Applies to your next run
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={handleOptions}
-              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
-            >
-              Options
             </button>
 
             <button
@@ -117,6 +101,23 @@ export const LandingPage = ({
               Training Mode
             </button>
 
+            <div className="flex flex-col gap-1">
+              <button
+                onClick={handleEditDeck}
+                className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+              >
+                Edit Deck
+              </button>
+              {hasSave}
+            </div>
+
+            <button
+              onClick={handleOptions}
+              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+            >
+              Options
+            </button>
+
             <button
               onClick={handleQuit}
               className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-600 text-white text-lg font-semibold transition-colors"
@@ -126,7 +127,92 @@ export const LandingPage = ({
           </div>
         )}
 
-        {confirmingNewGame && (
+        {isNewGameSetup && !confirmingNewGame && (
+          <div className="flex flex-col gap-4 w-72">
+            <h2 className="text-2xl font-semibold text-white text-center">
+              New Game Setup
+            </h2>
+            <div className="flex items-center justify-between gap-3 text-white">
+              <span className="font-semibold">Difficulty</span>
+              <div
+                className="relative w-36"
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setDifficultyOpen(false);
+                  }
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') {
+                    setDifficultyOpen(false);
+                    difficultyTriggerRef.current?.focus();
+                  }
+                }}
+              >
+                <button
+                  ref={difficultyTriggerRef}
+                  type="button"
+                  aria-label={`Difficulty: ${difficultyLabel}`}
+                  aria-haspopup="true"
+                  aria-expanded={difficultyOpen}
+                  aria-controls="difficulty-options"
+                  onClick={() => setDifficultyOpen((open) => !open)}
+                  disabled={starting}
+                  className="flex w-full items-center justify-between rounded-lg border border-slate-600 bg-slate-700 px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:opacity-50"
+                >
+                  <span>{difficultyLabel}</span>
+                  <span
+                    aria-hidden="true"
+                    className={`h-2 w-2 rotate-45 border-b-2 border-r-2 border-slate-300 transition-transform ${difficultyOpen ? 'translate-y-1 -rotate-[135deg]' : '-translate-y-0.5'}`}
+                  />
+                </button>
+                {difficultyOpen && (
+                  <div
+                    id="difficulty-options"
+                    role="group"
+                    aria-label="Difficulty options"
+                    className="absolute right-0 top-full z-20 mt-2 w-full rounded-lg border border-slate-600 bg-slate-800 p-1 shadow-xl shadow-black/30"
+                  >
+                    {[
+                      { value: 'easy', label: 'Easy' },
+                      { value: 'medium', label: 'Medium' },
+                      { value: 'hard', label: 'Hard' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        aria-pressed={difficulty === option.value}
+                        onClick={() => {
+                          onDifficultyChange(option.value);
+                          setDifficultyOpen(false);
+                          difficultyTriggerRef.current?.focus();
+                        }}
+                        className={`w-full rounded-md px-3 py-2 text-left text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${difficulty === option.value ? 'bg-emerald-700 text-white' : 'text-slate-200 hover:bg-slate-700 hover:text-white'}`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={handleNewGame}
+              disabled={starting}
+              className="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-semibold transition-colors disabled:opacity-50"
+            >
+              Start New Game
+            </button>
+            <button
+              onClick={onBackToMenu}
+              disabled={starting}
+              className="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-50"
+            >
+              Back
+            </button>
+          </div>
+        )}
+
+        {isNewGameSetup && confirmingNewGame && (
           <div className="flex flex-col items-center gap-4 w-72">
             <p className="text-white text-center">
               Starting a new game will overwrite your current save. Are you
@@ -142,7 +228,8 @@ export const LandingPage = ({
               </button>
               <button
                 onClick={() => setConfirmingNewGame(false)}
-                className="px-5 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors"
+                disabled={starting}
+                className="px-5 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
