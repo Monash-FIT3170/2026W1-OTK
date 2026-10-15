@@ -36,7 +36,7 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
-    engine.advanceStage();
+    engine.advanceStage(userData.seenDialogue);
     engine.touch();
 
     await UserDataCollection.updateAsync(

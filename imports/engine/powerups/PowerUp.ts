@@ -29,11 +29,13 @@ export abstract class PowerUp {
   }
 
   // Concrete power-ups override this to affect the player's game state.
-  // TODO: hook up to real player stats once those exist on GameEngine.
-  abstract apply(engine: GameEngine): void;
+  // Returns false when there was nothing to do (e.g. empty hand), so the
+  // engine leaves the power-up unspent. Availability and removal are
+  // handled by GameEngine.usePowerUp, not here.
+  abstract apply(engine: GameEngine): boolean;
 
-  applyTo(engine: GameEngine): void {
-    this.apply(engine);
+  applyTo(engine: GameEngine): boolean {
+    return this.apply(engine);
   }
 
   isAvailable(): boolean {

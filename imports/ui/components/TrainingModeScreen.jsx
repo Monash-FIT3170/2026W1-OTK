@@ -5,7 +5,7 @@ import { HealthBar } from './enemy/HealthBar';
 import { PlayerDisplay } from './PlayerDisplay';
 import { EnemyDisplay } from './enemy/EnemyDisplay';
 import { DeckViewer } from './DeckViewer';
-import { DraggableCard } from '../cards/DraggableCard';
+import { HandLayout } from '../cards/HandLayout';
 import { SelectionPanel } from '../cards/SelectionPanel';
 import { useTrainingEngine } from '../hooks/useTrainingEngine';
 
@@ -178,22 +178,17 @@ export const TrainingModeScreen = ({
 
       <div
         ref={handRef}
-        className="absolute flex items-end gap-2"
+        className="absolute flex items-end"
         style={{ left: 370, right: 140, bottom: 20 }}
       >
-        {[...visibleHand].reverse().map((card) => (
-          <DraggableCard
-            key={card.uniqueId}
-            cardProps={card}
-            marginLeft="0px"
-            onClick={() => onHandCardClick(card)}
-            handRef={handRef}
-            onPlay={playCard}
-            isInSelectionMode={inSelectionMode}
-            affordable={canAfford(card)}
-            playable={!card.isFrozen}
-          />
-        ))}
+        <HandLayout
+          cards={visibleHand}
+          handRef={handRef}
+          onPlay={playCard}
+          onCardClick={onHandCardClick}
+          isInSelectionMode={inSelectionMode}
+          isAffordable={canAfford}
+        />
       </div>
 
       <div

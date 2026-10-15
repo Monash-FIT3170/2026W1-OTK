@@ -22,6 +22,9 @@ import '../imports/engine/debuffs/Inflation.tests.js';
 // GAME ENGINE / STAGE TESTS
 import '../imports/engine/GameEngine.tests.js';
 import '../imports/api/user-data/methods/advanceStage.tests.js';
+import '../imports/api/user-data/methods/finishDialogue.tests.js';
+import '../imports/ui/components/DialogueBox.tests.jsx';
+import '../imports/ui/App.dialogue.tests.jsx';
 
 // AUTH TESTS
 import '/imports/api/auth/index.js';
@@ -49,3 +52,7 @@ import '../imports/api/auth/methods/markTutorialSeen.tests.js';
 // TRAINING TESTS
 import '../imports/ui/hooks/useTrainingEngine.tests.js';
 import '../imports/api/user-data/methods/saveTrainingHighScore.tests.js';
+
+// LEADERBOARD TESTS
+import '../imports/api/user-data/methods/saveTrainingHighScore.tests.js';
+import '../imports/api/user-data/methods/getMyTrainingRank.tests.js';

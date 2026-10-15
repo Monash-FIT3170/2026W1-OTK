@@ -10,20 +10,16 @@ export class DealDamagePowerUp extends PowerUp {
       powerUpId: 'deal-damage-power-up',
       name: 'Deal Damage',
       description: `Deal ${DAMAGE} damage to the enemy.`,
-      icon: '',
+      icon: '/assets/sprites/powerups/deal-damage-pu-sprite.png',
       available: true,
       consumedOnUse: false,
       ...data,
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('Deal Damage powerup is unavailable');
-    }
-
+  apply(engine: GameEngine): boolean {
     engine.enemy.takeDamage(DAMAGE);
-    this.available = false;
+    return true;
   }
 }
 

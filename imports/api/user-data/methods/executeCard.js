@@ -27,6 +27,12 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    if (engine.isIntroPending()) {
+      throw new Meteor.Error(
+        'game.executeCard.dialoguePending',
+        'Finish the intro dialogue before playing cards.'
+      );
+    }
     engine.rebaseAfterAway();
 
     const card = engine.getCard(uniqueCardId);

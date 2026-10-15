@@ -12,6 +12,7 @@ export const LandingPage = ({
   onBackToMenu = () => {},
   onOpenTutorial,
   onOpenTrainingMode,
+  onOpenLeaderboard,
   onEditDeck,
 }) => {
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
@@ -65,7 +66,7 @@ export const LandingPage = ({
   return (
     <div className="min-h-screen w-screen bg-slate-900">
       <div className="min-h-screen flex flex-col items-center justify-center gap-8">
-        <h1 className="text-5xl font-bold text-white tracking-wide drop-shadow-lg">
+        <h1 style={{ fontFamily: 'var(--game-font)'}} className="text-7xl font-semibold text-white tracking-wide drop-shadow-lg">
           One Turn Kill
         </h1>
 
@@ -74,7 +75,7 @@ export const LandingPage = ({
             {hasSave && (
               <button
                 onClick={handleContinue}
-                className="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-semibold transition-colors"
+                style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-2xl transition-colors"
               >
                 Continue
               </button>
@@ -82,21 +83,21 @@ export const LandingPage = ({
 
             <button
               onClick={onOpenNewGameSetup}
-              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors disabled:opacity-50"
+              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors disabled:opacity-50"
             >
               New Game
             </button>
 
             <button
               onClick={onOpenTutorial}
-              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
             >
               Tutorial
             </button>
 
             <button
               onClick={onOpenTrainingMode}
-              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
             >
               Training Mode
             </button>
@@ -104,23 +105,29 @@ export const LandingPage = ({
             <div className="flex flex-col gap-1">
               <button
                 onClick={handleEditDeck}
-                className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+                style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-2xl transition-colors"
               >
                 Edit Deck
               </button>
-              {hasSave}
+              {hasSave && (
+                // The deck is locked for the duration of a run: edits are saved
+                // to nextDeck and only picked up by game.newGame.
+                <p style={{ fontFamily: 'var(--game-font)'}} className="text-slate-400 text-xl text-center">
+                  Applies to your next run
+                </p>
+              )}
             </div>
 
             <button
               onClick={handleOptions}
-              className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
+              style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-2xl transition-colors"
             >
               Options
             </button>
 
             <button
               onClick={handleQuit}
-              className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-600 text-white text-lg font-semibold transition-colors"
+              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-600 text-white text-lg font-semibold transition-colors"
             >
               Quit
             </button>
@@ -198,14 +205,21 @@ export const LandingPage = ({
             <button
               onClick={handleNewGame}
               disabled={starting}
-              className="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-semibold transition-colors disabled:opacity-50"
+              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-semibold transition-colors disabled:opacity-50"
             >
               Start New Game
             </button>
             <button
               onClick={onBackToMenu}
               disabled={starting}
-              className="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-50"
+              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-50"
+            >
+              Leaderboard
+            </button>
+
+            <button
+              onClick={handleQuit}
+              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-600 text-white text-2xl transition-colors"
             >
               Back
             </button>
@@ -214,7 +228,7 @@ export const LandingPage = ({
 
         {isNewGameSetup && confirmingNewGame && (
           <div className="flex flex-col items-center gap-4 w-72">
-            <p className="text-white text-center">
+            <p style={{ fontFamily: 'var(--game-font)'}} className="text-white text-xl text-center">
               Starting a new game will overwrite your current save. Are you
               sure?
             </p>
@@ -222,14 +236,14 @@ export const LandingPage = ({
               <button
                 onClick={handleNewGame}
                 disabled={starting}
-                className="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold transition-colors disabled:opacity-50"
+                style={{ fontFamily: 'var(--game-font)'}} className="px-5 py-2 text-2xl rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors disabled:opacity-50"
               >
                 {starting ? 'Starting...' : 'Overwrite'}
               </button>
               <button
                 onClick={() => setConfirmingNewGame(false)}
                 disabled={starting}
-                className="px-5 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-50"
+                style={{ fontFamily: 'var(--game-font)'}} className="px-5 py-2 text-2xl rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-colors"
               >
                 Cancel
               </button>

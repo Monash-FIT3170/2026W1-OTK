@@ -12,18 +12,14 @@ export class StockUpPowerUp extends PowerUp {
       powerUpId: 'stock-up',
       name: 'Stock Up',
       description: `Add ${NUM_CARDS_ADDED} copies of "Blank" to your deck.`,
-      icon: '',
+      icon: '/assets/sprites/powerups/stock-pu-sprite.png',
       available: true,
       consumedOnUse: false,
       ...data,
     });
   }
 
-  apply(engine: GameEngine): void {
-    if (!this.isAvailable()) {
-      throw new Error('Stock Up powerup is unavailable');
-    }
-
+  apply(engine: GameEngine): boolean {
     const CARD = new Blank();
 
     for (let i = 0; i < NUM_CARDS_ADDED; i++) {
@@ -33,7 +29,7 @@ export class StockUpPowerUp extends PowerUp {
       }));
     }
 
-    this.available = false;
+    return true;
   }
 }
 
