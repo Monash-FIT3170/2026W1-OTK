@@ -415,7 +415,7 @@ export class GameEngine {
       powerUpChoices: [],
       dialogueSeen: !shouldShowDialogue(stage, 'intro', seen),
       outroSeen: !shouldShowDialogue(stage, 'outro', seen),
-      endingSeen: !!seen?.[dialogueKey(getFinalStageFromDifficulty(this.difficulty))]?.ending,
+      endingSeen: !!seen?.[dialogueKey(getFinalStageFromDifficulty(difficulty ?? "easy"))]?.ending,
       secretEndingSeen: !!seen?.[dialogueKey(SECRET_BOSS_STAGE)]?.ending,
       selectedPowerUps: [],
     };

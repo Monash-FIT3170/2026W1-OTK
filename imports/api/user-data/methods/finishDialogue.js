@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { UserDataCollection } from '../collections/UserDataCollection';
 import { GameEngine } from '../../../engine/GameEngine';
-import { dialogueKey, FINAL_STAGE, SECRET_BOSS_STAGE } from '../../../engine/stages';
+import { dialogueKey, getFinalStageFromDifficulty, SECRET_BOSS_STAGE } from '../../../engine/stages';
 
 Meteor.methods({
   /**
@@ -61,7 +61,7 @@ Meteor.methods({
       if (
         engine.result !== 'win' ||
         !engine.outroSeen ||
-        (engine.stage !== FINAL_STAGE && engine.stage !== SECRET_BOSS_STAGE)
+        (engine.stage !== getFinalStageFromDifficulty(engine.difficulty) && engine.stage !== SECRET_BOSS_STAGE)
       ) {
         throw new Meteor.Error(
           'game.finishDialogue.notPending',

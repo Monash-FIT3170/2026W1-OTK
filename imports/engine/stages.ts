@@ -327,6 +327,7 @@ export function getFinalStageFromDifficulty(difficulty: Difficulty): number {
     default:
       throw new Error(`Unknown difficulty: ${difficulty}`)
   }
+}
 
 export function getStageDialogue(stage: number, kind: 'intro' | 'outro'): DialogueLine[] {
   return getStageConfig(stage).dialogue[kind];
