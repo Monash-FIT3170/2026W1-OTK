@@ -26,7 +26,7 @@ import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
 import { getFinalStageFromDifficulty, SECRET_BOSS_STAGE, getStageDialogue } from '../engine/stages';
 import { DialogueBox } from './components/DialogueBox';
-import { NORMAL_ENDING, SECRET_ENDING } from '../engine/endings';
+import { getEnding } from '../engine/endings';
 
 import { useGameSounds } from './hooks/useGameSounds';
 import Settings from './components/Settings';
@@ -75,7 +75,7 @@ export const App = () => {
   const introPending =
     gameState?.result === 'playing' && gameState?.dialogueSeen === false;
   const unseenEnding =
-    (gameState?.stage === getFinalStageFromDifficulty(gameState?.difficulty ?? "hard") && gameState?.endingSeen !== true) ||
+    (gameState?.stage === getFinalStageFromDifficulty(gameState?.difficulty ?? 'easy') && gameState?.endingSeen !== true) ||
     (gameState?.stage === SECRET_BOSS_STAGE && gameState?.secretEndingSeen !== true);
   const victoryStoryPending =
     gameState?.result === 'win' &&
@@ -324,6 +324,10 @@ export const App = () => {
     gameState.outroSeen === false;
 
   const isSecretEnding = stage === SECRET_BOSS_STAGE;
+  // Easy and Medium endings tease Hard mode when the run used no power-ups.
+  const noPowerUpsUsed = (gameState.bossRecap ?? []).every(
+    (entry) => (entry.powerUpsUsed ?? 0) === 0
+  );
   const endingPending =
     gameState.result === 'win' &&
     delayedResult === 'win' &&
@@ -343,7 +347,7 @@ export const App = () => {
     return (
       <StageClearScreen
         stage={stage}
-        difficulty={gameState.difficulty}
+        difficulty={gameState.difficulty ?? 'easy'}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
         powerUpChoices={gameState.powerUpChoices}
@@ -359,7 +363,7 @@ export const App = () => {
         <div className="absolute inset-0 bg-black" data-testid={isSecretEnding ? 'secret-ending' : 'normal-ending'}>
           <DialogueBox
             key={isSecretEnding ? 'secret-ending' : 'normal-ending'}
-            lines={isSecretEnding ? SECRET_ENDING : NORMAL_ENDING}
+            lines={getEnding(gameState.difficulty ?? 'easy', isSecretEnding, noPowerUpsUsed)}
             finishHint="Click to view results"
             onFinish={() => handleFinishDialogue('ending')}
           />
@@ -372,7 +376,7 @@ export const App = () => {
     return (
       <ResultScreen
         result={delayedResult}
-        difficulty={gameState.difficulty}
+        difficulty={gameState.difficulty ?? 'easy'}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
         onBackToMenu={() => setShowLanding(true)}
@@ -396,7 +400,7 @@ export const App = () => {
 
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
         <p className="text-white text-2xl font-semibold mb-2 drop-shadow-lg">
-          Stage {stage} / {getFinalStageFromDifficulty(gameState.difficulty)}
+          Stage {stage} / {getFinalStageFromDifficulty(gameState.difficulty ?? 'easy')}
         </p>
         {/* <HealthBar
           current={enemy.currentHealth}
@@ -458,7 +462,7 @@ export const App = () => {
           {/* Keyed so a new stage / the outro always starts at line one. */}
           <DialogueBox
             key={`${stage}-${dialogueKind}`}
-            lines={getStageDialogue(stage, dialogueKind)}
+            lines={getStageDialogue(stage, dialogueKind, gameState.difficulty)}
             enemyName={enemy.name}
             finishHint={
               dialogueKind === 'intro' ? 'Click to begin' : 'Click to continue'

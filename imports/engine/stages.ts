@@ -28,49 +28,78 @@ export type StageDialogue = {
   outro: DialogueLine[]; // plays once the boss is down, before the stage-clear / result screen
 };
 
+// Hard is the base: `dialogue` is what Hard plays, and what Easy and Medium
+// fall back to for anything they do not override.
+export type ModeDifficulty = Exclude<Difficulty, 'hard'>;
+export type StageDialogueOverrides = Partial<
+  Record<ModeDifficulty, Partial<StageDialogue>>
+>;
+
 export type StageConfig = {
   stage: number;
   BossClass: new (data?: any) => Enemy;
   scene: string;
   dialogue: StageDialogue;
+  // Easy / Medium replacements for this stage's intro and/or outro. Leave a
+  // mode (or just one of intro / outro) out to reuse the Hard dialogue.
+  dialogueByDifficulty?: StageDialogueOverrides;
 };
 
-// TODO(story): every line below is placeholder copy - replace with the real
-// lore. A stage with an empty intro/outro array simply skips that dialogue.
+// The opening narration is the same in every mode except for how many
+// Chronoshards are in play: Easy has four, Medium five and Hard six.
+const opening = (count: string): DialogueLine[] => [
+  { speaker: 'narrator', text: '11:59:59.' },
+  { speaker: 'narrator', text: 'One second before midnight.' },
+  { speaker: 'narrator', text: 'And for longer than anyone remembers… that second has never passed.' },
+  { speaker: 'narrator', text: 'The player wakes beside a shattered glowing Clock.' },
+  { speaker: 'player', text: 'Where am I…?' },
+  { speaker: 'player', text: 'I remember another place.' },
+  { speaker: 'player', text: 'Another life.' },
+  { speaker: 'player', text: 'But not how I got here.' },
+  { speaker: 'narrator', text: 'The shattered Clock pulses.' },
+  { speaker: 'player', text: 'That Clock…' },
+  { speaker: 'player', text: 'Maybe it can get me home.' },
+  { speaker: 'narrator', text: `${count} fragments of the ancient Clock remain scattered across the world, frozen in time.` },
+  { speaker: 'narrator', text: 'Chronoshards.' },
+  { speaker: 'narrator', text: 'Each is guarded by one of the powerful ancient demigods known as the Guardians of Time.' },
+  { speaker: 'narrator', text: `${count} pieces.` },
+  { speaker: 'narrator', text: 'Fix the Clock.' },
+  { speaker: 'narrator', text: 'Find a way home.' },
+];
+
+const GOBLIN_INTRO: DialogueLine[] = [
+  { speaker: 'enemy', text: 'HEY! You moved!' },
+  { speaker: 'player', text: 'So did you.'},
+  { speaker: 'enemy', text: 'Yeah, but I\'m supposed to! Why aren\'t you frozen like the others? '},
+  { speaker: 'enemy', text: '*** Holds up a glowing Chronoshard *** '},
+  { speaker: 'player', text: '!!!...  I need that.'},
+  { speaker: 'enemy', text: 'I found it first. Another hero come to take my shiny treasure? ' },
+  { speaker: 'enemy', text: 'Alright let\'s see what you got. You get one turn. Make it count.' },
+  { speaker: 'player', text: 'One turn is all I need.' },
+];
+
+// Ninja's goodbye points the player at the Merchant, who is only fought on
+// Hard. Medium ends on the Ninja, so it keeps every line except that pointer.
+const NINJA_OUTRO: DialogueLine[] = [
+    { speaker: 'enemy', text: 'Fast... faster than a shadow.' },
+    { speaker: 'enemy', text: 'How is this possible? I can predict your every move.' },
+    { speaker: 'player', text: 'Heh... I guess I\'ve had my fair share of practice' },
+    { speaker: 'enemy', text: 'So you say... Your past versions weren\'t like you. They were so predictable.' },
+    { speaker: 'player', text: 'What happens to me after I fix the clock?' },
+    { speaker: 'player', text: 'What lies beyond the Chronosphere? What lies beyond time itself?' },
+    { speaker: 'enemy', text: 'Ask the Merchant. He remembers more than most.' },
+];
+
+// A stage with an empty intro/outro array simply skips that dialogue. To give
+// Easy or Medium its own script for a stage, add (for example):
+//   dialogueByDifficulty: { easy: { outro: [...] }, medium: { intro: [...] } },
 export const STAGES: StageConfig[] = [
   {
     stage: 1,
     BossClass: Goblin,
     scene: 'underpass-overlaid',
     dialogue: {
-      intro: [
-        // Opening sequence, followed by the Goblin encounter.
-        { speaker: 'narrator', text: '11:59:59.' },
-        { speaker: 'narrator', text: 'One second before midnight.' },
-        { speaker: 'narrator', text: 'And for longer than anyone remembers… that second has never passed.' },
-        { speaker: 'narrator', text: 'The player wakes beside a shattered glowing Clock.' },
-        { speaker: 'player', text: 'Where am I…?' },
-        { speaker: 'player', text: 'I remember another place.' },
-        { speaker: 'player', text: 'Another life.' },
-        { speaker: 'player', text: 'But not how I got here.' },
-        { speaker: 'narrator', text: 'The shattered Clock pulses.' },
-        { speaker: 'player', text: 'That Clock…' },
-        { speaker: 'player', text: 'Maybe it can get me home.' },
-        { speaker: 'narrator', text: 'Six fragments of the ancient Clock remain scattered across the world, frozen in time.' },
-        { speaker: 'narrator', text: 'Chronoshards.' },
-        { speaker: 'narrator', text: 'Each is guarded by one of the powerful ancient demigods known as the Guardians of Time.' },
-        { speaker: 'narrator', text: 'Six pieces.' },
-        { speaker: 'narrator', text: 'Fix the Clock.' },
-        { speaker: 'narrator', text: 'Find a way home.' },
-        { speaker: 'enemy', text: 'HEY! You moved!' },
-        { speaker: 'player', text: 'So did you.'},
-        { speaker: 'enemy', text: 'Yeah, but I\'m supposed to! Why aren\'t you frozen like the others? '},
-        { speaker: 'enemy', text: '*** Holds up a glowing Chronoshard *** '},
-        { speaker: 'player', text: '!!!...  I need that.'},
-        { speaker: 'enemy', text: 'I found it first. Another hero come to take my shiny treasure? ' },
-        { speaker: 'enemy', text: 'Alright let\'s see what you got. You get one turn. Make it count.' },
-        { speaker: 'player', text: 'One turn is all I need.' },
-      ],
+      intro: [...opening('Six'), ...GOBLIN_INTRO],
       outro: [
         { speaker: 'enemy', text: 'Alright! Alright! Take it!' },
         { speaker: 'player', text: 'Thanks. One down.' },
@@ -80,6 +109,10 @@ export const STAGES: StageConfig[] = [
         { speaker: 'player', text: 'Huh? Who?' },
         { speaker: 'enemy', text: '...No idea. Now leave me alone!' },
       ],
+    },
+    dialogueByDifficulty: {
+      easy: { intro: [...opening('Four'), ...GOBLIN_INTRO] },
+      medium: { intro: [...opening('Five'), ...GOBLIN_INTRO] },
     },
   },
   {
@@ -195,6 +228,24 @@ export const STAGES: StageConfig[] = [
         { speaker: 'enemy', text: 'You might reach the end of the cycle this time after all...' },
       ],
     },
+    dialogueByDifficulty: {
+      // The Timekeeper is Easy's final boss. The Merchant is not fought on
+      // Easy, so his warning about the Clock's powers moves here.
+      easy: {
+        outro: [
+          { speaker: 'narrator', text: 'The Timekeeper is defeated.' },
+          { speaker: 'enemy', text: 'So…' },
+          { speaker: 'enemy', text: 'This cycle reaches its end.' },
+          { speaker: 'player', text: 'Before you go, tell me about the powers.' },
+          { speaker: 'enemy', text: 'Nothing the Clock gives is free.' },
+          { speaker: 'player', text: 'What does it take?' },
+          { speaker: 'enemy', text: 'A little more of you each time.' },
+          { speaker: 'player', text: "That's not an answer." },
+          { speaker: 'enemy', text: 'You will understand shortly.' },
+          { speaker: 'narrator', text: 'The player takes the fourth Chronoshard.' },
+        ],
+      },
+    },
   },
   {
     stage: 5,
@@ -209,15 +260,12 @@ export const STAGES: StageConfig[] = [
         { speaker: 'enemy', text: 'Nonsense. Everyone does.' },
         { speaker: 'player', text: 'Then predict this!' },
       ],
-      outro: [
-        { speaker: 'enemy', text: 'Fast... faster than a shadow.' },
-        { speaker: 'enemy', text: 'How is this possible? I can predict your every move.' },
-        { speaker: 'player', text: 'Heh... I guess I\'ve had my fair share of practice' },
-        { speaker: 'enemy', text: 'So you say... Your past versions weren\'t like you. They were so predictable.' },
-        { speaker: 'player', text: 'What happens to me after I fix the clock?' },
-        { speaker: 'player', text: 'What lies beyond the Chronosphere? What lies beyond time itself?' },
-        { speaker: 'enemy', text: 'Ask the Merchant. He remembers more than most.' },
-      ],
+      outro: NINJA_OUTRO,
+    },
+    dialogueByDifficulty: {
+      // TODO(story): the Ninja is Medium's final boss, so his closing lines
+      // need writing. Until then, everything but the pointer to the Merchant.
+      medium: { outro: NINJA_OUTRO.slice(0, -1) },
     },
   },
   {
@@ -329,15 +377,42 @@ export function getFinalStageFromDifficulty(difficulty: Difficulty): number {
   }
 }
 
-export function getStageDialogue(stage: number, kind: 'intro' | 'outro'): DialogueLine[] {
-  return getStageConfig(stage).dialogue[kind];
+// The Easy / Medium override for this stage's intro or outro, if it has one.
+function getDialogueOverride(
+  stage: number,
+  kind: 'intro' | 'outro',
+  difficulty?: Difficulty
+): DialogueLine[] | undefined {
+  if (!difficulty || difficulty === 'hard') return undefined;
+  return getStageConfig(stage).dialogueByDifficulty?.[difficulty]?.[kind];
+}
+
+export function getStageDialogue(
+  stage: number,
+  kind: 'intro' | 'outro',
+  difficulty?: Difficulty
+): DialogueLine[] {
+  return getDialogueOverride(stage, kind, difficulty) ?? getStageConfig(stage).dialogue[kind];
 }
 
 // Mongo-safe key for a stage inside the account-level SeenDialogue record
 // (a bare numeric path segment like "seenDialogue.1.intro" is ambiguous with
 // an array index).
-export function dialogueKey(stage: number): string {
-  return `stage${stage}`;
+//
+// Hard, and any Easy / Medium dialogue that reuses the Hard script, share the
+// plain "stage<N>" key, so watching it once covers every mode. A script written
+// only for Easy or Medium is tracked as "easy-stage<N>" / "medium-stage<N>",
+// as is each mode's own ending.
+export function dialogueKey(
+  stage: number,
+  kind?: 'intro' | 'outro' | 'ending',
+  difficulty?: Difficulty
+): string {
+  if (!difficulty || difficulty === 'hard' || !kind) return `stage${stage}`;
+  const ownScript =
+    kind === 'ending' ||
+    getDialogueOverride(stage, kind, difficulty) !== undefined;
+  return ownScript ? `${difficulty}-stage${stage}` : `stage${stage}`;
 }
 
 // True when this stage's dialogue still has to be shown to the player: the
@@ -345,8 +420,9 @@ export function dialogueKey(stage: number): string {
 export function shouldShowDialogue(
   stage: number,
   kind: 'intro' | 'outro',
-  seen?: SeenDialogue | null
+  seen?: SeenDialogue | null,
+  difficulty?: Difficulty
 ): boolean {
-  if (getStageDialogue(stage, kind).length === 0) return false;
-  return !seen?.[dialogueKey(stage)]?.[kind];
+  if (getStageDialogue(stage, kind, difficulty).length === 0) return false;
+  return !seen?.[dialogueKey(stage, kind, difficulty)]?.[kind];
 }
