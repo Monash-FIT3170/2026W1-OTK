@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import { App } from './App';
 import { UserDataCollection } from '../api/user-data/collections/UserDataCollection';
 import { GameEngine } from '../engine/GameEngine';
-import { FINAL_STAGE, SECRET_BOSS_STAGE } from '../engine/stages';
+import { getFinalStageFromDifficulty, SECRET_BOSS_STAGE } from '../engine/stages';
 import { soundManager } from './soundManager';
 
 if (Meteor.isClient) {
@@ -14,7 +14,7 @@ if (Meteor.isClient) {
     let doc;
     let calls;
     beforeEach(function () {
-      doc = { gameState: GameEngine.newGame('dialogue-ui-user') };
+      doc = { gameState: GameEngine.newGame('dialogue-ui-user', [], "hard") };
       sinon.stub(Meteor, 'user').returns({ _id: 'dialogue-ui-user' });
       sinon.stub(Meteor, 'subscribe').returns({ ready: () => true, stop: () => {} });
       sinon.stub(UserDataCollection, 'findOne').callsFake(() => doc);
@@ -56,7 +56,7 @@ if (Meteor.isClient) {
 
     it('waits for the boss death animation before showing its outro', function () {
       const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-      const view = openGame(FINAL_STAGE, 'playing', { dialogueSeen: true, outroSeen: false });
+      const view = openGame(getFinalStageFromDifficulty("hard"), 'playing', { dialogueSeen: true, outroSeen: false });
       doc.gameState = { ...doc.gameState, result: 'win' };
       view.rerender(<App />);
       assert.isNull(screen.queryByTestId('dialogue-box'));
@@ -69,7 +69,7 @@ if (Meteor.isClient) {
     });
 
     it('shows the Merchant outro before the normal ending, then results', function () {
-      const view = openGame(FINAL_STAGE, 'win', { outroSeen: false });
+      const view = openGame(getFinalStageFromDifficulty("hard"), 'win', { outroSeen: false });
       assert.exists(screen.getByTestId('dialogue-box'));
       assert.isNull(screen.queryByTestId('normal-ending'));
       assert.isNull(screen.queryByText('Victory!'));
@@ -98,7 +98,7 @@ if (Meteor.isClient) {
     });
 
     it('uses the stage-clear screen on the route to the hidden boss', function () {
-      openGame(FINAL_STAGE, 'stageCleared', { outroSeen: true });
+      openGame(getFinalStageFromDifficulty("hard"), 'stageCleared', { outroSeen: true });
       assert.isNull(screen.queryByTestId('normal-ending'));
       assert.isNull(screen.queryByTestId('secret-ending'));
       assert.isNull(screen.queryByText('Victory!'));
@@ -114,7 +114,7 @@ if (Meteor.isClient) {
     });
 
     it('does not offer Continue after the normal or secret ending was completed', function () {
-      for (const stage of [FINAL_STAGE, SECRET_BOSS_STAGE]) {
+      for (const stage of [getFinalStageFromDifficulty("hard"), SECRET_BOSS_STAGE]) {
         const engine = new GameEngine(doc.gameState);
         engine.stage = stage;
         engine.result = 'win';

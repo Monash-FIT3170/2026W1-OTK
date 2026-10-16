@@ -6,10 +6,10 @@ import { cardRegistry } from './card/CardRegistry';
 import './card/registerAllCards';
 import './powerups/RestartStagePowerup';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData, BossRecapEntry, RunResult, SeenDialogue, cardData, powerUpData } from './types';
+import { UserData, EnemyData, BossRecapEntry, RunResult, SeenDialogue, cardData, powerUpData, Difficulty } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { FIRST_STAGE, FINAL_STAGE, SECRET_BOSS_STAGE, getStageConfig, shouldShowDialogue, dialogueKey } from './stages';
+import { FIRST_STAGE, SECRET_BOSS_STAGE, getStageConfig, getFinalStageFromDifficulty, shouldShowDialogue, dialogueKey } from './stages';
 import { pickRandomPowerUps, PowerUp } from './powerups';
 import { powerUpRegistry, powerupRegistry } from './powerups/PowerupRegistry';
 
@@ -23,6 +23,7 @@ export class GameEngine {
   public hand: Card[];
   public deck: Card[];
   public enemy: Enemy;
+  public difficulty: Difficulty;
   public stage: number;
   public userId: string;
   public result: RunResult;
@@ -52,6 +53,7 @@ export class GameEngine {
     this.hand = userData.hand.map((card) => cardRegistry.create(card));
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
     this.enemy = enemyRegistry.create(userData.enemy);
+    this.difficulty = userData.difficulty ?? 'easy';
     this.stage = userData.stage;
     this.result = userData.result;
     this.bossRecap = userData.bossRecap ?? [];
@@ -151,7 +153,7 @@ export class GameEngine {
     this.clearTimerDebuff();
     
     const continueToFinalBoss = this.stage === (SECRET_BOSS_STAGE - 1) && this.shouldContinueToSecretBoss();
-    this.result = this.stage >= FINAL_STAGE && !continueToFinalBoss ? 'win' : 'stageCleared';
+    this.result = this.stage >= getFinalStageFromDifficulty(this.difficulty) && !continueToFinalBoss ? 'win' : 'stageCleared';
 
     // Don't provide power ups when progressing to the secret boss
     if (this.result === 'stageCleared' && !continueToFinalBoss) {
@@ -281,7 +283,7 @@ export class GameEngine {
     return (
       this.result === 'win' &&
       this.outroSeen &&
-      ((this.stage === FINAL_STAGE && !this.endingSeen) ||
+      ((this.stage === getFinalStageFromDifficulty(this.difficulty) && !this.endingSeen) ||
         (this.stage === SECRET_BOSS_STAGE && !this.secretEndingSeen))
     );
   }
@@ -387,11 +389,7 @@ export class GameEngine {
 
   // `seen` is the account-level record of dialogue already watched, so
   // restarting a run skips any dialogue the player has seen before.
-  static newGame(
-    userId: string,
-    deck?: cardData[] | null,
-    seen?: SeenDialogue | null
-  ): UserData {
+  static newGame(userId: string, deck?: cardData[] | null, difficulty?: Difficulty, seen?: SeenDialogue | null): UserData {
     deck ??= DeckBuilder.buildStartingDeck(); // No deck provided, use the default starting deck
     const baseDeck = [...deck];
     const stage = FIRST_STAGE;
@@ -404,6 +402,7 @@ export class GameEngine {
       deck,
       hand: [],
       enemy,
+      difficulty: difficulty ?? "easy",
       scene,
       result: 'playing',
       bossRecap: [],
@@ -416,7 +415,7 @@ export class GameEngine {
       powerUpChoices: [],
       dialogueSeen: !shouldShowDialogue(stage, 'intro', seen),
       outroSeen: !shouldShowDialogue(stage, 'outro', seen),
-      endingSeen: !!seen?.[dialogueKey(FINAL_STAGE)]?.ending,
+      endingSeen: !!seen?.[dialogueKey(getFinalStageFromDifficulty(difficulty ?? "easy"))]?.ending,
       secretEndingSeen: !!seen?.[dialogueKey(SECRET_BOSS_STAGE)]?.ending,
       selectedPowerUps: [],
     };
@@ -479,6 +478,7 @@ export class GameEngine {
   toJSON(): UserData {
     return {
       userId: this.userId,
+      difficulty: this.difficulty,
       stage: this.stage,
       baseDeck: this.baseDeck.map((card) => card.toJSON()),
       deck: this.deck.map((card) => card.toJSON()),

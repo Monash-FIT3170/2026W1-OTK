@@ -24,7 +24,7 @@ import { LeaderboardScreen } from './components/LeaderboardScreen';
 import { DeckBuilder } from './components/deck/DeckBuilder';
 import { buildAvailableCards } from './../engine/DeckBuilderCards';
 import { DeckBuilder as DeckBuilderEngine } from '../engine/DeckBuilder';
-import { FINAL_STAGE, SECRET_BOSS_STAGE, getStageDialogue } from '../engine/stages';
+import { getFinalStageFromDifficulty, SECRET_BOSS_STAGE, getStageDialogue } from '../engine/stages';
 import { DialogueBox } from './components/DialogueBox';
 import { NORMAL_ENDING, SECRET_ENDING } from '../engine/endings';
 
@@ -53,6 +53,8 @@ export const App = () => {
 
   const [justStartedNewGame, setJustStartedNewGame] = useState(false);
   const [showDeckBuilder, setShowDeckBuilder] = useState(false);
+  const [showNewGameSetup, setShowNewGameSetup] = useState(false);
+  const [newGameDifficulty, setNewGameDifficulty] = useState('easy');
   const [showPowerupMenu, setShowPowerupMenu] = useState(false);
 
   // Subscribe to auth and game data reactively
@@ -73,7 +75,7 @@ export const App = () => {
   const introPending =
     gameState?.result === 'playing' && gameState?.dialogueSeen === false;
   const unseenEnding =
-    (gameState?.stage === FINAL_STAGE && gameState?.endingSeen !== true) ||
+    (gameState?.stage === getFinalStageFromDifficulty(gameState?.difficulty ?? "hard") && gameState?.endingSeen !== true) ||
     (gameState?.stage === SECRET_BOSS_STAGE && gameState?.secretEndingSeen !== true);
   const victoryStoryPending =
     gameState?.result === 'win' &&
@@ -193,6 +195,7 @@ export const App = () => {
 
   const handleStart = (isNewGame = false) => {
     setShowLanding(false);
+    setShowNewGameSetup(false);
     if (isNewGame) setJustStartedNewGame(true);
   };
 
@@ -246,6 +249,11 @@ export const App = () => {
           victoryStoryPending
         }
         onStart={handleStart}
+        isNewGameSetup={showNewGameSetup}
+        difficulty={newGameDifficulty}
+        onDifficultyChange={setNewGameDifficulty}
+        onOpenNewGameSetup={() => setShowNewGameSetup(true)}
+        onBackToMenu={() => setShowNewGameSetup(false)}
         onOpenTutorial={handleOpenTutorial}
         onOpenTrainingMode={handleOpenTrainingMode}
         onOpenLeaderboard={handleOpenLeaderboard}
@@ -335,6 +343,7 @@ export const App = () => {
     return (
       <StageClearScreen
         stage={stage}
+        difficulty={gameState.difficulty}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
         powerUpChoices={gameState.powerUpChoices}
@@ -363,6 +372,7 @@ export const App = () => {
     return (
       <ResultScreen
         result={delayedResult}
+        difficulty={gameState.difficulty}
         enemyName={enemy.name}
         bossRecap={gameState.bossRecap}
         onBackToMenu={() => setShowLanding(true)}
@@ -386,7 +396,7 @@ export const App = () => {
 
       <div className="px-6 py-4 mx-auto w-350" data-tutorial-target="health">
         <p className="text-white text-2xl font-semibold mb-2 drop-shadow-lg">
-          Stage {stage} / {FINAL_STAGE}
+          Stage {stage} / {getFinalStageFromDifficulty(gameState.difficulty)}
         </p>
         {/* <HealthBar
           current={enemy.currentHealth}

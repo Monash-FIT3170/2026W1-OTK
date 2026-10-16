@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { assert } from 'chai';
 import { UserDataCollection } from '../collections/UserDataCollection';
 import { GameEngine } from '../../../engine/GameEngine';
-import { FINAL_STAGE, SECRET_BOSS_STAGE } from '../../../engine/stages';
+import { getFinalStageFromDifficulty, SECRET_BOSS_STAGE } from '../../../engine/stages';
 
 /**
  * Unit tests for the game.finishDialogue method and the dialogue guards on
@@ -28,7 +28,7 @@ if (Meteor.isServer) {
   const seedRun = (seenDialogue) =>
     UserDataCollection.insertAsync({
       userId,
-      gameState: GameEngine.newGame(userId, null, seenDialogue),
+      gameState: GameEngine.newGame(userId, null, 'hard', seenDialogue),
       ...(seenDialogue ? { seenDialogue } : {}),
     });
 
@@ -50,29 +50,29 @@ if (Meteor.isServer) {
 
   describe('game.finishDialogue', function () {
     it('records the normal ending and skips it on a restarted run', async function () {
-      const engine = new GameEngine(GameEngine.newGame(userId));
-      engine.stage = FINAL_STAGE;
+      const engine = new GameEngine(GameEngine.newGame(userId, [], 'hard'));
+      engine.stage = getFinalStageFromDifficulty(engine.difficulty);
       engine.result = 'win';
       engine.finishOutro();
       await UserDataCollection.insertAsync({ userId, gameState: engine.toJSON() });
       await callFinish('ending');
       let doc = await UserDataCollection.findOneAsync({ userId });
       assert.isTrue(doc.gameState.endingSeen);
-      assert.isTrue(doc.seenDialogue[`stage${FINAL_STAGE}`].ending);
+      assert.isTrue(doc.seenDialogue[`stage${getFinalStageFromDifficulty(engine.difficulty)}`].ending);
       await callFinish('ending');
-      await call('game.newGame');
+      await call('game.newGame', ['hard']);
       doc = await UserDataCollection.findOneAsync({ userId });
       assert.isTrue(doc.gameState.endingSeen);
     });
 
     it('rejects the ending before the outro, during battle, and on non-final stages', async function () {
       for (const [stage, result, outroSeen] of [
-        [FINAL_STAGE, 'win', false],
-        [FINAL_STAGE, 'playing', true],
+        [getFinalStageFromDifficulty("hard"), 'win', false],
+        [getFinalStageFromDifficulty("hard"), 'playing', true],
         [1, 'win', true],
       ]) {
         await UserDataCollection.removeAsync({ userId });
-        const gameState = { ...GameEngine.newGame(userId), stage, result, outroSeen };
+        const gameState = { ...GameEngine.newGame(userId, [], "hard"), stage, result, outroSeen };
         await UserDataCollection.insertAsync({ userId, gameState });
         try {
           await callFinish('ending');
@@ -84,7 +84,7 @@ if (Meteor.isServer) {
     });
 
     it('records secret victory separately and preserves it on restart', async function () {
-      const engine = new GameEngine(GameEngine.newGame(userId));
+      const engine = new GameEngine(GameEngine.newGame(userId, [], 'hard'));
       engine.stage = SECRET_BOSS_STAGE;
       engine.result = 'win';
       engine.finishOutro();
@@ -95,7 +95,7 @@ if (Meteor.isServer) {
       assert.isTrue(doc.gameState.secretEndingSeen);
       assert.isFalse(doc.gameState.endingSeen);
       assert.isTrue(doc.seenDialogue[`stage${SECRET_BOSS_STAGE}`].ending);
-      assert.isUndefined(doc.seenDialogue[`stage${FINAL_STAGE}`]);
+      assert.isUndefined(doc.seenDialogue[`stage${getFinalStageFromDifficulty(engine.difficulty)}`]);
       await call('game.newGame');
       doc = await UserDataCollection.findOneAsync({ userId });
       assert.isTrue(doc.gameState.secretEndingSeen);
