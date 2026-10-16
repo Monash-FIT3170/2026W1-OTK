@@ -75,7 +75,7 @@ export const App = () => {
   const introPending =
     gameState?.result === 'playing' && gameState?.dialogueSeen === false;
   const unseenEnding =
-    (gameState?.stage === FINAL_STAGE && gameState?.endingSeen !== true) ||
+    (gameState?.stage === getFinalStageFromDifficulty(gameState?.difficulty ?? "hard") && gameState?.endingSeen !== true) ||
     (gameState?.stage === SECRET_BOSS_STAGE && gameState?.secretEndingSeen !== true);
   const victoryStoryPending =
     gameState?.result === 'win' &&

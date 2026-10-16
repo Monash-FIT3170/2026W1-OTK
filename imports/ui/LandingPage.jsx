@@ -83,23 +83,8 @@ export const LandingPage = ({
 
             <button
               onClick={onOpenNewGameSetup}
-              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors disabled:opacity-50"
-            >
+              style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-2xl transition-colors disabled:opacity-50"            >
               New Game
-            </button>
-
-            <button
-              onClick={onOpenTutorial}
-              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
-            >
-              Tutorial
-            </button>
-
-            <button
-              onClick={onOpenTrainingMode}
-              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-lg font-semibold transition-colors"
-            >
-              Training Mode
             </button>
 
             <div className="flex flex-col gap-1">
@@ -123,6 +108,27 @@ export const LandingPage = ({
               style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-2xl transition-colors"
             >
               Options
+            </button>
+
+            <button
+              onClick={onOpenTutorial}
+              style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-2xl transition-colors"
+            >
+              Tutorial
+            </button>
+
+            <button
+              onClick={onOpenTrainingMode}
+              style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-2xl transition-colors"
+            >
+              Training Mode
+            </button>
+
+            <button
+              onClick={onOpenLeaderboard}
+              style={{ fontFamily: 'var(--game-font)'}} className="border-2 border-slate-600 px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-2xl transition-colors"
+            >
+              Leaderboard
             </button>
 
             <button
@@ -213,13 +219,6 @@ export const LandingPage = ({
               onClick={onBackToMenu}
               disabled={starting}
               style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-colors disabled:opacity-50"
-            >
-              Leaderboard
-            </button>
-
-            <button
-              onClick={handleQuit}
-              style={{ fontFamily: 'var(--game-font)'}} className="px-6 py-3 rounded-lg bg-red-700 hover:bg-red-600 text-white text-2xl transition-colors"
             >
               Back
             </button>
