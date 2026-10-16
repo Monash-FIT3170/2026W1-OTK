@@ -68,7 +68,7 @@ export function StageClearScreen({
   };
 
   return (
-    <div className="h-screen bg-slate-900 flex flex-col items-center justify-center gap-4 overflow-hidden px-8 py-6">
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-4 px-8 py-6">
       <div className="text-center">
         <h1 style={{ fontFamily: 'var(--game-font)'}} className="text-7xl text-emerald-400">
           Stage {stage} Cleared!

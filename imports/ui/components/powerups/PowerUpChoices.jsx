@@ -18,7 +18,7 @@ export function PowerUpChoices({ powerUpChoices, selectedIndex, onSelect }) {
       <p className="text-slate-300 text-sm uppercase tracking-wide">
         Choose a Power-Up
       </p>
-      <div className="flex flex-row gap-5">
+      <div className="flex flex-row flex-wrap justify-center gap-5">
         {validChoices.map((powerUpId, index) => {
           const powerUp = powerupRegistry.create(powerUpId);
           const isSelected = index === selectedIndex;
