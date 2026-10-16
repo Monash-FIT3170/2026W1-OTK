@@ -352,7 +352,7 @@ describe('GameEngine - boss dialogue', function () {
   });
 
   it('skips dialogue the account has already seen when a run starts', function () {
-    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, seenAll()));
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, "hard", seenAll()));
 
     assert.isTrue(engine.dialogueSeen);
     assert.isTrue(engine.outroSeen);
@@ -361,7 +361,7 @@ describe('GameEngine - boss dialogue', function () {
 
   it('only skips the stages that have been seen', function () {
     const seen = { stage1: { intro: true, outro: true } };
-    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, seen));
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, "hard", seen));
     killBoss(engine);
 
     engine.advanceStage(seen);
@@ -373,7 +373,7 @@ describe('GameEngine - boss dialogue', function () {
 
   it('treats an intro seen without its outro as half-seen', function () {
     const engine = new GameEngine(
-      GameEngine.newGame(USER_ID, null, { stage1: { intro: true } })
+      GameEngine.newGame(USER_ID, null, "hard", { stage1: { intro: true } })
     );
 
     assert.isTrue(engine.dialogueSeen);
@@ -381,7 +381,7 @@ describe('GameEngine - boss dialogue', function () {
   });
 
   it('puts the next stage back into an intro-pending state', function () {
-    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, seenAll()));
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, "hard", seenAll()));
     killBoss(engine);
 
     engine.advanceStage({});
@@ -471,7 +471,7 @@ describe('GameEngine - boss dialogue', function () {
 describe('GameEngine - normal ending', function () {
   it('waits for normal victory and the final boss outro', function () {
     const engine = freshEngine();
-    engine.stage = FINAL_STAGE;
+    engine.stage = getFinalStageFromDifficulty(engine.difficulty);
     engine.result = 'playing';
     assert.isFalse(engine.isEndingPending());
     engine.result = 'stageCleared';
@@ -488,18 +488,18 @@ describe('GameEngine - normal ending', function () {
   it('does not play an ending after a loss', function () {
     const engine = freshEngine();
     engine.finishOutro();
-    engine.stage = FINAL_STAGE;
+    engine.stage = getFinalStageFromDifficulty(engine.difficulty);
     engine.result = 'loss';
     assert.isFalse(engine.isEndingPending());
   });
 
   it('tracks the ending separately from previously watched boss dialogue', function () {
-    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, {
-      [`stage${FINAL_STAGE}`]: { outro: true },
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, "hard", {
+      [`stage${getFinalStageFromDifficulty("hard")}`]: { outro: true },
     }));
     assert.isFalse(engine.endingSeen);
-    const watched = new GameEngine(GameEngine.newGame(USER_ID, null, {
-      [`stage${FINAL_STAGE}`]: { ending: true },
+    const watched = new GameEngine(GameEngine.newGame(USER_ID, null, "hard", {
+      [`stage${getFinalStageFromDifficulty("hard")}`]: { ending: true },
     }));
     assert.isTrue(watched.endingSeen);
   });
@@ -507,8 +507,8 @@ describe('GameEngine - normal ending', function () {
 
 describe('GameEngine - secret ending', function () {
   it('plays after secret victory even when the normal ending was watched', function () {
-    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, {
-      [`stage${FINAL_STAGE}`]: { ending: true },
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, "hard", {
+      [`stage${getFinalStageFromDifficulty("hard")}`]: { ending: true },
     }));
     engine.stage = SECRET_BOSS_STAGE;
     engine.outroSeen = true;
@@ -522,7 +522,7 @@ describe('GameEngine - secret ending', function () {
   });
 
   it('skips a watched secret ending without skipping an unseen normal ending', function () {
-    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, {
+    const engine = new GameEngine(GameEngine.newGame(USER_ID, null, "hard", {
       [`stage${SECRET_BOSS_STAGE}`]: { ending: true },
     }));
     assert.isTrue(engine.secretEndingSeen);
@@ -531,7 +531,7 @@ describe('GameEngine - secret ending', function () {
     engine.outroSeen = true;
     engine.result = 'win';
     assert.isFalse(engine.isEndingPending());
-    engine.stage = FINAL_STAGE;
+    engine.stage = getFinalStageFromDifficulty("hard");
     assert.isTrue(engine.isEndingPending());
   });
 });
