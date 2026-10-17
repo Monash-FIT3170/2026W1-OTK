@@ -10,6 +10,7 @@ import { tutorialSteps } from '../tutorial/tutorialSteps';
 import { useTutorialEngine } from '../hooks/useTutorialEngine';
 import {
   measureTarget,
+  isSameRect,
   computeHighlightStyle,
   computeCardPositionStyle,
 } from '../tutorial/spotlight';
@@ -22,7 +23,7 @@ const demoTutorialSteps = [
   ...tutorialSteps.slice(0, -1),
   {
     target: 'end-turn',
-    action: 'end-turn',
+    action: null,
     title: 'Keep Practising',
     description:
       'Keep playing cards against the Training Dummy for as long as you like. When you are ready to end the tutorial, press End Turn.',
@@ -49,6 +50,7 @@ export const TutorialDemoScreen = ({
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === demoTutorialSteps.length - 1;
   const isWaitingForAction = Boolean(step.action);
+  const [tutorialFinished, setTutorialFinished] = useState(false);
 
   // Baseline captured whenever we enter a gated step, so we can tell
   // "the player just played a card" apart from "they already played one
@@ -72,20 +74,21 @@ export const TutorialDemoScreen = ({
   }, [cardsPlayedCount, step.action]);
 
   useEffect(() => {
-    const measure = () => setRect(measureTarget(step.target));
-    measure();
-    const settleTimer = setTimeout(measure, 60);
-    window.addEventListener('resize', measure);
-    return () => {
-      window.removeEventListener('resize', measure);
-      clearTimeout(settleTimer);
+    if (tutorialFinished) return undefined;
+    let frame;
+    const tick = () => {
+      const next = measureTarget(step.target);
+      setRect((prev) => (isSameRect(prev, next) ? prev : next));
+      frame = requestAnimationFrame(tick);
     };
-  }, [stepIndex, step.target]);
+    tick();
+    return () => cancelAnimationFrame(frame);
+  }, [step.target, tutorialFinished]);
 
   const handleNext = () => {
-    if (isWaitingForAction) return; // gated steps only advance via the real action
+    if (isWaitingForAction) return;
     if (isLastStep) {
-      onClose();
+      setTutorialFinished(true); // hide overlay
       return;
     }
     setStepIndex((i) => i + 1);
@@ -98,7 +101,7 @@ export const TutorialDemoScreen = ({
 
   const handleEndTurn = () => {
     endTurn();
-    if (step.action === 'end-turn') {
+    if (tutorialFinished) {
       onClose();
     }
   };
@@ -215,8 +218,9 @@ export const TutorialDemoScreen = ({
       </div>
 
       <div
-        className="absolute flex items-end pointer-events-none"
-        style={{ left: 87, right: 140, bottom: 163 }}
+        className="absolute pointer-events-none"
+        data-tutorial-target="deck"
+        style={{ left: 54, bottom: 162 }}
       >
         {/* Reuses the real DeckViewer component — it's purely local/
             presentational (no Meteor calls), so it's safe here and gives
@@ -224,39 +228,33 @@ export const TutorialDemoScreen = ({
             of a custom placeholder. Wrapped tightly so the tutorial
             spotlight highlights just the visible deck number, not the
             wide positioning container around it. */}
-        <div
-          className="inline-block pointer-events-auto"
-          data-tutorial-target="deck"
-        >
-          <DeckViewer cards={deck} />
-        </div>
+        <DeckViewer cards={deck} />
       </div>
 
       {/* Portaled straight to document.body — see the matching comment in
           TutorialOverlay.jsx for why: rendering position: fixed elements
           inside GameBackground (a possibly CSS-scaled ancestor) makes
           them relative to that scaled box instead of the true viewport. */}
-      {!rect
-        ? createPortal(
+      {!tutorialFinished &&
+        createPortal(
+          !rect ? (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
               <div className="w-full max-w-md mx-4">{cardContent}</div>
-            </div>,
-            document.body
-          )
-        : createPortal(
+            </div>
+          ) : (
             <>
               <div style={computeHighlightStyle(rect)} />
               <div
                 style={computeCardPositionStyle(rect, {
-                  pinToTop:
-                    step.target === 'hand' || step.action === 'end-turn',
+                  pinToTop: step.target === 'hand' || isLastStep,
                 })}
               >
                 {cardContent}
               </div>
-            </>,
-            document.body
-          )}
+            </>
+          ),
+          document.body
+        )}
     </GameBackground>
   );
 };
