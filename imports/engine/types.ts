@@ -42,6 +42,8 @@ export type EnemyData = {
 // - 'loss'         run over
 export type RunResult = 'playing' | 'stageCleared' | 'win' | 'loss';
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 // per-boss recap entry recorded when a boss fight ends
 export type BossRecapEntry = {
   bossName: string;
@@ -52,9 +54,31 @@ export type BossRecapEntry = {
   result: 'win' | 'loss';
 };
 
+// One line of boss dialogue. 'enemy' is rendered with the current boss's name,
+// 'player' as "You", and 'narrator' as unattributed italic story text with no
+// name plate.
+export type DialogueSpeaker = 'player' | 'enemy' | 'narrator';
+
+export type DialogueLine = {
+  speaker: DialogueSpeaker;
+  speakerName?: string; // named speakers outside the current boss encounter
+  text: string;
+};
+
+// Dialogue plays before/after fights, or as a victory ending.
+export type DialogueKind = 'intro' | 'outro' | 'ending';
+
+// Account-level record of which stage dialogue the player has already seen,
+// keyed by dialogueKey(stage). It lives at the top level of the user's
+// document - not inside gameState - so starting a new run does not reset it.
+export type SeenDialogue = {
+  [stageKey: string]: { intro?: boolean; outro?: boolean; ending?: boolean };
+};
+
 // data shape stored in UserDataCollection
 export type UserData = {
   userId: string;
+  difficulty?: Difficulty;
   stage: number;
   baseDeck?: cardData[];
   deck: cardData[];
@@ -70,6 +94,10 @@ export type UserData = {
   lastActiveAt?: number; // Date.now() of the last server-side action or heartbeat
   powerUps?: powerUpData[]; // powerUpIds chosen so far, in pick order
   powerUpChoices?: string[]; // powerUpIds currently offered on the stage-clear screen
+  dialogueSeen?: boolean; // pre-battle dialogue finished (or not needed) for the current stage
+  outroSeen?: boolean; // post-battle dialogue finished (or not needed) for the current stage
+  endingSeen?: boolean; // normal ending finished (or already watched on this account)
+  secretEndingSeen?: boolean; // secret ending tracked independently of normal victory
   selectedPowerUps?: string[];
 };
 

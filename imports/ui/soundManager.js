@@ -13,6 +13,7 @@ const CARD_SOUNDS = {
 // Named music tracks
 const MUSIC_TRACKS = {
   'spark-mandrill': 'MegaMan_X_Spark_Mandrill_Theme.mp3',
+  'battle': 'battle-ost-loop.wav',
 };
 
 // Named one-shot event sounds

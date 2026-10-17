@@ -8,7 +8,7 @@ export function useGameSounds(result, active) {
       return;
     }
     if (result === 'playing') {
-      soundManager.playBackgroundMusic('spark-mandrill');
+      soundManager.playBackgroundMusic('battle');
       return;
     }
     // Any non-playing result: cut the battle music first so the sting plays

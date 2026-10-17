@@ -6,10 +6,10 @@ import { cardRegistry } from './card/CardRegistry';
 import './card/registerAllCards';
 import './powerups/RestartStagePowerup';
 import { enemyRegistry } from './enemy/EnemyRegistry';
-import { UserData, EnemyData, BossRecapEntry, RunResult, cardData, powerUpData } from './types';
+import { UserData, EnemyData, BossRecapEntry, RunResult, SeenDialogue, cardData, powerUpData, Difficulty } from './types';
 import { DeckBuilder } from './DeckBuilder';
 import { debuffRegistry } from './debuffs';
-import { FIRST_STAGE, FINAL_STAGE, SECRET_BOSS_STAGE, getStageConfig } from './stages';
+import { FIRST_STAGE, SECRET_BOSS_STAGE, getStageConfig, getFinalStageFromDifficulty, shouldShowDialogue, dialogueKey } from './stages';
 import { pickRandomPowerUps, PowerUp } from './powerups';
 import { powerUpRegistry, powerupRegistry } from './powerups/PowerupRegistry';
 
@@ -23,6 +23,7 @@ export class GameEngine {
   public hand: Card[];
   public deck: Card[];
   public enemy: Enemy;
+  public difficulty: Difficulty;
   public stage: number;
   public userId: string;
   public result: RunResult;
@@ -34,6 +35,14 @@ export class GameEngine {
   public lastActiveAt: number;
   public powerUps: PowerUp[];
   public powerUpChoices: string[];
+  // Pre-battle dialogue for the current stage is finished (or not needed).
+  // While false on a 'playing' run the fight has not started - see
+  // isIntroPending().
+  public dialogueSeen: boolean;
+  // Post-battle dialogue for the current stage is finished (or not needed).
+  public outroSeen: boolean;
+  public endingSeen: boolean;
+  public secretEndingSeen: boolean;
   public selectedPowerUps: string[];
 
   constructor(userData: UserData) {
@@ -44,6 +53,7 @@ export class GameEngine {
     this.hand = userData.hand.map((card) => cardRegistry.create(card));
     this.deck = userData.deck.map((card) => cardRegistry.create(card));
     this.enemy = enemyRegistry.create(userData.enemy);
+    this.difficulty = userData.difficulty ?? 'easy';
     this.stage = userData.stage;
     this.result = userData.result;
     this.bossRecap = userData.bossRecap ?? [];
@@ -61,6 +71,12 @@ export class GameEngine {
       return powerUp;
     });
     this.powerUpChoices = userData.powerUpChoices ?? [];
+    // Saves from before dialogue existed default to seen, so nobody gets a
+    // dialogue popping up mid-fight after the update.
+    this.dialogueSeen = userData.dialogueSeen ?? true;
+    this.outroSeen = userData.outroSeen ?? true;
+    this.endingSeen = userData.endingSeen ?? false;
+    this.secretEndingSeen = userData.secretEndingSeen ?? false;
     this.selectedPowerUps = userData.selectedPowerUps ?? [];
   }
 
@@ -137,7 +153,7 @@ export class GameEngine {
     this.clearTimerDebuff();
     
     const continueToFinalBoss = this.stage === (SECRET_BOSS_STAGE - 1) && this.shouldContinueToSecretBoss();
-    this.result = this.stage >= FINAL_STAGE && !continueToFinalBoss ? 'win' : 'stageCleared';
+    this.result = this.stage >= getFinalStageFromDifficulty(this.difficulty) && !continueToFinalBoss ? 'win' : 'stageCleared';
 
     // Don't provide power ups when progressing to the secret boss
     if (this.result === 'stageCleared' && !continueToFinalBoss) {
@@ -200,7 +216,10 @@ export class GameEngine {
   //
   // The deck is rebuilt from this run's baseDeck and never from the player's
   // saved nextDeck - that is what locks the deck for the duration of a run.
-  advanceStage(): void {
+  //
+  // `seen` is the account-level record of dialogue the player has already
+  // watched (in any run), so a restarted run does not replay it.
+  advanceStage(seen?: SeenDialogue | null): void {
     if (this.result !== 'stageCleared') {
       throw new Error('Cannot advance: the current stage is not cleared');
     }
@@ -220,12 +239,61 @@ export class GameEngine {
     this.stageStartedAt = Date.now();
     this.cardsUsedThisStage = 0;
     this.powerUpsUsedThisStage = 0;
-    
+    this.dialogueSeen = !shouldShowDialogue(this.stage, 'intro', seen, this.difficulty);
+    this.outroSeen = !shouldShowDialogue(this.stage, 'outro', seen, this.difficulty);
     this.refreshPowerUps();
     
     this.shuffle();
     this.activateEnemyDebuffs();
     this.draw();
+  }
+
+  // The stage has been dealt but the pre-battle dialogue has not been
+  // dismissed yet. The fight has not started: no card, power-up, end-turn or
+  // timer heartbeat may act on it until finishDialogue().
+  isIntroPending(): boolean {
+    return this.result === 'playing' && !this.dialogueSeen;
+  }
+
+  // The boss is down but the post-battle dialogue has not been dismissed yet,
+  // so the stage-clear / result screen is held back.
+  isOutroPending(): boolean {
+    return (
+      (this.result === 'stageCleared' || this.result === 'win') &&
+      !this.outroSeen
+    );
+  }
+
+  // Player finished or skipped the pre-battle dialogue - this is the moment
+  // the fight actually begins. Restarts the stage clock so the boss recap time
+  // doesn't count time spent reading, and makes sure no timer-debuff countdown
+  // is running from before the fight started.
+  finishDialogue(now: number = Date.now()): void {
+    this.dialogueSeen = true;
+    this.stageStartedAt = now;
+    this.clearTimerDebuff();
+  }
+
+  // Player finished or skipped the post-battle dialogue.
+  finishOutro(): void {
+    this.outroSeen = true;
+  }
+
+  isEndingPending(): boolean {
+    return (
+      this.result === 'win' &&
+      this.outroSeen &&
+      ((this.stage === getFinalStageFromDifficulty(this.difficulty) && !this.endingSeen) ||
+        (this.stage === SECRET_BOSS_STAGE && !this.secretEndingSeen))
+    );
+  }
+
+  finishEnding(): void {
+    if (this.stage === SECRET_BOSS_STAGE) {
+      this.secretEndingSeen = true;
+    } else {
+      this.endingSeen = true;
+    }
   }
 
   /**
@@ -319,10 +387,13 @@ export class GameEngine {
     );
   }
 
-  static newGame(userId: string, deck?: cardData[] | null): UserData {
+  // `seen` is the account-level record of dialogue already watched, so
+  // restarting a run skips any dialogue the player has seen before.
+  static newGame(userId: string, deck?: cardData[] | null, difficulty?: Difficulty, seen?: SeenDialogue | null): UserData {
     deck ??= DeckBuilder.buildStartingDeck(); // No deck provided, use the default starting deck
     const baseDeck = [...deck];
     const stage = FIRST_STAGE;
+    const level: Difficulty = difficulty ?? "easy";
     const { BossClass, scene } = getStageConfig(stage);
     const enemy: EnemyData = new BossClass().toJSON();
     const userData: UserData = {
@@ -332,6 +403,7 @@ export class GameEngine {
       deck,
       hand: [],
       enemy,
+      difficulty: level,
       scene,
       result: 'playing',
       bossRecap: [],
@@ -342,6 +414,12 @@ export class GameEngine {
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
+      dialogueSeen: !shouldShowDialogue(stage, 'intro', seen, level),
+      outroSeen: !shouldShowDialogue(stage, 'outro', seen, level),
+      endingSeen: !!seen?.[
+        dialogueKey(getFinalStageFromDifficulty(level), 'ending', level)
+      ]?.ending,
+      secretEndingSeen: !!seen?.[dialogueKey(SECRET_BOSS_STAGE)]?.ending,
       selectedPowerUps: [],
     };
 
@@ -403,6 +481,7 @@ export class GameEngine {
   toJSON(): UserData {
     return {
       userId: this.userId,
+      difficulty: this.difficulty,
       stage: this.stage,
       baseDeck: this.baseDeck.map((card) => card.toJSON()),
       deck: this.deck.map((card) => card.toJSON()),
@@ -418,6 +497,10 @@ export class GameEngine {
       lastActiveAt: this.lastActiveAt,
       powerUps: this.powerUps,
       powerUpChoices: this.powerUpChoices,
+      dialogueSeen: this.dialogueSeen,
+      outroSeen: this.outroSeen,
+      endingSeen: this.endingSeen,
+      secretEndingSeen: this.secretEndingSeen,
       selectedPowerUps: this.selectedPowerUps,
     };
   }

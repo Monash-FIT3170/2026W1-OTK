@@ -23,6 +23,11 @@ Meteor.methods({
     if (userData.gameState?.result !== 'playing') return;
 
     const engine = new GameEngine(userData.gameState);
+
+    // The fight has not begun while the intro dialogue is up: no clocks run,
+    // and nothing is saved, so lastActiveAt stays put until finishDialogue.
+    if (engine.isIntroPending()) return;
+
     engine.rebaseAfterAway();
     engine.resolveTimerDebuff();
     engine.touch();
