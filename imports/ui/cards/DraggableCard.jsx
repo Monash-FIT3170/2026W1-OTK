@@ -14,6 +14,9 @@ export function DraggableCard({
   isInSelectionMode = false,
   affordable = true,
   playable = true,
+  zIndex,
+  shiftX = 0,
+  onHoverChange,
 }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -59,9 +62,15 @@ export function DraggableCard({
   return (
     <motion.div
       initial={{ y: 80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      style={{ marginLeft, flexShrink: 0 }}
+      animate={{ x: shiftX, y: 0, opacity: 1 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 20,
+        // Hover fan-out slide
+        x: { type: 'spring', stiffness: 300, damping: 40 },
+      }}
+      style={{ marginLeft, flexShrink: 0, position: 'relative', zIndex }}
     >
       <motion.div
         ref={cardRef}
@@ -70,15 +79,38 @@ export function DraggableCard({
           y,
           position: 'relative',
           touchAction: 'none',
-          cursor: !playable ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
+          cursor: isInSelectionMode? 'pointer': !playable? 'not-allowed': isDragging? 'grabbing': 'grab',
         }}
-        whileHover={!isDragging ? { scale: 1.1 } : { }}
+        whileHover={!isDragging ? { scale: 1.1 } : {}}
         onClick={onClick}
-        onHoverStart={() => !isDragging && soundManager.playCardHover()}
+        onHoverStart={() => {
+          if (!isDragging) soundManager.playCardHover();
+          onHoverChange?.(true);
+        }}
+        onHoverEnd={() => onHoverChange?.(false)}
         onPanStart={handlePanStart}
         onPan={handlePan}
         onPanEnd={handlePanEnd}
       >
+        <motion.div
+          className={isInSelectionMode ? '[&_*]:!cursor-pointer' : ''}
+          animate={
+            isInSelectionMode
+              ? {
+                  filter: [
+                    'drop-shadow(0 0 0px rgba(163,230,53,0))',
+                    'drop-shadow(0 0 14px rgba(163,230,53,0.85))',
+                    'drop-shadow(0 0 0px rgba(163,230,53,0))',
+                  ],
+                }
+              : { filter: 'drop-shadow(0 0 0px rgba(163,230,53,0))' }
+          }
+          transition={
+            isInSelectionMode
+              ? { duration: 1.6, repeat: Infinity}
+              : { duration: 0.2 }
+          }
+        >
         <Card cardProps={cardProps} />
         {!affordable && !isInSelectionMode && (
           <div
@@ -96,6 +128,7 @@ export function DraggableCard({
             }}
           />
         )}
+        </motion.div>
       </motion.div>
     </motion.div>
   );

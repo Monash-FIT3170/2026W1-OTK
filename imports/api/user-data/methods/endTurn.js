@@ -18,6 +18,12 @@ Meteor.methods({
     }
 
     const engine = new GameEngine(userData.gameState);
+    if (engine.isIntroPending()) {
+      throw new Meteor.Error(
+        'game.endTurn.dialoguePending',
+        'Finish the intro dialogue before ending your turn.'
+      );
+    }
     engine.rebaseAfterAway();
     engine.finalizeBossRecap('loss');
     engine.result = 'loss';

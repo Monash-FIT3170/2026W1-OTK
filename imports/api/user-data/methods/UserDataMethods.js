@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { UserDataCollection } from '../collections/UserDataCollection';
 import { check } from 'meteor/check';
-import { GameEngine } from '../../../engine/GameEngine';
 
 /**
  * Meteor methods for managing user-associated game data.
@@ -34,10 +33,10 @@ Meteor.methods({
    * This method:
    * - Validates the provided userId
    * - Prevents duplicate user data entries
-   * - Creates a default GameState structure for the user
    *
-   * The created GameState acts as the initial save structure
-   * for the user's OTK run progress.
+   * No GameState is created here: a brand-new user has no run to continue,
+   * and the landing page treats any 'playing' GameState as a save. The
+   * first GameState is created by `game.newGame` when the player starts a run.
    *
    * @method userData.registerUser
    *

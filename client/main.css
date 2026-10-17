@@ -10,6 +10,20 @@ body {
   background-color: #f8fafc;
 }
 
+/* Game font. Toggled by the "Readable font" setting (imports/ui/fontPreference.js),
+   which sets data-font="readable" on <html>. */
+:root {
+  --game-font: 'Micro 5', monospace;
+  --game-font-adjust: none;
+}
+:root[data-font='readable'] {
+  --game-font: 'Pixelify Sans', monospace;
+  /* Pixelify Sans is much larger than Micro 5 at the same font-size. This shrinks it
+     so its capital letters are this fraction of the font-size, keeping card text
+     inside the cards. Raise for bigger text, lower if text overflows. */
+  --game-font-adjust: cap-height 0.45;
+}
+
 @theme {
   --color-led: #1a2e28;
 }

@@ -1,4 +1,5 @@
 // Goblin.ts
+// Stage 1 boss. No debuff.
 
 import { Enemy } from '../Enemy';
 import { enemyRegistry } from '../EnemyRegistry';
@@ -22,6 +23,8 @@ export class Goblin extends Enemy {
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,
       timerDebuffTickAmount: data.timerDebuffTickAmount,
+      damageTakenCount: data.damageTakenCount,
+      shieldLayers: data.shieldLayers,
     });
 
     // The stage 1 boss is deliberately debuff-free - it is the run's tutorial
