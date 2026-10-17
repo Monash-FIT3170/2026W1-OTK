@@ -239,8 +239,8 @@ export class GameEngine {
     this.stageStartedAt = Date.now();
     this.cardsUsedThisStage = 0;
     this.powerUpsUsedThisStage = 0;
-    this.dialogueSeen = !shouldShowDialogue(this.stage, 'intro', seen);
-    this.outroSeen = !shouldShowDialogue(this.stage, 'outro', seen);
+    this.dialogueSeen = !shouldShowDialogue(this.stage, 'intro', seen, this.difficulty);
+    this.outroSeen = !shouldShowDialogue(this.stage, 'outro', seen, this.difficulty);
     this.refreshPowerUps();
     
     this.shuffle();
@@ -393,6 +393,7 @@ export class GameEngine {
     deck ??= DeckBuilder.buildStartingDeck(); // No deck provided, use the default starting deck
     const baseDeck = [...deck];
     const stage = FIRST_STAGE;
+    const level: Difficulty = difficulty ?? "easy";
     const { BossClass, scene } = getStageConfig(stage);
     const enemy: EnemyData = new BossClass().toJSON();
     const userData: UserData = {
@@ -402,7 +403,7 @@ export class GameEngine {
       deck,
       hand: [],
       enemy,
-      difficulty: difficulty ?? "easy",
+      difficulty: level,
       scene,
       result: 'playing',
       bossRecap: [],
@@ -413,9 +414,11 @@ export class GameEngine {
       lastActiveAt: Date.now(),
       powerUps: [],
       powerUpChoices: [],
-      dialogueSeen: !shouldShowDialogue(stage, 'intro', seen),
-      outroSeen: !shouldShowDialogue(stage, 'outro', seen),
-      endingSeen: !!seen?.[dialogueKey(getFinalStageFromDifficulty(difficulty ?? "easy"))]?.ending,
+      dialogueSeen: !shouldShowDialogue(stage, 'intro', seen, level),
+      outroSeen: !shouldShowDialogue(stage, 'outro', seen, level),
+      endingSeen: !!seen?.[
+        dialogueKey(getFinalStageFromDifficulty(level), 'ending', level)
+      ]?.ending,
       secretEndingSeen: !!seen?.[dialogueKey(SECRET_BOSS_STAGE)]?.ending,
       selectedPowerUps: [],
     };

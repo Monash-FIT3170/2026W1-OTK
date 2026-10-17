@@ -78,7 +78,7 @@ Meteor.methods({
       {
         $set: {
           gameState: engine.toJSON(),
-          [`seenDialogue.${dialogueKey(engine.stage)}.${kind}`]: true,
+          [`seenDialogue.${dialogueKey(engine.stage, kind, engine.difficulty)}.${kind}`]: true,
         },
       }
     );

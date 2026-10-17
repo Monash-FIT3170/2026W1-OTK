@@ -83,6 +83,29 @@ if (Meteor.isClient) {
       assert.exists(screen.getByText('Victory!'));
     });
 
+    it('ends an easy run after stage 4 with the ending for that mode', function () {
+      const view = openGame(4, 'win', { difficulty: 'easy', outroSeen: true });
+      assert.exists(screen.getByTestId('normal-ending'));
+      assert.isNull(screen.queryByText('Victory!'));
+      fireEvent.click(screen.getByText('Skip'));
+      assert.isTrue(calls.calledWith('game.finishDialogue', { kind: 'ending' }));
+      doc.gameState = { ...doc.gameState, endingSeen: true };
+      view.rerender(<App />);
+      assert.exists(screen.getByText('Victory!'));
+      assert.exists(screen.getByText(/cleared all 4 stages/));
+    });
+
+    it('does not end a medium run at stage 4', function () {
+      openGame(4, 'stageCleared', { difficulty: 'medium', outroSeen: true });
+      assert.isNull(screen.queryByTestId('normal-ending'));
+      assert.exists(screen.getByText('Next Enemy'));
+    });
+
+    it('counts stages against the run difficulty', function () {
+      openGame(1, 'playing', { difficulty: 'medium', dialogueSeen: true });
+      assert.exists(screen.getByText('Stage 1 / 5'));
+    });
+
     it('shows the secret ending independently of normal completion, then results', function () {
       const view = openGame(SECRET_BOSS_STAGE, 'win', {
         outroSeen: true, endingSeen: true, secretEndingSeen: false,

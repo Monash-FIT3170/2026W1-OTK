@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import { GameEngine } from './GameEngine';
-import { SECRET_BOSS_STAGE, STAGES, getStageConfig, getFinalStageFromDifficulty } from './stages';
+import { SECRET_BOSS_STAGE, STAGES, getStageConfig, getFinalStageFromDifficulty, getStageDialogue, dialogueKey, shouldShowDialogue } from './stages';
+import { getEnding, EASY_ENDING, MEDIUM_ENDING, NORMAL_ENDING, SECRET_ENDING, HARD_MODE_TEASER } from './endings';
 import { Shield } from './debuffs';
 
 const USER_ID = 'stage-test-user';
@@ -533,5 +534,162 @@ describe('GameEngine - secret ending', function () {
     assert.isFalse(engine.isEndingPending());
     engine.stage = getFinalStageFromDifficulty("hard");
     assert.isTrue(engine.isEndingPending());
+  });
+});
+
+describe('GameEngine - difficulty dialogue', function () {
+  const texts = (lines) => lines.map((line) => line.text);
+
+  // Plays a whole run for a difficulty without using any power-up.
+  function playToEnd(difficulty) {
+    const engine = freshEngine(difficulty);
+    for (let guard = 0; guard < 10 && engine.result !== 'win'; guard++) {
+      killBoss(engine);
+      if (engine.result === 'stageCleared') engine.advanceStage();
+    }
+    return engine;
+  }
+
+  it('ends each difficulty on its own final boss, with Hard alone reaching the secret boss', function () {
+    const easy = playToEnd('easy');
+    assert.deepEqual([easy.stage, easy.enemy.enemyId], [4, 'timekeeper']);
+    const medium = playToEnd('medium');
+    assert.deepEqual([medium.stage, medium.enemy.enemyId], [5, 'ninja']);
+    assert.equal(playToEnd('hard').stage, SECRET_BOSS_STAGE);
+  });
+
+  it('plays each mode\'s own ending after its final boss outro', function () {
+    [['easy', 4], ['medium', 5], ['hard', 6]].forEach(([difficulty, final]) => {
+      const engine = freshEngine(difficulty);
+      engine.stage = final - 1;
+      engine.result = 'win';
+      engine.outroSeen = true;
+      assert.isFalse(engine.isEndingPending(), `${difficulty} stage ${final - 1}`);
+      engine.stage = final;
+      assert.isTrue(engine.isEndingPending(), `${difficulty} stage ${final}`);
+      engine.finishEnding();
+      assert.isFalse(engine.isEndingPending());
+    });
+  });
+
+  it('opens with the right Chronoshard count for each mode', function () {
+    const opening = (difficulty) => texts(getStageDialogue(1, 'intro', difficulty));
+    assert.include(opening('easy'), 'Four pieces.');
+    assert.include(opening('medium'), 'Five pieces.');
+    assert.include(opening('hard'), 'Six pieces.');
+    assert.notInclude(opening('easy'), 'Six pieces.');
+    // Everything except those two lines is shared.
+    const strip = (lines) => lines.filter((text) => !/ fragments of | pieces\.$/.test(text));
+    assert.deepEqual(strip(opening('easy')), strip(opening('hard')));
+    assert.deepEqual(strip(opening('medium')), strip(opening('hard')));
+  });
+
+  it('gives Easy\'s Timekeeper the power warning the Merchant would have delivered', function () {
+    assert.include(texts(getStageDialogue(4, 'outro', 'easy')), 'Nothing the Clock gives is free.');
+    assert.notInclude(texts(getStageDialogue(4, 'outro', 'medium')), 'Nothing the Clock gives is free.');
+    assert.notInclude(texts(getStageDialogue(4, 'outro', 'hard')), 'Nothing the Clock gives is free.');
+  });
+
+  it('stops Medium\'s Ninja pointing at a Merchant who is never fought', function () {
+    assert.isTrue(texts(getStageDialogue(5, 'outro', 'hard')).some((text) => /Merchant/.test(text)));
+    assert.isFalse(texts(getStageDialogue(5, 'outro', 'medium')).some((text) => /Merchant/.test(text)));
+    assert.isAbove(getStageDialogue(5, 'outro', 'medium').length, 0);
+  });
+
+  it('leaves every Hard script exactly as it is for the other modes to fall back on', function () {
+    STAGES.forEach((stage) => {
+      assert.strictEqual(getStageDialogue(stage.stage, 'intro', 'hard'), stage.dialogue.intro);
+      assert.strictEqual(getStageDialogue(stage.stage, 'outro', undefined), stage.dialogue.outro);
+    });
+    // A stage with no override reuses Hard's lines in Easy and Medium.
+    assert.strictEqual(getStageDialogue(2, 'intro', 'easy'), getStageConfig(2).dialogue.intro);
+    assert.strictEqual(getStageDialogue(3, 'outro', 'medium'), getStageConfig(3).dialogue.outro);
+  });
+
+  it('keeps shared scripts on the plain key and mode-only scripts on their own', function () {
+    assert.equal(dialogueKey(1, 'intro', 'hard'), 'stage1');
+    assert.equal(dialogueKey(1, 'intro', 'easy'), 'easy-stage1');
+    assert.equal(dialogueKey(1, 'outro', 'easy'), 'stage1', 'Goblin outro is shared');
+    assert.equal(dialogueKey(4, 'outro', 'easy'), 'easy-stage4');
+    assert.equal(dialogueKey(4, 'intro', 'easy'), 'stage4', 'Timekeeper intro is shared');
+    assert.equal(dialogueKey(5, 'outro', 'medium'), 'medium-stage5');
+    assert.equal(dialogueKey(6, 'ending', 'hard'), 'stage6');
+    assert.equal(dialogueKey(4, 'ending', 'easy'), 'easy-stage4');
+    assert.equal(dialogueKey(5, 'ending', 'medium'), 'medium-stage5');
+    assert.equal(dialogueKey(3), 'stage3');
+  });
+
+  it('does not let watching Hard hide a mode-only script, but does skip shared ones', function () {
+    const seenHard = { stage1: { intro: true, outro: true }, stage2: { intro: true, outro: true } };
+    assert.isTrue(shouldShowDialogue(1, 'intro', seenHard, 'easy'), 'Easy has its own opening');
+    assert.isFalse(shouldShowDialogue(1, 'outro', seenHard, 'easy'), 'shared outro already seen');
+    assert.isFalse(shouldShowDialogue(2, 'intro', seenHard, 'easy'), 'shared stage already seen');
+    assert.isFalse(shouldShowDialogue(1, 'intro', { 'easy-stage1': { intro: true } }, 'easy'));
+    assert.isTrue(shouldShowDialogue(1, 'intro', { 'easy-stage1': { intro: true } }, 'medium'));
+  });
+
+  it('starts an Easy run with its own opening even after Hard was watched', function () {
+    const seen = { stage1: { intro: true, outro: true } };
+    assert.isTrue(new GameEngine(GameEngine.newGame(USER_ID, null, 'easy', seen)).isIntroPending());
+    assert.isFalse(new GameEngine(GameEngine.newGame(USER_ID, null, 'hard', seen)).isIntroPending());
+  });
+
+  it('tracks each mode\'s ending separately in the account record', function () {
+    const seen = { 'easy-stage4': { ending: true } };
+    assert.isTrue(new GameEngine(GameEngine.newGame(USER_ID, null, 'easy', seen)).endingSeen);
+    assert.isFalse(new GameEngine(GameEngine.newGame(USER_ID, null, 'medium', seen)).endingSeen);
+    assert.isFalse(new GameEngine(GameEngine.newGame(USER_ID, null, 'hard', seen)).endingSeen);
+    assert.isTrue(
+      new GameEngine(GameEngine.newGame(USER_ID, null, 'hard', { stage6: { ending: true } })).endingSeen
+    );
+  });
+
+  describe('endings', function () {
+    it('picks the script by difficulty, and the secret ending always wins', function () {
+      assert.strictEqual(getEnding('easy'), EASY_ENDING);
+      assert.strictEqual(getEnding('medium'), MEDIUM_ENDING);
+      assert.strictEqual(getEnding('hard'), NORMAL_ENDING);
+      assert.strictEqual(getEnding('hard', true), SECRET_ENDING);
+    });
+
+    it('uses the right shard numbers for each mode', function () {
+      const easy = texts(EASY_ENDING);
+      assert.include(easy, 'Four Chronoshards.');
+      assert.include(easy, 'There must be… five.');
+      assert.include(easy, 'There were four Guardians.');
+      assert.include(easy, 'FIFTH CHRONOSHARD DETECTED.');
+      assert.include(easy, 'Five pieces became one.');
+      assert.include(easy, 'Thank you… and forgive me.');
+      const medium = texts(MEDIUM_ENDING);
+      assert.include(medium, 'Five Chronoshards.');
+      assert.include(medium, 'There must be… six.');
+      assert.include(medium, 'There were five Guardians.');
+      assert.include(medium, 'SIXTH CHRONOSHARD DETECTED.');
+      assert.include(medium, 'Six pieces became one.');
+      [easy, medium].forEach((lines) => {
+        assert.notInclude(lines, 'SEVENTH CHRONOSHARD DETECTED.');
+        assert.isFalse(lines.some((text) => /seven/i.test(text)));
+      });
+    });
+
+    it('lets Easy\'s Timekeeper speak straight after his defeat but Medium\'s return as an echo', function () {
+      assert.include(texts(EASY_ENDING), 'The Timekeeper struggles to speak.');
+      assert.notInclude(texts(EASY_ENDING), 'Huh?!? Who is that?');
+      assert.include(texts(MEDIUM_ENDING), 'The Timekeeper. What remains of him.');
+    });
+
+    it('adds the Hard-mode teaser only to Easy and Medium runs that used no power-ups', function () {
+      assert.deepEqual(getEnding('easy', false, true), [...EASY_ENDING, ...HARD_MODE_TEASER]);
+      assert.deepEqual(getEnding('medium', false, true), [...MEDIUM_ENDING, ...HARD_MODE_TEASER]);
+      assert.strictEqual(getEnding('easy', false, false), EASY_ENDING);
+      assert.strictEqual(getEnding('hard', false, true), NORMAL_ENDING, 'Hard has the secret boss instead');
+    });
+
+    it('uses only valid speakers', function () {
+      [EASY_ENDING, MEDIUM_ENDING, HARD_MODE_TEASER].flat().forEach((line) => {
+        assert.oneOf(line.speaker, ['player', 'enemy', 'narrator']);
+        assert.isNotEmpty(line.text);
+      });
+    });
   });
 });

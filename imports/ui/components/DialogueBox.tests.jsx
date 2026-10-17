@@ -4,7 +4,7 @@ import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { DialogueBox } from './DialogueBox';
-import { NORMAL_ENDING, SECRET_ENDING } from '../../engine/endings';
+import { NORMAL_ENDING, SECRET_ENDING, EASY_ENDING, MEDIUM_ENDING } from '../../engine/endings';
 import { getStageDialogue, SECRET_BOSS_STAGE } from '../../engine/stages';
 
 if (Meteor.isClient) {
@@ -52,6 +52,9 @@ if (Meteor.isClient) {
       ['opening', getStageDialogue(1, 'intro')],
       ['secret introduction', getStageDialogue(SECRET_BOSS_STAGE, 'intro')],
       ['normal ending', NORMAL_ENDING],
+      ['easy opening', getStageDialogue(1, 'intro', 'easy')],
+      ['easy ending', EASY_ENDING],
+      ['medium ending', MEDIUM_ENDING],
       ['secret ending', SECRET_ENDING],
     ]) {
       it(`plays every line of the ${name} with the right speaker`, function () {

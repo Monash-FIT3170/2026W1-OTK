@@ -65,6 +65,35 @@ if (Meteor.isServer) {
       assert.isTrue(doc.gameState.endingSeen);
     });
 
+    it('records an easy or medium ending under its own key, apart from the hard one', async function () {
+      for (const [difficulty, final] of [['easy', 4], ['medium', 5]]) {
+        await UserDataCollection.removeAsync({});
+        const engine = new GameEngine(GameEngine.newGame(userId, [], difficulty));
+        engine.stage = final;
+        engine.result = 'win';
+        engine.finishOutro();
+        await UserDataCollection.insertAsync({ userId, gameState: engine.toJSON() });
+        await callFinish('ending');
+        const doc = await UserDataCollection.findOneAsync({ userId });
+        assert.isTrue(doc.gameState.endingSeen, `${difficulty} run flag`);
+        assert.isTrue(doc.seenDialogue[`${difficulty}-stage${final}`].ending);
+        assert.isUndefined(doc.seenDialogue.stage6, 'hard ending untouched');
+        assert.isFalse(GameEngine.newGame(userId, [], 'hard', doc.seenDialogue).endingSeen);
+        assert.isTrue(GameEngine.newGame(userId, [], difficulty, doc.seenDialogue).endingSeen);
+      }
+    });
+
+    it('records a mode-only intro under that mode\'s key and a shared one under the plain key', async function () {
+      await UserDataCollection.insertAsync({
+        userId,
+        gameState: GameEngine.newGame(userId, [], 'easy'),
+      });
+      await callFinish('intro');
+      const doc = await UserDataCollection.findOneAsync({ userId });
+      assert.isTrue(doc.seenDialogue['easy-stage1'].intro, 'Easy has its own opening');
+      assert.isUndefined(doc.seenDialogue.stage1);
+    });
+
     it('rejects the ending before the outro, during battle, and on non-final stages', async function () {
       for (const [stage, result, outroSeen] of [
         [getFinalStageFromDifficulty("hard"), 'win', false],
@@ -191,7 +220,7 @@ if (Meteor.isServer) {
       await seedRun();
       await callFinish('intro');
 
-      await call('game.newGame');
+      await call('game.newGame', ['hard']);
 
       const doc = await UserDataCollection.findOneAsync({ userId });
       assert.isTrue(doc.gameState.dialogueSeen, 'stage 1 intro is not replayed');
