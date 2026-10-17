@@ -130,13 +130,13 @@ if (Meteor.isServer) {
   });
 
   /**
-   * Test: Default gameState is created correctly.
+   * Test: No gameState is created on registration.
    *
    * Verifies that:
-   * - A default gameState object is created
-   * - Initial values are correctly assigned
+   * - A newly registered user has no gameState, so the landing page
+   *   does not offer "Continue" for a run that was never started
    */
-  it('User Data: Creates default gameState', async function () {
+  it('User Data: Does not create a gameState on registration', async function () {
     await Meteor.server.method_handlers['userData.registerUser'].apply({}, [
       { userId: validUserId },
     ]);
@@ -145,19 +145,8 @@ if (Meteor.isServer) {
       userId: validUserId,
     });
 
-    assert.exists(userData.gameState);
-
-    assert.equal(userData.gameState.stage, 1);
-
-    assert.isArray(userData.gameState.hand);
-    assert.isArray(userData.gameState.deck);
-
-    assert.exists(userData.gameState.enemy);
-    assert.equal(userData.gameState.enemy.enemyId, 'goblin');
-
-    assert.equal(userData.gameState.scene, 'underpass-overlaid');
-
-    assert.equal(userData.gameState.userId, validUserId);
+    assert.exists(userData);
+    assert.notExists(userData.gameState);
   });
 
   /**

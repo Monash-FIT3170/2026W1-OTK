@@ -13,7 +13,7 @@ export function ResultScreen({
   const isWin = result === 'win';
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-6">
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-6 px-8 py-6">
       {isWin ? (
         <>
           <h1 style={{ fontFamily: 'var(--game-font)'}} className="text-7xl font-semibold text-yellow-400">Victory!</h1>

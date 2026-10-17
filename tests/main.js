@@ -48,6 +48,7 @@ import '../imports/ui/components/TutorialOverlay.tests.jsx';
 import '../imports/ui/components/TutorialDemoScreen.tests.jsx';
 import '../imports/ui/hooks/useTutorialEngine.tests.js';
 import '../imports/api/auth/methods/markTutorialSeen.tests.js';
+import '../imports/ui/tutorial/shouldAutoShowTutorial.tests.js';
 
 // TRAINING TESTS
 import '../imports/ui/hooks/useTrainingEngine.tests.js';
