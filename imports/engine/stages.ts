@@ -263,9 +263,12 @@ export const STAGES: StageConfig[] = [
       outro: NINJA_OUTRO,
     },
     dialogueByDifficulty: {
-      // TODO(story): the Ninja is Medium's final boss, so his closing lines
-      // need writing. Until then, everything but the pointer to the Merchant.
-      medium: { outro: NINJA_OUTRO.slice(0, -1) },
+      medium: {
+        outro: [
+          ...NINJA_OUTRO.slice(0, -1),
+          { speaker: 'enemy', text: 'Heh Heh... You\'ll find out soon enough...' },
+        ],
+      },
     },
   },
   {

@@ -14,7 +14,7 @@ export class SecretBoss extends Enemy {
 
     super({
       enemyId: SecretBoss.enemyId,
-      name: data.name ?? 'Reflection of You',
+      name: data.name ?? 'Dark Reflection',
       health,
       currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],      // Need to pass debuffs to this enemy, as it may vary
