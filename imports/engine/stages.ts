@@ -381,7 +381,7 @@ export const STAGES: StageConfig[] = [
   {
     stage: 6,
     BossClass: Merchant,
-    scene: 'otkclone_bg_ninja',
+    scene: 'underpass-overlaid',
     dialogue: {
       intro: [
         { speaker: 'enemy', text: 'Welcome back.' },
