@@ -40,7 +40,7 @@ export abstract class Enemy {
     this.currentHealth = data.currentHealth ?? data.health;
     this.debuffs = data.debuffs ?? [];
     this.entryAnimation = data.entryAnimation ?? 'fade';
-    this.hitAnimation = data.hitAnimation ?? 'shake';
+    this.hitAnimation = data.hitAnimation ?? 'knockback';
     this.timerDebuffActive = data.timerDebuffActive ?? false;
     this.timerDebuffDeadline = data.timerDebuffDeadline ?? null;
     this.timerDebuffInterval = data.timerDebuffInterval ?? 5000;

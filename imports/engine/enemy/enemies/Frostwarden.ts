@@ -19,7 +19,7 @@ export class Frostwarden extends Enemy {
       currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],
       entryAnimation: data.entryAnimation ?? 'drop',
-      hitAnimation: data.hitAnimation ?? 'squish',
+      hitAnimation: data.hitAnimation ?? 'knockback',
       timerDebuffActive: data.timerDebuffActive,
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,

@@ -27,7 +27,7 @@ export class IceCube extends Enemy {
       currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],
       entryAnimation: data.entryAnimation ?? 'spin',
-      hitAnimation: data.hitAnimation ?? 'squish',
+      hitAnimation: data.hitAnimation ?? 'knockback',
       damageTakenCount: data.damageTakenCount,
       shieldLayers: data.shieldLayers,
     });

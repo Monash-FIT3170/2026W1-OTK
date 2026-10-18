@@ -17,7 +17,7 @@ export class Ninja extends Enemy {
       currentHealth: data.currentHealth ?? data.health ?? 100,
       debuffs: data.debuffs ?? [],
       entryAnimation: data.entryAnimation ?? 'drop',
-      hitAnimation: data.hitAnimation ?? 'squish',
+      hitAnimation: data.hitAnimation ?? 'knockback',
       timerDebuffActive: data.timerDebuffActive,
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,

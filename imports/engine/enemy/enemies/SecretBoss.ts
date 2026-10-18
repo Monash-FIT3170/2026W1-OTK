@@ -19,7 +19,7 @@ export class SecretBoss extends Enemy {
       currentHealth: data.currentHealth ?? health,
       debuffs: data.debuffs ?? [],      // Need to pass debuffs to this enemy, as it may vary
       entryAnimation: data.entryAnimation ?? 'drop',
-      hitAnimation: data.hitAnimation ?? 'squish',
+      hitAnimation: data.hitAnimation ?? 'knockback',
       timerDebuffActive: data.timerDebuffActive,
       timerDebuffDeadline: data.timerDebuffDeadline,
       timerDebuffInterval: data.timerDebuffInterval,

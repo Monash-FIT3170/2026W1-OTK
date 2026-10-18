@@ -11,7 +11,7 @@ export const tutorialDemoEnemy = {
   currentHealth: 100,
   debuffs: [],
   entryAnimation: 'drop',
-  hitAnimation: 'squish',
+  hitAnimation: 'knockback',
 };
 
 export const tutorialDemoHand = [
