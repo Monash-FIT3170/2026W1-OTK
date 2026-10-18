@@ -4,6 +4,16 @@ import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
 import ShieldLayers from './ShieldDisplay';
 import { soundManager } from '../../soundManager';
+import { Evasion } from '../../../engine/debuffs/Evasion';
+import { Inflation } from '../../../engine/debuffs/Inflation';
+
+// Full-screen colour flashes: green when the enemy heals, the Merchant's
+// dark purple when its inflation raises card costs. A dark colour would
+// barely show through mix-blend-screen, so that one is laid over normally.
+const FLASH_COLOURS = {
+  heal: 'bg-green-400 mix-blend-screen',
+  inflation: 'bg-purple-900',
+};
 
 const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
@@ -30,6 +40,7 @@ const ENEMY_SPRITE_OFFSETS = {
   lion: 'translate-x-35 translate-y-10',
   turtle: '-translate-x-20 translate-y-17',
   merchant: 'translate-y-10',
+  secretBoss: '-translate-y-10',
 };
 
 // Supported animation states for sprites with incomplete animation sets.
@@ -41,18 +52,35 @@ const ENEMY_SPRITE_STATES = {
   merchant: ['idle'],
 };
 
+// Enemies that hover in place (the Merchant is a floating cloak): a slow,
+// gentle bob in whole pixels so it stays crisp against the pixel art.
+const FLOAT_ANIMATIONS = {
+  merchant: {
+    y: [0, -12, 0],
+    transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+  },
+};
+
 export function EnemyDisplay({
   enemy,
   isVisible,
   lastActiveAt,
+  cardsUsed,
   _useAnimate = useAnimate,
 }) {
   if (!enemy) return null;
 
   const [scope, animate] = _useAnimate();
   const [spriteState, setSpriteState] = useState('entry'); // 'entry' | 'idle' | 'hit' | 'dodge' | 'die'
-  const [healFlash, setHealFlash] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
+  // Kept after the flash ends so it fades out in the same colour
+  const [flashColour, setFlashColour] = useState(FLASH_COLOURS.heal);
+  const triggerFlash = (kind) => {
+    setFlashColour(FLASH_COLOURS[kind]);
+    setFlashOn(true);
+  };
   const prevHealthRef = useRef(null);
+  const prevCardsUsedRef = useRef(null);
   const prevDamageTakenCountRef = useRef(null);
   const entryTimerRef = useRef(null);
   const dodgeTimerRef = useRef(null);
@@ -89,7 +117,7 @@ export function EnemyDisplay({
         });
       } else if (hp > prevHealthRef.current) {
         // Timer debuff healed the enemy: green fade + gong.
-        setHealFlash(true);
+        triggerFlash('heal');
         soundManager.playGong();
       } else if (
         damageWasEvaded &&
@@ -98,6 +126,7 @@ export function EnemyDisplay({
       ) {
         clearTimeout(dodgeTimerRef.current);
         setSpriteState('dodge');
+        soundManager.playSwoosh();
         dodgeTimerRef.current = setTimeout(() => {
           setSpriteState((current) => (current === 'dodge' ? 'idle' : current));
         }, 1000);
@@ -110,12 +139,35 @@ export function EnemyDisplay({
 
   useEffect(() => () => clearTimeout(dodgeTimerRef.current), []);
 
-  // Clear the heal flash after it fades in.
+  // Tell the sound manager ahead of time when the next hit will be dodged,
+  // so the attack's own sound is skipped and only the swoosh plays.
   useEffect(() => {
-    if (!healFlash) return;
-    const id = setTimeout(() => setHealFlash(false), 900);
+    soundManager.setEnemyEvadesNextHit(Evasion.evadesNextHit(enemy));
+  }, [enemy.enemyId, enemy.damageTakenCount, enemy.debuffs?.join()]);
+
+  useEffect(() => () => soundManager.setEnemyEvadesNextHit(false), []);
+
+  // Merchant's inflation raised card costs: gold flash + coin sound.
+  useEffect(() => {
+    if (cardsUsed === undefined) return;
+    if (
+      prevCardsUsedRef.current !== null &&
+      cardsUsed > prevCardsUsedRef.current &&
+      enemy.debuffs.includes('inflation') &&
+      Inflation.raisedCostsAt(cardsUsed)
+    ) {
+      triggerFlash('inflation');
+      soundManager.playCoinUp();
+    }
+    prevCardsUsedRef.current = cardsUsed;
+  }, [cardsUsed]);
+
+  // Clear the flash after it fades in.
+  useEffect(() => {
+    if (!flashOn) return;
+    const id = setTimeout(() => setFlashOn(false), 900);
     return () => clearTimeout(id);
-  }, [healFlash]);
+  }, [flashOn]);
 
   const {
     initial,
@@ -149,70 +201,87 @@ export function EnemyDisplay({
       : normalizedId === 'secretboss'
         ? `secretBoss-${effectiveState === 'hit' ? 'attack' : 'idle'}-enemy.gif`
         : `${spriteId}${suffix}-enemy.gif`;
-  const isSecretBossDying = normalizedId === 'secretboss' && spriteState === 'die';
+  const isSecretBossDying =
+    normalizedId === 'secretboss' && spriteState === 'die';
 
   return (
     <>
       <div
-        className="pointer-events-none fixed inset-0 z-50 bg-green-400 mix-blend-screen transition-opacity duration-700"
-        style={{ opacity: healFlash ? 0.6 : 0 }}
+        className={`pointer-events-none fixed inset-0 z-50 ${flashColour} transition-opacity duration-700`}
+        style={{ opacity: flashOn ? 0.6 : 0 }}
       />
       <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          ref={scope}
-          key={enemy.enemyId}
-          initial={initial}
-          animate={animateProps}
-          exit={exit}
-          transition={transition}
-        >
-          <div className="relative inline-block">
-            <img
-              src={`/assets/sprites/enemies/${spriteFilename}`}
-              alt={enemy.name}
-              className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
-              style={{
-                imageRendering: 'pixelated',
-                transform:
-                  normalizedId === 'secretboss'
-                    ? isSecretBossDying
-                      ? 'scaleX(-1) scale(1.08) translateY(-8px)'
-                      : 'scaleX(-1)'
-                    : undefined,
-                filter: isSecretBossDying ? 'brightness(0) blur(5px)' : undefined,
-                opacity: isSecretBossDying ? 0 : 1,
-                transition:
-                  normalizedId === 'secretboss'
-                    ? 'opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease'
-                    : undefined,
-              }}
-              onError={(e) => {
-                const target = e.currentTarget;
-                const idleGif =
-                  normalizedId === 'secretboss'
-                    ? '/assets/sprites/enemies/secretBoss-idle-enemy.gif'
-                    : `/assets/sprites/enemies/${spriteId}-enemy.gif`;
-                const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
+        {isVisible && (
+          <motion.div
+            ref={scope}
+            key={enemy.enemyId}
+            initial={initial}
+            animate={animateProps}
+            exit={exit}
+            transition={transition}
+          >
+            <div className="relative inline-block">
+              <motion.div
+                className="inline-block"
+                animate={
+                  FLOAT_ANIMATIONS[spriteId]
+                    ? { y: FLOAT_ANIMATIONS[spriteId].y }
+                    : undefined
+                }
+                transition={FLOAT_ANIMATIONS[spriteId]?.transition}
+                transformTemplate={({ y }) =>
+                  `translateY(${Math.round(parseFloat(y) || 0)}px)`
+                }
+              >
+                <img
+                  src={`/assets/sprites/enemies/${spriteFilename}`}
+                  alt={enemy.name}
+                  className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
+                  style={{
+                    imageRendering: 'pixelated',
+                    transform:
+                      normalizedId === 'secretboss'
+                        ? isSecretBossDying
+                          ? 'scaleX(-1) scale(1.08) translateY(-8px)'
+                          : 'scaleX(-1)'
+                        : undefined,
+                    filter: isSecretBossDying
+                      ? 'brightness(0) blur(5px)'
+                      : undefined,
+                    opacity: isSecretBossDying ? 0 : 1,
+                    transition:
+                      normalizedId === 'secretboss'
+                        ? 'opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease'
+                        : undefined,
+                  }}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const idleGif =
+                      normalizedId === 'secretboss'
+                        ? '/assets/sprites/enemies/secretBoss-idle-enemy.gif'
+                        : `/assets/sprites/enemies/${spriteId}-enemy.gif`;
+                    const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
 
-                  // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
-                  if (
-                    !target.src.endsWith(`${spriteId}-enemy.gif`) &&
-                    !target.src.endsWith(`${spriteId}-enemy.png`)
-                  ) {
-                    target.src = idleGif;
-                    return;
-                  }
-                  // Fall back to PNG if GIF is missing
-                  if (target.src.endsWith('.gif')) {
-                    target.src = idlePng;
-                    return;
-                  }
+                    // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
+                    if (
+                      !target.src.endsWith(`${spriteId}-enemy.gif`) &&
+                      !target.src.endsWith(`${spriteId}-enemy.png`)
+                    ) {
+                      target.src = idleGif;
+                      return;
+                    }
+                    // Fall back to PNG if GIF is missing
+                    if (target.src.endsWith('.gif')) {
+                      target.src = idlePng;
+                      return;
+                    }
 
-                  target.onerror = null;
-                  target.src = '/assets/sprites/enemies/placeholder-enemy.png';
-                }}
-              />
+                    target.onerror = null;
+                    target.src =
+                      '/assets/sprites/enemies/placeholder-enemy.png';
+                  }}
+                />
+              </motion.div>
               <TimerDebuff enemy={enemy} />
               <ShieldLayers enemy={enemy} />
             </div>

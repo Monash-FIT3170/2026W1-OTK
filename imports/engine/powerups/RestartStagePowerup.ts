@@ -1,6 +1,6 @@
 import type { GameEngine } from '../GameEngine';
 import { cardRegistry } from '../card/CardRegistry';
-import { getStageConfig } from '../stages';
+import { getStageConfig, SECRET_BOSS_STAGE } from '../stages';
 import { PowerUp, powerUpData } from './PowerUp';
 import { powerUpRegistry } from './PowerupRegistry';
 
@@ -20,7 +20,12 @@ export class RestartStagePowerup extends PowerUp {
   apply(engine: GameEngine): boolean {
     const { BossClass } = getStageConfig(engine.stage);
 
-    engine.enemy = new BossClass();
+    // The secret boss is built from the run's debuffs (see advanceStage), so
+    // a bare new SecretBoss() would come back with none of them.
+    engine.enemy =
+      engine.stage === SECRET_BOSS_STAGE
+        ? new BossClass({ debuffs: engine.debuffsFaced })
+        : new BossClass();
     engine.deck = engine.baseDeck.map((card) => {
       const fresh = cardRegistry.create({
         ...card.toJSON(),

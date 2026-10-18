@@ -108,7 +108,7 @@ if (Meteor.isClient) {
       expect(screen.getByRole('img').getAttribute('src')).to.equal(
         '/assets/sprites/enemies/ninja-enemy.gif'
       );
-      expect(screen.getByRole('img').className).to.include('h-80');
+      expect(screen.getByRole('img').className).to.include('h-100');
 
       rerender(
         <EnemyDisplay
@@ -154,7 +154,7 @@ if (Meteor.isClient) {
       expect(img.getAttribute('src')).to.equal(
         '/assets/sprites/enemies/secretBoss-idle-enemy.gif'
       );
-      expect(img.className).to.include('h-65');
+      expect(img.className).to.include('h-55');
       expect(img.style.transform).to.equal('scaleX(-1)');
       expect(img.style.transition).to.include('opacity');
 
@@ -248,8 +248,7 @@ if (Meteor.isClient) {
       const img = screen.getByRole('img');
       expect(img.getAttribute('src')).to.include('dragon');
       expect(img.className).to.include('h-100');
-      // The offset sits on the wrapper so overlays (shields) move with the sprite.
-      expect(img.parentElement.className).to.include('translate-x-100');
+      expect(img.className).to.include('translate-x-100');
     });
 
     // 7. Cascading onError fallback sequence

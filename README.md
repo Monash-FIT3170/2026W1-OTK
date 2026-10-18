@@ -46,7 +46,7 @@ The production deployment is hosted on Railway and can be accessed at:
 
 # Game Architecture
 
-OTK (OneTurnKill) is a card-based game where the player progresses through a series of stages by building a deck and defeating enemies within one turn.
+Time to Kill (formerly OTK, OneTurnKill) is a card-based game where the player progresses through a series of stages by building a deck and defeating enemies within one turn.
 
 ## Deck Builder
 

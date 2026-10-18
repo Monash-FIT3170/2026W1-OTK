@@ -17,9 +17,9 @@ export const tutorialSteps = [
   {
     target: null,
     action: null,
-    title: 'Welcome to One Turn Kill',
+    title: 'Welcome to Time to Kill',
     description:
-      "OTK is a one-turn battle. You win by defeating the enemy before you end your turn — there's no second chance, so every card you play matters.",
+      "Time to Kill is a one-turn battle. You win by defeating the enemy before you end your turn — there's no second chance, so every card you play matters.",
   },
   {
     target: 'health',

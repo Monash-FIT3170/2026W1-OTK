@@ -67,7 +67,7 @@ export const LandingPage = ({
     <div className="min-h-screen w-screen bg-slate-900">
       <div className="min-h-screen flex flex-col items-center justify-center gap-8">
         <h1 style={{ fontFamily: 'var(--game-font)'}} className="text-7xl font-semibold text-white tracking-wide drop-shadow-lg">
-          One Turn Kill
+          Time to Kill
         </h1>
 
         {!isNewGameSetup && (

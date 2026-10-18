@@ -111,9 +111,17 @@ export const App = () => {
   // Auto-show the tutorial when a player starts a new game, but only if
   // they haven't seen it yet (profile.hasSeenTutorial, set by
   // user.markTutorialSeen). The Tutorial button on the landing page still
-  // lets them replay it at any time.
+  // lets them replay it at any time. Held back until the stage's intro
+  // dialogue has been dismissed, so the tutorial plays after it.
   useEffect(() => {
-    if (!loading && user && gameState && !showLanding && justStartedNewGame) {
+    if (
+      !loading &&
+      user &&
+      gameState &&
+      !showLanding &&
+      justStartedNewGame &&
+      !introPending
+    ) {
       if (shouldAutoShowTutorial(user)) setShowTutorial(true);
       setJustStartedNewGame(false);
     }
@@ -128,7 +136,12 @@ export const App = () => {
     !showTrainingMode &&
     !showLeaderboard;
 
-  useGameSounds(gameState?.result, onGameScreen);
+  // The boss's outro dialogue plays before the victory sting.
+  const outroStillToCome =
+    (gameState?.result === 'stageCleared' || gameState?.result === 'win') &&
+    gameState?.outroSeen === false;
+
+  useGameSounds(gameState?.result, onGameScreen, outroStillToCome);
 
   // No heartbeat until the intro is dismissed - the fight (and every clock in
   // it) starts when the player finishes the dialogue, not when the stage loads.
@@ -418,6 +431,7 @@ export const App = () => {
           enemy={enemy}
           isVisible={true}
           lastActiveAt={gameState.lastActiveAt}
+          cardsUsed={gameState.cardsUsedThisStage}
         />
       </div>
 

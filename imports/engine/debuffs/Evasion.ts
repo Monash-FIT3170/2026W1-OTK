@@ -15,10 +15,27 @@ export class Evasion extends Debuff {
     });
   }
 
+  // Every TRIGGER_EVERY-th hit (1-based) is dodged
+  static evadesHit(hitNumber: number): boolean {
+    return hitNumber % Evasion.TRIGGER_EVERY === 0;
+  }
+
+  // Whether the next hit on this enemy will be dodged. Takes plain enemy
+  // data so the UI can ask before the server has resolved the hit.
+  static evadesNextHit(enemy: {
+    debuffs?: string[];
+    damageTakenCount?: number;
+  }): boolean {
+    return (
+      (enemy.debuffs ?? []).includes('evasion') &&
+      Evasion.evadesHit((enemy.damageTakenCount ?? 0) + 1)
+    );
+  }
+
   activateDebuff(engine: GameEngine): void {}
 
   override modifyIncomingDamage(enemy: Enemy, amount: number): number {
-    return enemy.damageTakenCount % Evasion.TRIGGER_EVERY === 0 ? 0 : amount;
+    return Evasion.evadesHit(enemy.damageTakenCount) ? 0 : amount;
   }
 }
 

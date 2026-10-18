@@ -288,5 +288,15 @@ if (Meteor.isServer) {
       const { gameState } = await UserDataCollection.findOneAsync({ userId });
       assert.equal(gameState.result, 'loss');
     });
+
+    it('game.endTurn does not turn a cleared stage into a loss', async function () {
+      await seedClearedStageOne();
+
+      await call('game.endTurn');
+
+      const { gameState } = await UserDataCollection.findOneAsync({ userId });
+      assert.equal(gameState.result, 'stageCleared');
+      assert.equal(gameState.bossRecap.length, 1);
+    });
   });
 }

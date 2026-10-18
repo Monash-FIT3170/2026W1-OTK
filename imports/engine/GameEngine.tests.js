@@ -3,6 +3,7 @@ import { GameEngine } from './GameEngine';
 import { SECRET_BOSS_STAGE, STAGES, getStageConfig, getFinalStageFromDifficulty, getStageDialogue, dialogueKey, shouldShowDialogue } from './stages';
 import { getEnding, EASY_ENDING, MEDIUM_ENDING, NORMAL_ENDING, SECRET_ENDING, HARD_MODE_TEASER } from './endings';
 import { Shield } from './debuffs';
+import { powerUpRegistry } from './powerups';
 
 const USER_ID = 'stage-test-user';
 
@@ -61,27 +62,27 @@ describe('GameEngine - multi-stage run', function () {
     assert.equal(engine.bossRecap.length, 1, 'boss recorded exactly once');
   });
 
-  it('advances to the stage 2 secret boss', function () {
+  it('advances to the stage 2 Frostwarden boss', function () {
     const engine = freshEngine();
     killBoss(engine);
     engine.advanceStage();
 
     assert.equal(engine.stage, 2);
-    assert.equal(engine.enemy.enemyId, 'secretboss');
-    assert.deepEqual(engine.enemy.debuffs, []);
+    assert.equal(engine.enemy.enemyId, 'frostwarden');
+    assert.deepEqual(engine.enemy.debuffs, ['freeze']);
     assert.equal(engine.result, 'playing');
     assert.equal(engine.cardsUsedThisStage, 0);
     assert.equal(engine.hand.length, 5);
     assert.equal(engine.enemy.damageTakenCount, 0);
   });
 
-  it('advances to the stage 3 ninja boss', function () {
+  it('advances to the stage 3 Undying boss', function () {
     const engine = freshEngine();
     advanceTo(engine, 3);
 
     assert.equal(engine.stage, 3);
-    assert.equal(engine.enemy.enemyId, 'ninja');
-    assert.deepEqual(engine.enemy.debuffs, ['evasion']);
+    assert.equal(engine.enemy.enemyId, 'undying');
+    assert.deepEqual(engine.enemy.debuffs, ['shield']);
   });
 
   it('advances to the stage 4 timer boss', function () {
@@ -102,13 +103,13 @@ describe('GameEngine - multi-stage run', function () {
     assert.isTrue(engine.enemy.timerDebuffActive);
   });
 
-  it('advances to the stage 5 Frostwarden boss', function () {
+  it('advances to the stage 5 ninja boss', function () {
     const engine = freshEngine();
     advanceTo(engine, 5);
 
     assert.equal(engine.stage, 5);
-    assert.equal(engine.enemy.enemyId, 'frostwarden');
-    assert.deepEqual(engine.enemy.debuffs, ['freeze']);
+    assert.equal(engine.enemy.enemyId, 'ninja');
+    assert.deepEqual(engine.enemy.debuffs, ['evasion']);
   });
 
   it('advances to the stage 6 inflation boss', function () {
@@ -195,6 +196,17 @@ describe('GameEngine - multi-stage run', function () {
     );
   });
 
+  it('keeps the secret boss debuffs through a Restart Stage', function () {
+    const engine = freshEngine();
+    advanceTo(engine, SECRET_BOSS_STAGE);
+    engine.powerUps.push(powerUpRegistry.create('restart-stage'));
+
+    engine.usePowerUp(engine.powerUps.length - 1);
+
+    assert.equal(engine.enemy.enemyId, 'secretboss');
+    assert.sameMembers(engine.enemy.debuffs, engine.debuffsFaced);
+  });
+
   it('refuses to advance while a fight is still on', function () {
     const engine = freshEngine();
     assert.throws(() => engine.advanceStage(), 'not cleared');
@@ -209,7 +221,7 @@ describe('GameEngine - multi-stage run', function () {
     engine.deck[1].isFrozen = true;
     engine.draw(4);
 
-    while (engine.stage < 5) {
+    while (engine.stage < 2) {
       killBoss(engine);
       engine.advanceStage();
     }
@@ -224,7 +236,7 @@ describe('GameEngine - multi-stage run', function () {
       allCards.every((card) => card.currentCost === card.baseCost),
       'costs reset to base'
     );
-    // Exactly one card is frozen by Frostwarden at stage 5, not left over
+    // Exactly one card is frozen by Frostwarden at stage 2, not left over
     // from an earlier stage.
     assert.equal(allCards.filter((card) => card.isFrozen).length, 1);
     assert.equal(
@@ -257,7 +269,7 @@ describe('GameEngine - multi-stage run', function () {
 
     restored.advanceStage();
     assert.equal(restored.stage, 2);
-    assert.equal(restored.enemy.enemyId, 'secretboss');
+    assert.equal(restored.enemy.enemyId, 'frostwarden');
   });
 
   it('keeps scene in step with the stage', function () {

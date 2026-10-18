@@ -84,13 +84,13 @@ const GOBLIN_INTRO: DialogueLine[] = [
   { speaker: 'player', text: 'So did you.' },
   {
     speaker: 'enemy',
-    text: "Yeah, but I'm supposed to! Why aren't you frozen like the others? ",
+    text: "Yeah, but I'm supposed to! Why aren't you frozen like the others?",
   },
-  { speaker: 'enemy', text: '*** Holds up a glowing Chronoshard *** ' },
-  { speaker: 'player', text: '!!!...  I need that.' },
+  { speaker: 'narrator', text: 'The goblin holds up a glowing Chronoshard.' },
+  { speaker: 'player', text: '!!!... I need that.' },
   {
     speaker: 'enemy',
-    text: 'I found it first. Another hero come to take my shiny treasure? ',
+    text: 'I found it first. Another hero come to take my shiny treasure?',
   },
   {
     speaker: 'enemy',
@@ -109,7 +109,7 @@ const NINJA_OUTRO: DialogueLine[] = [
   },
   {
     speaker: 'player',
-    text: "Heh... I guess I've had my fair share of practice",
+    text: "Heh... I guess I've had my fair share of practice.",
   },
   {
     speaker: 'enemy',
@@ -185,7 +185,7 @@ export const STAGES: StageConfig[] = [
         },
       ],
       outro: [
-        { speaker: 'enemy', text: "THE ICE...  IT'S CRACKING..." },
+        { speaker: 'enemy', text: "THE ICE... IT'S CRACKING..." },
         { speaker: 'player', text: 'Finally, the way forward is open.' },
       ],
     },
@@ -203,7 +203,7 @@ export const STAGES: StageConfig[] = [
         },
         { speaker: 'enemy', text: "You don't remember?" },
         { speaker: 'player', text: 'Remember what?' },
-        { speaker: 'enemy', text: 'Never mind' },
+        { speaker: 'enemy', text: 'Never mind.' },
         {
           speaker: 'player',
           text: 'You have something I need. I need that Chronoshard.',
@@ -498,9 +498,9 @@ export const STAGES: StageConfig[] = [
         { speaker: 'enemy', text: 'At last we meet.' },
         {
           speaker: 'player',
-          text: "You're the entity beyond the chronosphere!",
+          text: "You're the entity beyond the Chronosphere!",
         },
-        { speaker: 'enemy', text: 'You have carried me through every cycle. ' },
+        { speaker: 'enemy', text: 'You have carried me through every cycle.' },
         { speaker: 'player', text: 'What do you mean?' },
         {
           speaker: 'enemy',

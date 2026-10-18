@@ -16,11 +16,17 @@ export class Inflation extends Debuff {
     });
   }
 
+  // Whether the card play that brought the stage's count up to cardsUsed
+  // raised the hand's costs. Shared with the UI so it can react to it.
+  static raisedCostsAt(cardsUsed: number): boolean {
+    return cardsUsed > 0 && cardsUsed % Inflation.TRIGGER_EVERY === 0;
+  }
+
   // No start-of-fight effect, as the inflation only reacts to card plays
   activateDebuff(engine: GameEngine): void {}
 
   executeDebuff(engine: GameEngine): void {
-    if ((engine.cardsUsedThisStage + 1) % Inflation.TRIGGER_EVERY === 0) {
+    if (Inflation.raisedCostsAt(engine.cardsUsedThisStage + 1)) {
       new ChangeCostEffect(engine.getHand(), Inflation.COST_INCREASE).resolve(
         engine
       );

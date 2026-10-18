@@ -1,5 +1,6 @@
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
+import { soundManager } from '../../soundManager';
 import { PowerUp } from './PowerUp';
 import { PowerUp as EnginePowerUp } from '../../../engine/powerups/PowerUp';
 
@@ -13,8 +14,11 @@ import { PowerUp as EnginePowerUp } from '../../../engine/powerups/PowerUp';
 export function PowerUpInventory({ powerUps = [] }) {
   if (powerUps.length === 0) return null;
 
-  const handleUse = (index, available) => {
-    if (available) {
+  const handleUse = (index, powerUp) => {
+    if (powerUp.available) {
+      // Played on click, as cards are, so a dodge is judged against the
+      // enemy before this hit lands.
+      soundManager.playPowerUpSound(powerUp);
       Meteor.call('game.usePowerUp', index, (err) => {
         if (err) console.error('game.usePowerUp failed:', err);
       });
@@ -31,7 +35,7 @@ export function PowerUpInventory({ powerUps = [] }) {
         <PowerUp
           key={index}
           powerUp={powerUp}
-          onClick={() => handleUse(index, powerUp.available)}
+          onClick={() => handleUse(index, powerUp)}
         />
       ))}
     </div>
