@@ -65,7 +65,6 @@ Meteor.methods({
         'There already exists user data for this user.'
       );
     }
-    // Initialise a fresh game state for the new user
     return UserDataCollection.insertAsync({
       userId: userId
     });

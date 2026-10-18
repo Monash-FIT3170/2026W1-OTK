@@ -469,16 +469,11 @@ export const App = () => {
 
       {!dialogueKind && (
         <div
-          className="absolute flex items-end pointer-events-none"
-          style={{
-            left: 87,
-            right: 140,
-            bottom: 163,
-          }}
+          className="absolute pointer-events-none"
+          data-tutorial-target="deck"
+          style={{ left: 54, bottom: 162 }}
         >
-          <div className="inline-block" data-tutorial-target="deck">
-            <DeckViewer cards={deck} />
-          </div>
+          <DeckViewer cards={deck} />
         </div>
       )}
 
