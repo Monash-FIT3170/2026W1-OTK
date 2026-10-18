@@ -3,8 +3,8 @@ import { motion } from 'motion/react';
 // Arc layout, all relative to the enemy sprite's box (% of its width/height).
 // Tweak these to reposition the shields.
 const ARC = {
-  centerX: 50, // arc centre, % from the sprite's left edge
-  centerY: 50, // arc centre, % from the sprite's top edge
+  centerX: 20, // arc centre, % from the sprite's left edge
+  centerY: 70, // arc centre, % from the sprite's top edge
   radiusX: 80, // horizontal radius, % of sprite width
   radiusY: 70, // vertical radius, % of sprite height
   spread: 120, // total angle the arc covers, in degrees
