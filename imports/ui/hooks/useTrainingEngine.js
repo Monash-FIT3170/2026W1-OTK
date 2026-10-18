@@ -112,7 +112,7 @@ export function useTrainingEngine(savedDeck) {
       return;
     }
 
-    soundManager.playCardSound(card.cardId);
+    soundManager.playCardSound(card);
     engine.executeCard(uniqueId, []);
     finishPlay(engine);
 
@@ -124,7 +124,7 @@ export function useTrainingEngine(savedDeck) {
     const engine = engineRef.current;
     if (!pendingSelection) return;
 
-    soundManager.playCardSound(pendingSelection.card.cardId);
+    soundManager.playCardSound(pendingSelection.card);
     engine.executeCard(pendingSelection.uniqueCardId, selectedCardIds);
     finishPlay(engine);
 

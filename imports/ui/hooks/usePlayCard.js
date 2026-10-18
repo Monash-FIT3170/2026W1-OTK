@@ -22,7 +22,7 @@ export function usePlayCard() {
           cardAmountToSelect: result.cardAmountToSelect,
         });
       } else {
-        soundManager.playCardSound(card.cardId);
+        soundManager.playCardSound(card);
         Meteor.call(
           'game.executeCard',
           { uniqueCardId: card.uniqueId, selectedCardIds: [] },
@@ -36,7 +36,7 @@ export function usePlayCard() {
 
   const confirmSelection = (selectedCardIds) => {
     if (!pendingSelection) return;
-    soundManager.playCardSound(pendingSelection.card.cardId);
+    soundManager.playCardSound(pendingSelection.card);
     Meteor.call(
       'game.executeCard',
       { uniqueCardId: pendingSelection.uniqueCardId, selectedCardIds },
