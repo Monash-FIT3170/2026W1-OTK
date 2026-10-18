@@ -18,7 +18,7 @@ export function PowerUpChoices({ powerUpChoices, selectedIndex, onSelect }) {
       <p className="text-slate-300 text-sm uppercase tracking-wide">
         Choose a Power-Up
       </p>
-      <div className="flex flex-row flex-wrap justify-center gap-5">
+      <div className="flex flex-row flex-wrap justify-center gap-4">
         {validChoices.map((powerUpId, index) => {
           const powerUp = powerupRegistry.create(powerUpId);
           const isSelected = index === selectedIndex;
@@ -28,7 +28,7 @@ export function PowerUpChoices({ powerUpChoices, selectedIndex, onSelect }) {
               key={index}
               type="button"
               onClick={() => onSelect(index)}
-              className={`flex flex-col items-center gap-2 w-40 rounded-2xl border-2 px-4 py-4 transition-colors ${
+              className={`flex flex-col items-center gap-1.5 w-32 rounded-xl border-2 px-3 py-3 transition-colors ${
                 isSelected
                   ? 'border-emerald-400 bg-emerald-900/40'
                   : 'border-slate-600 bg-slate-800/60 hover:border-slate-400'
@@ -37,7 +37,7 @@ export function PowerUpChoices({ powerUpChoices, selectedIndex, onSelect }) {
               <img
                 src={powerUp.icon}
                 alt={powerUp.name}
-                className="h-16 w-16 object-contain"
+                className="h-10 w-10 object-contain"
                 style={{ imageRendering: 'pixelated' }}
                 draggable={false}
               />

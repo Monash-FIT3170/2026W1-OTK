@@ -80,7 +80,7 @@ export function StageClearScreen({
       </div>
 
       <div className="flex flex-col items-center gap-4 w-full max-w-3xl">
-        <div className="w-full max-w-xs">
+        <div className="w-full">
           <BossRecapTable bossRecap={bossRecap} title="Run so far" compact />
         </div>
         {requiresSelection && (
