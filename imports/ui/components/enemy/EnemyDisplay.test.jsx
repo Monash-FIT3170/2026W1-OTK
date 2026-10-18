@@ -6,6 +6,8 @@ import { expect } from 'chai';
 import { EnemyDisplay } from './EnemyDisplay';
 import { Goblin } from '/imports/engine/enemy/enemies/Goblin';
 import { Frostwarden } from '/imports/engine/enemy/enemies/Frostwarden';
+import { Ninja } from '/imports/engine/enemy/enemies/Ninja';
+import { SecretBoss } from '/imports/engine/enemy/enemies/SecretBoss';
 
 let goblin;
 let animateSpy;
@@ -91,6 +93,90 @@ if (Meteor.isClient) {
       );
 
       expect(screen.getByRole('img').getAttribute('src')).to.include('-attack');
+    });
+
+    it('uses Ninja attack and dodge sprites for its Evasion debuff', () => {
+      const ninja = new Ninja();
+      const { rerender } = render(
+        <EnemyDisplay
+          enemy={ninja}
+          isVisible={true}
+          _useAnimate={fakeUseAnimate}
+        />
+      );
+
+      expect(screen.getByRole('img').getAttribute('src')).to.equal(
+        '/assets/sprites/enemies/ninja-enemy.gif'
+      );
+      expect(screen.getByRole('img').className).to.include('h-80');
+
+      rerender(
+        <EnemyDisplay
+          enemy={new Ninja({ currentHealth: 90, damageTakenCount: 1 })}
+          isVisible={true}
+          _useAnimate={fakeUseAnimate}
+        />
+      );
+      expect(screen.getByRole('img').getAttribute('src')).to.equal(
+        '/assets/sprites/enemies/ninja-attack-enemy.gif'
+      );
+
+      rerender(
+        <EnemyDisplay
+          enemy={new Ninja({ damageTakenCount: 2 })}
+          isVisible={true}
+          _useAnimate={fakeUseAnimate}
+        />
+      );
+      rerender(
+        <EnemyDisplay
+          enemy={new Ninja({ damageTakenCount: 3 })}
+          isVisible={true}
+          _useAnimate={fakeUseAnimate}
+        />
+      );
+      expect(screen.getByRole('img').getAttribute('src')).to.equal(
+        '/assets/sprites/enemies/ninja-dodge-enemy.gif'
+      );
+    });
+
+    it('uses the secret boss animations and fades away on death', () => {
+      const secretBoss = new SecretBoss();
+      const { rerender } = render(
+        <EnemyDisplay
+          enemy={secretBoss}
+          isVisible={true}
+          _useAnimate={fakeUseAnimate}
+        />
+      );
+
+      const img = screen.getByRole('img');
+      expect(img.getAttribute('src')).to.equal(
+        '/assets/sprites/enemies/secretBoss-idle-enemy.gif'
+      );
+      expect(img.className).to.include('h-65');
+      expect(img.style.transform).to.equal('scaleX(-1)');
+      expect(img.style.transition).to.include('opacity');
+
+      rerender(
+        <EnemyDisplay
+          enemy={new SecretBoss({ currentHealth: 90 })}
+          isVisible={true}
+          _useAnimate={fakeUseAnimate}
+        />
+      );
+      expect(img.getAttribute('src')).to.equal(
+        '/assets/sprites/enemies/secretBoss-attack-enemy.gif'
+      );
+
+      rerender(
+        <EnemyDisplay
+          enemy={new SecretBoss({ currentHealth: 0 })}
+          isVisible={true}
+          _useAnimate={fakeUseAnimate}
+        />
+      );
+      expect(img.style.opacity).to.equal('0');
     });
 
     // 4. Shows die sprite (-die) when health drops to 0 or below

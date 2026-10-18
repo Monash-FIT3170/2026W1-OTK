@@ -61,34 +61,27 @@ describe('GameEngine - multi-stage run', function () {
     assert.equal(engine.bossRecap.length, 1, 'boss recorded exactly once');
   });
 
-  it('advances to the stage 2 freeze boss', function () {
+  it('advances to the stage 2 secret boss', function () {
     const engine = freshEngine();
     killBoss(engine);
     engine.advanceStage();
 
     assert.equal(engine.stage, 2);
-    assert.equal(engine.enemy.enemyId, 'frostwarden');
-    assert.include(engine.enemy.debuffs, 'freeze');
+    assert.equal(engine.enemy.enemyId, 'secretboss');
+    assert.deepEqual(engine.enemy.debuffs, []);
     assert.equal(engine.result, 'playing');
     assert.equal(engine.cardsUsedThisStage, 0);
     assert.equal(engine.hand.length, 5);
-    // Freeze picks its target before the opening hand is dealt, so the frozen
-    // card can end up in either pile - count across both.
-    assert.equal(
-      [...engine.deck, ...engine.hand].filter((card) => card.isFrozen).length,
-      1,
-      'the freeze debuff activates on arrival'
-    );
+    assert.equal(engine.enemy.damageTakenCount, 0);
   });
 
-  it('advances to the stage 3 undying boss', function () {
+  it('advances to the stage 3 ninja boss', function () {
     const engine = freshEngine();
     advanceTo(engine, 3);
 
     assert.equal(engine.stage, 3);
-    assert.equal(engine.enemy.enemyId, 'undying');
-    assert.deepEqual(engine.enemy.debuffs, ['shield']);
-    assert.equal(Shield.getRemainingLayers(engine.enemy), 3);
+    assert.equal(engine.enemy.enemyId, 'ninja');
+    assert.deepEqual(engine.enemy.debuffs, ['evasion']);
   });
 
   it('advances to the stage 4 timer boss', function () {
@@ -109,14 +102,13 @@ describe('GameEngine - multi-stage run', function () {
     assert.isTrue(engine.enemy.timerDebuffActive);
   });
 
-  it('advances to the stage 5 ninja boss', function () {
+  it('advances to the stage 5 Frostwarden boss', function () {
     const engine = freshEngine();
     advanceTo(engine, 5);
 
     assert.equal(engine.stage, 5);
-    assert.equal(engine.enemy.enemyId, 'ninja');
-    assert.deepEqual(engine.enemy.debuffs, ['evasion']);
-    assert.equal(engine.enemy.damageTakenCount, 0);
+    assert.equal(engine.enemy.enemyId, 'frostwarden');
+    assert.deepEqual(engine.enemy.debuffs, ['freeze']);
   });
 
   it('advances to the stage 6 inflation boss', function () {
@@ -217,8 +209,10 @@ describe('GameEngine - multi-stage run', function () {
     engine.deck[1].isFrozen = true;
     engine.draw(4);
 
-    killBoss(engine);
-    engine.advanceStage();
+    while (engine.stage < 5) {
+      killBoss(engine);
+      engine.advanceStage();
+    }
 
     assert.equal(
       engine.deck.length + engine.hand.length,
@@ -230,8 +224,8 @@ describe('GameEngine - multi-stage run', function () {
       allCards.every((card) => card.currentCost === card.baseCost),
       'costs reset to base'
     );
-    // Exactly one card is frozen, and it is the stage 2 debuff's doing rather
-    // than a leftover from stage 1.
+    // Exactly one card is frozen by Frostwarden at stage 5, not left over
+    // from an earlier stage.
     assert.equal(allCards.filter((card) => card.isFrozen).length, 1);
     assert.equal(
       new Set(allCards.map((card) => card.uniqueId)).size,
@@ -263,7 +257,7 @@ describe('GameEngine - multi-stage run', function () {
 
     restored.advanceStage();
     assert.equal(restored.stage, 2);
-    assert.equal(restored.enemy.enemyId, 'frostwarden');
+    assert.equal(restored.enemy.enemyId, 'secretboss');
   });
 
   it('keeps scene in step with the stage', function () {

@@ -23,5 +23,9 @@ export const HitAnimations = {
   knockback: {
     keyframes: { x: [0, 30, 0] }, 
     options: { duration: 0.8, ease: 'easeOut' }
+  },
+  squish: {
+    keyframes: { scale: [1, 0.92, 1] },
+    options: { duration: 0.8, ease: 'easeOut' }
   }
 }
