@@ -35,9 +35,11 @@ export class GiantSlayerPowerUp extends PowerUp {
     if (highestAttackCard == undefined) return;
     if (highestAttackCard.currentAttack == undefined) return;
 
-    highestAttackCard.currentAttack +=
+    // Rounded so the boosted attack stays a whole number
+    highestAttackCard.currentAttack += Math.round(
       (highestAttackCard.currentAttack * 2 * engine.enemy.currentHealth) /
-      engine.enemy.health;
+        engine.enemy.health
+    );
   }
 }
 
