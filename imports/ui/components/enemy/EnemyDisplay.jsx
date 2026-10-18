@@ -40,6 +40,7 @@ const ENEMY_SPRITE_OFFSETS = {
   lion: 'translate-x-35 translate-y-10',
   turtle: '-translate-x-20 translate-y-17',
   merchant: 'translate-y-10',
+  secretBoss: '-translate-y-10',
 };
 
 // Supported animation states for sprites with incomplete animation sets.
@@ -54,7 +55,10 @@ const ENEMY_SPRITE_STATES = {
 // Enemies that hover in place (the Merchant is a floating cloak): a slow,
 // gentle bob in whole pixels so it stays crisp against the pixel art.
 const FLOAT_ANIMATIONS = {
-  merchant: { y: [0, -12, 0], transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' } },
+  merchant: {
+    y: [0, -12, 0],
+    transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+  },
 };
 
 export function EnemyDisplay({
@@ -197,7 +201,8 @@ export function EnemyDisplay({
       : normalizedId === 'secretboss'
         ? `secretBoss-${effectiveState === 'hit' ? 'attack' : 'idle'}-enemy.gif`
         : `${spriteId}${suffix}-enemy.gif`;
-  const isSecretBossDying = normalizedId === 'secretboss' && spriteState === 'die';
+  const isSecretBossDying =
+    normalizedId === 'secretboss' && spriteState === 'die';
 
   return (
     <>
@@ -206,68 +211,77 @@ export function EnemyDisplay({
         style={{ opacity: flashOn ? 0.6 : 0 }}
       />
       <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          ref={scope}
-          key={enemy.enemyId}
-          initial={initial}
-          animate={animateProps}
-          exit={exit}
-          transition={transition}
-        >
-          <div className="relative inline-block">
-            <motion.div
-              className="inline-block"
-              animate={FLOAT_ANIMATIONS[spriteId] ? { y: FLOAT_ANIMATIONS[spriteId].y } : undefined}
-              transition={FLOAT_ANIMATIONS[spriteId]?.transition}
-              transformTemplate={({ y }) => `translateY(${Math.round(parseFloat(y) || 0)}px)`}
-            >
-            <img
-              src={`/assets/sprites/enemies/${spriteFilename}`}
-              alt={enemy.name}
-              className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
-              style={{
-                imageRendering: 'pixelated',
-                transform:
-                  normalizedId === 'secretboss'
-                    ? isSecretBossDying
-                      ? 'scaleX(-1) scale(1.08) translateY(-8px)'
-                      : 'scaleX(-1)'
-                    : undefined,
-                filter: isSecretBossDying ? 'brightness(0) blur(5px)' : undefined,
-                opacity: isSecretBossDying ? 0 : 1,
-                transition:
-                  normalizedId === 'secretboss'
-                    ? 'opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease'
-                    : undefined,
-              }}
-              onError={(e) => {
-                const target = e.currentTarget;
-                const idleGif =
-                  normalizedId === 'secretboss'
-                    ? '/assets/sprites/enemies/secretBoss-idle-enemy.gif'
-                    : `/assets/sprites/enemies/${spriteId}-enemy.gif`;
-                const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
+        {isVisible && (
+          <motion.div
+            ref={scope}
+            key={enemy.enemyId}
+            initial={initial}
+            animate={animateProps}
+            exit={exit}
+            transition={transition}
+          >
+            <div className="relative inline-block">
+              <motion.div
+                className="inline-block"
+                animate={
+                  FLOAT_ANIMATIONS[spriteId]
+                    ? { y: FLOAT_ANIMATIONS[spriteId].y }
+                    : undefined
+                }
+                transition={FLOAT_ANIMATIONS[spriteId]?.transition}
+                transformTemplate={({ y }) =>
+                  `translateY(${Math.round(parseFloat(y) || 0)}px)`
+                }
+              >
+                <img
+                  src={`/assets/sprites/enemies/${spriteFilename}`}
+                  alt={enemy.name}
+                  className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
+                  style={{
+                    imageRendering: 'pixelated',
+                    transform:
+                      normalizedId === 'secretboss'
+                        ? isSecretBossDying
+                          ? 'scaleX(-1) scale(1.08) translateY(-8px)'
+                          : 'scaleX(-1)'
+                        : undefined,
+                    filter: isSecretBossDying
+                      ? 'brightness(0) blur(5px)'
+                      : undefined,
+                    opacity: isSecretBossDying ? 0 : 1,
+                    transition:
+                      normalizedId === 'secretboss'
+                        ? 'opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease'
+                        : undefined,
+                  }}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const idleGif =
+                      normalizedId === 'secretboss'
+                        ? '/assets/sprites/enemies/secretBoss-idle-enemy.gif'
+                        : `/assets/sprites/enemies/${spriteId}-enemy.gif`;
+                    const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
 
-                  // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
-                  if (
-                    !target.src.endsWith(`${spriteId}-enemy.gif`) &&
-                    !target.src.endsWith(`${spriteId}-enemy.png`)
-                  ) {
-                    target.src = idleGif;
-                    return;
-                  }
-                  // Fall back to PNG if GIF is missing
-                  if (target.src.endsWith('.gif')) {
-                    target.src = idlePng;
-                    return;
-                  }
+                    // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
+                    if (
+                      !target.src.endsWith(`${spriteId}-enemy.gif`) &&
+                      !target.src.endsWith(`${spriteId}-enemy.png`)
+                    ) {
+                      target.src = idleGif;
+                      return;
+                    }
+                    // Fall back to PNG if GIF is missing
+                    if (target.src.endsWith('.gif')) {
+                      target.src = idlePng;
+                      return;
+                    }
 
-                  target.onerror = null;
-                  target.src = '/assets/sprites/enemies/placeholder-enemy.png';
-                }}
-              />
-            </motion.div>
+                    target.onerror = null;
+                    target.src =
+                      '/assets/sprites/enemies/placeholder-enemy.png';
+                  }}
+                />
+              </motion.div>
               <TimerDebuff enemy={enemy} />
               <ShieldLayers enemy={enemy} />
             </div>

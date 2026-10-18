@@ -11,6 +11,12 @@ const ARC = {
   size: 50, // each shield's width, % of sprite width
 };
 
+// Per-enemy overrides for any ARC value, keyed by enemyId. Only the keys
+// given here change; the rest come from ARC (which is tuned for the turtle).
+const ARC_OVERRIDES = {
+  secretboss: { centerX: 50, centerY: 20 },
+};
+
 const BREAK_FLASH = {
   filter: [
     'brightness(1)',
@@ -26,12 +32,13 @@ export default function ShieldLayers({ enemy }) {
   const threshold = enemy.health - enemy.shieldLayers;
   const remaining = Math.max(0, enemy.currentHealth - threshold);
   const count = enemy.shieldLayers;
+  const arc = { ...ARC, ...ARC_OVERRIDES[enemy.enemyId] };
 
   return (
     <div className="pointer-events-none absolute inset-0">
       {Array.from({ length: count }, (_, i) => {
         const angle =
-          count > 1 ? -ARC.spread / 2 + (ARC.spread * i) / (count - 1) : 0;
+          count > 1 ? -arc.spread / 2 + (arc.spread * i) / (count - 1) : 0;
         const rad = (angle * Math.PI) / 180;
         const broken = i >= remaining;
         return (
@@ -41,9 +48,9 @@ export default function ShieldLayers({ enemy }) {
             alt=""
             className="absolute"
             style={{
-              left: `${ARC.centerX + ARC.radiusX * Math.sin(rad)}%`,
-              top: `${ARC.centerY - ARC.radiusY * Math.cos(rad)}%`,
-              width: `${ARC.size}%`,
+              left: `${arc.centerX + arc.radiusX * Math.sin(rad)}%`,
+              top: `${arc.centerY - arc.radiusY * Math.cos(rad)}%`,
+              width: `${arc.size}%`,
               x: '-50%',
               y: '-50%',
               rotate: angle,
