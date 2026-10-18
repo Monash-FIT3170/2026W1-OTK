@@ -84,6 +84,9 @@ const testUserMethods = {
 // which drives the accounts login state machine and breaks the subsequent
 // `Meteor.loginWithPassword` in auth.app-tests.js with "No result from call to
 // login". These helpers are server-side test fixtures and must never be stubs.
-if (Meteor.isServer) {
+//
+// Test runs only: clearTestUsers wipes every account and createTestUser can
+// reset any user's password, so neither may exist on a deployed server.
+if (Meteor.isServer && (Meteor.isTest || Meteor.isAppTest)) {
   Meteor.methods(testUserMethods);
 }

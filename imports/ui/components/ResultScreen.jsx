@@ -34,7 +34,7 @@ export function ResultScreen({
 
       <button
         style={{ fontFamily: 'var(--game-font)'}} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-2xl transition-colors"
-        onClick={() => Meteor.call('game.newGame')}
+        onClick={() => Meteor.call('game.newGame', difficulty)}
       >
         {isWin ? 'Play Again' : 'Try Again'}
       </button>

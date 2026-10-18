@@ -4,10 +4,10 @@ import Card from '../../cards/Card';
 import DeckBuilderHandCard from './DeckBuilderHandCard';
 import DeckBuilderDeckCard from './DeckBuilderDeckCard';
 
-let instanceCounter = 0;
+// Random rather than a counter: a counter restarts on every page load, while
+// the saved deck keeps its old ids, so a re-added card could reuse one.
 function nextUniqueId(cardId) {
-  instanceCounter += 1;
-  return `${cardId}-deck-${instanceCounter}`;
+  return `${cardId}-deck-${crypto.randomUUID()}`;
 }
 
 export function DeckBuilder({
