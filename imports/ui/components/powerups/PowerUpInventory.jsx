@@ -16,12 +16,11 @@ export function PowerUpInventory({ powerUps = [] }) {
 
   const handleUse = (index, powerUp) => {
     if (powerUp.available) {
+      // Played on click, as cards are, so a dodge is judged against the
+      // enemy before this hit lands.
+      soundManager.playPowerUpSound(powerUp);
       Meteor.call('game.usePowerUp', index, (err) => {
-        if (err) {
-          console.error('game.usePowerUp failed:', err);
-          return;
-        }
-        soundManager.playPowerUpSound(powerUp);
+        if (err) console.error('game.usePowerUp failed:', err);
       });
     }
   };

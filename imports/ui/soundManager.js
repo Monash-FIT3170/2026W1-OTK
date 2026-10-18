@@ -35,6 +35,7 @@ const EVENT_SOUNDS = {
   'stage-clear': 'stage-clear.mp3',
   'card-hover': 'card_hover.mp3',
   gong: 'gong.mp3',
+  swoosh: 'swoosh.mp3',
 };
 
 class SoundManager {
@@ -53,6 +54,14 @@ class SoundManager {
     // Pre-cache Audio instances for SFX so first play has no delay
     this._sfxCache = {};
     this._eventCache = {};
+
+    // Set by EnemyDisplay. While true, the next hit will be dodged, so
+    // damage sounds are skipped and the dodge swoosh is the only sound.
+    this._enemyEvadesNextHit = false;
+  }
+
+  setEnemyEvadesNextHit(evades) {
+    this._enemyEvadesNextHit = evades;
   }
 
   _getSfx(filename, cache, basePath) {
@@ -89,16 +98,17 @@ class SoundManager {
    * DiscardNonDamageEffect.
    */
   playCardSound(card, volume = 1.0) {
-    const fallback =
-      card.baseAttack != null ? FALLBACK_DAMAGE_SOUND : FALLBACK_EFFECT_SOUND;
+    const dealsDamage = card.baseAttack != null;
+    if (dealsDamage && this._enemyEvadesNextHit) return;
+    const fallback = dealsDamage ? FALLBACK_DAMAGE_SOUND : FALLBACK_EFFECT_SOUND;
     this._playSfx(CARD_SOUNDS[card.cardId] ?? fallback, volume);
   }
 
   /** @param {Object} powerUp - power-up data; only powerUpId is read. */
   playPowerUpSound(powerUp, volume = 1.0) {
-    const fallback = DAMAGING_POWER_UPS.has(powerUp.powerUpId)
-      ? FALLBACK_DAMAGE_SOUND
-      : FALLBACK_EFFECT_SOUND;
+    const dealsDamage = DAMAGING_POWER_UPS.has(powerUp.powerUpId);
+    if (dealsDamage && this._enemyEvadesNextHit) return;
+    const fallback = dealsDamage ? FALLBACK_DAMAGE_SOUND : FALLBACK_EFFECT_SOUND;
     this._playSfx(POWER_UP_SOUNDS[powerUp.powerUpId] ?? fallback, volume);
   }
 
@@ -126,6 +136,9 @@ class SoundManager {
   }
   playGong() {
     this.playEventSound('gong');
+  }
+  playSwoosh() {
+    this.playEventSound('swoosh');
   }
 
   /**

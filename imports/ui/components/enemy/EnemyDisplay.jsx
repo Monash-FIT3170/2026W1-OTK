@@ -4,6 +4,7 @@ import { EntryAnimations, HitAnimations } from './EnemyAnimations';
 import TimerDebuff from './TimerDebuff';
 import ShieldLayers from './ShieldDisplay';
 import { soundManager } from '../../soundManager';
+import { Evasion } from '../../../engine/debuffs/Evasion';
 
 const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
@@ -98,6 +99,7 @@ export function EnemyDisplay({
       ) {
         clearTimeout(dodgeTimerRef.current);
         setSpriteState('dodge');
+        soundManager.playSwoosh();
         dodgeTimerRef.current = setTimeout(() => {
           setSpriteState((current) => (current === 'dodge' ? 'idle' : current));
         }, 1000);
@@ -109,6 +111,14 @@ export function EnemyDisplay({
   }, [enemy.currentHealth, enemy.damageTakenCount]);
 
   useEffect(() => () => clearTimeout(dodgeTimerRef.current), []);
+
+  // Tell the sound manager ahead of time when the next hit will be dodged,
+  // so the attack's own sound is skipped and only the swoosh plays.
+  useEffect(() => {
+    soundManager.setEnemyEvadesNextHit(Evasion.evadesNextHit(enemy));
+  }, [enemy.enemyId, enemy.damageTakenCount, enemy.debuffs?.join()]);
+
+  useEffect(() => () => soundManager.setEnemyEvadesNextHit(false), []);
 
   // Clear the heal flash after it fades in.
   useEffect(() => {
