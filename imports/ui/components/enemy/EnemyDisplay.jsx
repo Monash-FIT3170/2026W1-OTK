@@ -51,6 +51,12 @@ const ENEMY_SPRITE_STATES = {
   merchant: ['idle'],
 };
 
+// Enemies that hover in place (the Merchant is a floating cloak): a slow,
+// gentle bob in whole pixels so it stays crisp against the pixel art.
+const FLOAT_ANIMATIONS = {
+  merchant: { y: [0, -12, 0], transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' } },
+};
+
 export function EnemyDisplay({
   enemy,
   isVisible,
@@ -210,6 +216,12 @@ export function EnemyDisplay({
           transition={transition}
         >
           <div className="relative inline-block">
+            <motion.div
+              className="inline-block"
+              animate={FLOAT_ANIMATIONS[spriteId] ? { y: FLOAT_ANIMATIONS[spriteId].y } : undefined}
+              transition={FLOAT_ANIMATIONS[spriteId]?.transition}
+              transformTemplate={({ y }) => `translateY(${Math.round(parseFloat(y) || 0)}px)`}
+            >
             <img
               src={`/assets/sprites/enemies/${spriteFilename}`}
               alt={enemy.name}
@@ -255,6 +267,7 @@ export function EnemyDisplay({
                   target.src = '/assets/sprites/enemies/placeholder-enemy.png';
                 }}
               />
+            </motion.div>
               <TimerDebuff enemy={enemy} />
               <ShieldLayers enemy={enemy} />
             </div>
