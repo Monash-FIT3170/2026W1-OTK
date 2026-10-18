@@ -136,7 +136,12 @@ export const App = () => {
     !showTrainingMode &&
     !showLeaderboard;
 
-  useGameSounds(gameState?.result, onGameScreen);
+  // The boss's outro dialogue plays before the victory sting.
+  const outroStillToCome =
+    (gameState?.result === 'stageCleared' || gameState?.result === 'win') &&
+    gameState?.outroSeen === false;
+
+  useGameSounds(gameState?.result, onGameScreen, outroStillToCome);
 
   // No heartbeat until the intro is dismissed - the fight (and every clock in
   // it) starts when the player finishes the dialogue, not when the stage loads.

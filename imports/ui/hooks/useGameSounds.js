@@ -1,13 +1,17 @@
 import { useEffect } from 'react';
 import { soundManager } from '../soundManager';
 
-export function useGameSounds(result, active) {
+// holdVictory: the boss's outro dialogue is still to come, so the battle
+// music keeps playing and the stage-clear sting waits until it is dismissed.
+export function useGameSounds(result, active, holdVictory = false) {
   useEffect(() => {
     if (!active || result === undefined) {
       soundManager.stopMusic();
       return;
     }
-    if (result === 'playing') {
+    // The battle track carries on under the outro dialogue; it is cut, and
+    // the sting played, once the outro is dismissed.
+    if (result === 'playing' || holdVictory) {
       soundManager.playBackgroundMusic('battle');
       return;
     }
@@ -18,5 +22,5 @@ export function useGameSounds(result, active) {
       soundManager.playStageClear();
     }
     if (result === 'loss') soundManager.playGameOver();
-  }, [result, active]);
+  }, [result, active, holdVictory]);
 }
