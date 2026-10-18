@@ -5,6 +5,15 @@ import TimerDebuff from './TimerDebuff';
 import ShieldLayers from './ShieldDisplay';
 import { soundManager } from '../../soundManager';
 import { Evasion } from '../../../engine/debuffs/Evasion';
+import { Inflation } from '../../../engine/debuffs/Inflation';
+
+// Full-screen colour flashes: green when the enemy heals, the Merchant's
+// dark purple when its inflation raises card costs. A dark colour would
+// barely show through mix-blend-screen, so that one is laid over normally.
+const FLASH_COLOURS = {
+  heal: 'bg-green-400 mix-blend-screen',
+  inflation: 'bg-purple-900',
+};
 
 const ENEMY_SPRITE_IDS = {
   trainingdummy: 'goblin',
@@ -46,14 +55,22 @@ export function EnemyDisplay({
   enemy,
   isVisible,
   lastActiveAt,
+  cardsUsed,
   _useAnimate = useAnimate,
 }) {
   if (!enemy) return null;
 
   const [scope, animate] = _useAnimate();
   const [spriteState, setSpriteState] = useState('entry'); // 'entry' | 'idle' | 'hit' | 'dodge' | 'die'
-  const [healFlash, setHealFlash] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
+  // Kept after the flash ends so it fades out in the same colour
+  const [flashColour, setFlashColour] = useState(FLASH_COLOURS.heal);
+  const triggerFlash = (kind) => {
+    setFlashColour(FLASH_COLOURS[kind]);
+    setFlashOn(true);
+  };
   const prevHealthRef = useRef(null);
+  const prevCardsUsedRef = useRef(null);
   const prevDamageTakenCountRef = useRef(null);
   const entryTimerRef = useRef(null);
   const dodgeTimerRef = useRef(null);
@@ -90,7 +107,7 @@ export function EnemyDisplay({
         });
       } else if (hp > prevHealthRef.current) {
         // Timer debuff healed the enemy: green fade + gong.
-        setHealFlash(true);
+        triggerFlash('heal');
         soundManager.playGong();
       } else if (
         damageWasEvaded &&
@@ -120,12 +137,27 @@ export function EnemyDisplay({
 
   useEffect(() => () => soundManager.setEnemyEvadesNextHit(false), []);
 
-  // Clear the heal flash after it fades in.
+  // Merchant's inflation raised card costs: gold flash + coin sound.
   useEffect(() => {
-    if (!healFlash) return;
-    const id = setTimeout(() => setHealFlash(false), 900);
+    if (cardsUsed === undefined) return;
+    if (
+      prevCardsUsedRef.current !== null &&
+      cardsUsed > prevCardsUsedRef.current &&
+      enemy.debuffs.includes('inflation') &&
+      Inflation.raisedCostsAt(cardsUsed)
+    ) {
+      triggerFlash('inflation');
+      soundManager.playCoinUp();
+    }
+    prevCardsUsedRef.current = cardsUsed;
+  }, [cardsUsed]);
+
+  // Clear the flash after it fades in.
+  useEffect(() => {
+    if (!flashOn) return;
+    const id = setTimeout(() => setFlashOn(false), 900);
     return () => clearTimeout(id);
-  }, [healFlash]);
+  }, [flashOn]);
 
   const {
     initial,
@@ -164,8 +196,8 @@ export function EnemyDisplay({
   return (
     <>
       <div
-        className="pointer-events-none fixed inset-0 z-50 bg-green-400 mix-blend-screen transition-opacity duration-700"
-        style={{ opacity: healFlash ? 0.6 : 0 }}
+        className={`pointer-events-none fixed inset-0 z-50 ${flashColour} transition-opacity duration-700`}
+        style={{ opacity: flashOn ? 0.6 : 0 }}
       />
       <AnimatePresence>
       {isVisible && (

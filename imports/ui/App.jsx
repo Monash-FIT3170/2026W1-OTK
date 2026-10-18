@@ -431,6 +431,7 @@ export const App = () => {
           enemy={enemy}
           isVisible={true}
           lastActiveAt={gameState.lastActiveAt}
+          cardsUsed={gameState.cardsUsedThisStage}
         />
       </div>
 

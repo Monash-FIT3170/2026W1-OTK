@@ -36,6 +36,7 @@ const EVENT_SOUNDS = {
   'card-hover': 'card_hover.mp3',
   gong: 'gong.mp3',
   swoosh: 'swoosh.mp3',
+  'coin-up': 'coin-up.mp3',
 };
 
 class SoundManager {
@@ -139,6 +140,9 @@ class SoundManager {
   }
   playSwoosh() {
     this.playEventSound('swoosh');
+  }
+  playCoinUp() {
+    this.playEventSound('coin-up');
   }
 
   /**
