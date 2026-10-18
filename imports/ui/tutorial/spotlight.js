@@ -10,6 +10,18 @@ export const CARD_WIDTH = 320;
 export const VIEWPORT_MARGIN = 16;
 export const GAP_FROM_TARGET = 14;
 
+// Checks if two rectangles are the same, returns true if they are equal in
+// position and size, otherwise returns false. 
+export function isSameRect(a, b) {
+  if (!a || !b) return a === b;
+  return (
+    a.top === b.top &&
+    a.left === b.left &&
+    a.width === b.width &&
+    a.height === b.height
+  );
+}
+
 // Finds the on-screen element for a given target id and returns its
 // bounding box in viewport coordinates, or null if there's no target id
 // or no matching element is currently in the DOM.
