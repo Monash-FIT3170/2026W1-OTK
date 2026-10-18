@@ -111,9 +111,17 @@ export const App = () => {
   // Auto-show the tutorial when a player starts a new game, but only if
   // they haven't seen it yet (profile.hasSeenTutorial, set by
   // user.markTutorialSeen). The Tutorial button on the landing page still
-  // lets them replay it at any time.
+  // lets them replay it at any time. Held back until the stage's intro
+  // dialogue has been dismissed, so the tutorial plays after it.
   useEffect(() => {
-    if (!loading && user && gameState && !showLanding && justStartedNewGame) {
+    if (
+      !loading &&
+      user &&
+      gameState &&
+      !showLanding &&
+      justStartedNewGame &&
+      !introPending
+    ) {
       if (shouldAutoShowTutorial(user)) setShowTutorial(true);
       setJustStartedNewGame(false);
     }
