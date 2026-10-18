@@ -81,7 +81,7 @@ if (Meteor.isServer) {
     const { gameState } = await UserDataCollection.findOneAsync({ userId });
 
     assert.equal(gameState.stage, 2);
-    assert.equal(gameState.enemy.enemyId, 'frostwarden');
+    assert.equal(gameState.enemy.enemyId, 'ninja');
     assert.equal(gameState.enemy.currentHealth, gameState.enemy.health);
     assert.equal(gameState.result, 'playing');
     assert.equal(gameState.hand.length, 5);

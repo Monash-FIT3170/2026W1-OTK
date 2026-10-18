@@ -10,15 +10,17 @@ const ENEMY_SPRITE_IDS = {
   frostwarden: 'dragon',
   timekeeper: 'lion',
   undying: 'turtle',
-  ninja: 'goblin', //TODO: update with asset
+  ninja: 'ninja',
   merchant: 'merchant',
-  secretboss: 'goblin', // TODO: update with asset
+  secretboss: 'secretBoss',
 };
 
 const ENEMY_SPRITE_SIZES = {
   goblin: 'h-70',
+  ninja: 'h-100',
   dragon: 'h-100',
   lion: 'h-100',
+  secretBoss: 'h-55',
   turtle: 'h-80',
   merchant: 'h-80',
 };
@@ -30,10 +32,11 @@ const ENEMY_SPRITE_OFFSETS = {
   merchant: 'translate-y-10',
 };
 
-// Sprites that only ship an idle GIF. Every state resolves to idle rather
-// than requesting a file that will 404 into the onError cascade below.
+// Supported animation states for sprites with incomplete animation sets.
 const ENEMY_SPRITE_STATES = {
+  ninja: ['idle', 'hit', 'dodge'],
   lion: ['idle'],
+  secretBoss: ['idle', 'hit'],
   turtle: ['idle'],
   merchant: ['idle'],
 };
@@ -47,10 +50,12 @@ export function EnemyDisplay({
   if (!enemy) return null;
 
   const [scope, animate] = _useAnimate();
-  const [spriteState, setSpriteState] = useState('entry'); // 'entry' | 'idle' | 'hit' | 'die'
+  const [spriteState, setSpriteState] = useState('entry'); // 'entry' | 'idle' | 'hit' | 'dodge' | 'die'
   const [healFlash, setHealFlash] = useState(false);
   const prevHealthRef = useRef(null);
+  const prevDamageTakenCountRef = useRef(null);
   const entryTimerRef = useRef(null);
+  const dodgeTimerRef = useRef(null);
 
   // 1. Play Entry sprite on mount / enemy change, then transition to Idle
   useEffect(() => {
@@ -65,6 +70,11 @@ export function EnemyDisplay({
   // 2. Play Hit or Die sprites based on health changes
   useEffect(() => {
     const hp = enemy.currentHealth;
+    const damageTakenCount = enemy.damageTakenCount ?? 0;
+    const damageWasEvaded =
+      prevDamageTakenCountRef.current !== null &&
+      damageTakenCount > prevDamageTakenCountRef.current &&
+      hp === prevHealthRef.current;
 
     if (prevHealthRef.current !== null) {
       if (hp <= 0) {
@@ -81,11 +91,24 @@ export function EnemyDisplay({
         // Timer debuff healed the enemy: green fade + gong.
         setHealFlash(true);
         soundManager.playGong();
+      } else if (
+        damageWasEvaded &&
+        enemy.enemyId === 'ninja' &&
+        enemy.debuffs.includes('evasion')
+      ) {
+        clearTimeout(dodgeTimerRef.current);
+        setSpriteState('dodge');
+        dodgeTimerRef.current = setTimeout(() => {
+          setSpriteState((current) => (current === 'dodge' ? 'idle' : current));
+        }, 1000);
       }
     }
 
     prevHealthRef.current = hp;
-  }, [enemy.currentHealth]);
+    prevDamageTakenCountRef.current = damageTakenCount;
+  }, [enemy.currentHealth, enemy.damageTakenCount]);
+
+  useEffect(() => () => clearTimeout(dodgeTimerRef.current), []);
 
   // Clear the heal flash after it fades in.
   useEffect(() => {
@@ -110,6 +133,7 @@ export function EnemyDisplay({
   const STATE_SUFFIXES = {
     entry: '-entry',
     hit: '-attack',
+    dodge: '-dodge',
     die: '-die',
     idle: '',
   };
@@ -119,6 +143,13 @@ export function EnemyDisplay({
       ? 'idle'
       : spriteState;
   const suffix = STATE_SUFFIXES[effectiveState] ?? '';
+  const spriteFilename =
+    spriteId === 'ninja'
+      ? `ninja${suffix}-enemy.gif`
+      : normalizedId === 'secretboss'
+        ? `secretBoss-${effectiveState === 'hit' ? 'attack' : 'idle'}-enemy.gif`
+        : `${spriteId}${suffix}-enemy.gif`;
+  const isSecretBossDying = normalizedId === 'secretboss' && spriteState === 'die';
 
   return (
     <>
@@ -127,25 +158,42 @@ export function EnemyDisplay({
         style={{ opacity: healFlash ? 0.6 : 0 }}
       />
       <AnimatePresence>
-        {isVisible && (
-          <motion.div
-            ref={scope}
-            key={enemy.enemyId}
-            initial={initial}
-            animate={animateProps}
-            exit={exit}
-            transition={transition}
-          >
-            <div className={`relative inline-block ${spriteOffsetClass}`}>
-              <img
-                src={`/assets/sprites/enemies/${spriteId}${suffix}-enemy.gif`}
-                alt={enemy.name}
-                className={`${spriteSizeClass} w-auto object-contain transition-transform`}
-                style={{ imageRendering: 'pixelated' }}
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  const idleGif = `/assets/sprites/enemies/${spriteId}-enemy.gif`;
-                  const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
+      {isVisible && (
+        <motion.div
+          ref={scope}
+          key={enemy.enemyId}
+          initial={initial}
+          animate={animateProps}
+          exit={exit}
+          transition={transition}
+        >
+          <div className="relative inline-block">
+            <img
+              src={`/assets/sprites/enemies/${spriteFilename}`}
+              alt={enemy.name}
+              className={`${spriteSizeClass} ${spriteOffsetClass} w-auto object-contain transition-transform`}
+              style={{
+                imageRendering: 'pixelated',
+                transform:
+                  normalizedId === 'secretboss'
+                    ? isSecretBossDying
+                      ? 'scaleX(-1) scale(1.08) translateY(-8px)'
+                      : 'scaleX(-1)'
+                    : undefined,
+                filter: isSecretBossDying ? 'brightness(0) blur(5px)' : undefined,
+                opacity: isSecretBossDying ? 0 : 1,
+                transition:
+                  normalizedId === 'secretboss'
+                    ? 'opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease'
+                    : undefined,
+              }}
+              onError={(e) => {
+                const target = e.currentTarget;
+                const idleGif =
+                  normalizedId === 'secretboss'
+                    ? '/assets/sprites/enemies/secretBoss-idle-enemy.gif'
+                    : `/assets/sprites/enemies/${spriteId}-enemy.gif`;
+                const idlePng = `/assets/sprites/enemies/${spriteId}-enemy.png`;
 
                   // If specialized state GIF fails (e.g., dragon-entry-enemy.gif), fall back to idle GIF
                   if (

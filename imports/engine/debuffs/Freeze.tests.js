@@ -94,11 +94,17 @@ describe('Freeze', function () {
     assert.equal(allCards.filter((card) => card.isFrozen).length, 0);
   });
 
-  it('attaches and activates Freeze once when the stage 2 boss appears', function () {
-    const engine = new GameEngine(GameEngine.newGame('freeze-test-user'));
-    engine.enemy.takeDamage(engine.enemy.health);
-    engine.clearStage();
-    engine.advanceStage();
+  it('attaches and activates Freeze once when Frostwarden appears at stage 5', function () {
+    const engine = new GameEngine(
+      GameEngine.newGame('freeze-test-user', undefined, 'hard')
+    );
+    while (engine.stage < 5) {
+      while (engine.enemy.currentHealth > 0) {
+        engine.enemy.takeDamage(engine.enemy.health);
+      }
+      engine.clearStage();
+      engine.advanceStage();
+    }
 
     const gameState = engine.toJSON();
     const allCards = [...gameState.deck, ...gameState.hand];
