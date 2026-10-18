@@ -7,7 +7,7 @@ const clock = (text: string): DialogueLine => ({ speaker: 'enemy', speakerName: 
 const darkReflection = (text: string): DialogueLine => ({ speaker: 'enemy', speakerName: 'Dark Reflection', text });
 
 // Shared revelation before either the normal sacrifice or secret encounter.
-// Stage directions use narration; each beat advances individually.
+// Narration describes what happens; each beat advances individually.
 export const SEVENTH_SHARD_REVELATION: DialogueLine[] = [
   narrator('The player approaches the shattered Clock.'),
   player('Six Chronoshards.'),
@@ -19,7 +19,7 @@ export const SEVENTH_SHARD_REVELATION: DialogueLine[] = [
   timekeeper('Because…'),
   player('Huh?!? Who is that?'),
   timekeeper('The Timekeeper. What remains of him.'),
-  timekeeper('it is incomplete.'),
+  timekeeper('It is incomplete.'),
   player('Incomplete?'),
   timekeeper('There must be… seven.'),
   player('Seven?'),
@@ -30,7 +30,6 @@ export const SEVENTH_SHARD_REVELATION: DialogueLine[] = [
   player('Then where is the seventh?'),
   player('Where do I find the final piece?'),
   timekeeper('…'),
-  narrator('Long pause.'),
   timekeeper('It is you.'),
   player('…What?'),
   timekeeper('The seventh Chronoshard was used to create the Vessel.'),
@@ -38,10 +37,9 @@ export const SEVENTH_SHARD_REVELATION: DialogueLine[] = [
   timekeeper('Why the Clock answers you.'),
   timekeeper('Why you always return.'),
   player('So this was always the plan.'),
-  timekeeper("Yes. This is your purpose. The clock created you to find it's pieces throughout each cycle to restore itself."),
+  timekeeper("Yes. This is your purpose. The clock created you to find its pieces throughout each cycle to restore itself."),
   timekeeper('You return to what created you.'),
   player('And what happens to me?'),
-  narrator('Pause.'),
   timekeeper('You cease to exist.'),
 ];
 
@@ -110,7 +108,7 @@ export const SECRET_ENDING: DialogueLine[] = [
   narrator('11:59:59'),
   narrator('12:00:00'),
   narrator('Rain falls. People begin moving.'),
-  player('It’s finally midnight.'),
+  player("It's finally midnight."),
   timekeeper('Yes.'),
   player('Bit underwhelming.'),
   narrator('The next second passes.'),
@@ -126,7 +124,6 @@ export const SECRET_ENDING: DialogueLine[] = [
   narrator('And for the first time…'),
   narrator('the world had a future.'),
   narrator('And so did the player.'),
-  narrator('Fade to black.'),
   narrator('TRUE END'),
 ];
 
@@ -178,7 +175,6 @@ function buildVictoryEnding(count: ShardCount): DialogueLine[] {
     player(`Then where is the ${ordinal}?`),
     player('Where do I find the final piece?'),
     timekeeper('…'),
-    narrator('Long pause.'),
     timekeeper('It is you.'),
     player('…What?'),
     timekeeper(`The ${ordinal} Chronoshard was used to create the Vessel.`),
@@ -186,10 +182,9 @@ function buildVictoryEnding(count: ShardCount): DialogueLine[] {
     timekeeper('Why the Clock answers you.'),
     timekeeper('Why you always return.'),
     player('So this was always the plan.'),
-    timekeeper("Yes. This is your purpose. The clock created you to find it's pieces throughout each cycle to restore itself."),
+    timekeeper("Yes. This is your purpose. The clock created you to find its pieces throughout each cycle to restore itself."),
     timekeeper('You return to what created you.'),
     player('And what happens to me?'),
-    narrator('Pause.'),
     timekeeper('You cease to exist.'),
     player('And if I refuse?'),
     timekeeper('The Chronosphere remains broken.'),
