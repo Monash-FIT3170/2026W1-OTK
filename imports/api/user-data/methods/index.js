@@ -11,7 +11,7 @@ import './choosePowerUp';
 import './usePowerUp';
 import './saveTrainingHighScore';
 import './getMyTrainingRank';
-import './devJump';
+// import './devJump';
 // DEV TOOL: jumps the logged-in player straight to any boss dialogue so the
 // story can be checked without winning every fight. Only works under
 // `meteor run` / `meteor test` (Meteor.isDevelopment); refused in production.
