@@ -17,7 +17,17 @@ Meteor.methods({
       throw new Meteor.Error('game.endTurn.noUserData', 'No user data found.');
     }
 
+    // Only a live fight can be forfeited. End Turn stays on screen through the
+    // 1.8s death animation, so a click there must not turn a win into a loss.
+    if (userData.gameState?.result !== 'playing') return;
+
     const engine = new GameEngine(userData.gameState);
+    if (engine.isIntroPending()) {
+      throw new Meteor.Error(
+        'game.endTurn.dialoguePending',
+        'Finish the intro dialogue before ending your turn.'
+      );
+    }
     engine.rebaseAfterAway();
     engine.finalizeBossRecap('loss');
     engine.result = 'loss';

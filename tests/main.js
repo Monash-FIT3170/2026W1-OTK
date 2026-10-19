@@ -13,11 +13,18 @@ import '../imports/api/enemy/index.js';
 //import '../imports/engine/enemy/DamageEnemy.tests.js';
 import '../imports/api/enemy/enemy.tests.js';
 import '../imports/engine/debuffs/Freeze.tests.js';
+import '../imports/engine/debuffs/Evasion.tests.js';
+import '../imports/engine/debuffs/Shield.tests.js';
 import '../imports/engine/debuffs/Timer.tests.js';
+import '../imports/engine/enemy/Undying.tests.ts';
+import '../imports/engine/debuffs/Inflation.tests.js';
 
 // GAME ENGINE / STAGE TESTS
 import '../imports/engine/GameEngine.tests.js';
 import '../imports/api/user-data/methods/advanceStage.tests.js';
+import '../imports/api/user-data/methods/finishDialogue.tests.js';
+import '../imports/ui/components/DialogueBox.tests.jsx';
+import '../imports/ui/App.dialogue.tests.jsx';
 
 // AUTH TESTS
 import '/imports/api/auth/index.js';
@@ -41,3 +48,12 @@ import '../imports/ui/components/TutorialOverlay.tests.jsx';
 import '../imports/ui/components/TutorialDemoScreen.tests.jsx';
 import '../imports/ui/hooks/useTutorialEngine.tests.js';
 import '../imports/api/auth/methods/markTutorialSeen.tests.js';
+import '../imports/ui/tutorial/shouldAutoShowTutorial.tests.js';
+
+// TRAINING TESTS
+import '../imports/ui/hooks/useTrainingEngine.tests.js';
+import '../imports/api/user-data/methods/saveTrainingHighScore.tests.js';
+
+// LEADERBOARD TESTS
+import '../imports/api/user-data/methods/saveTrainingHighScore.tests.js';
+import '../imports/api/user-data/methods/getMyTrainingRank.tests.js';

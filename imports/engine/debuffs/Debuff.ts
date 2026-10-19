@@ -25,12 +25,16 @@ export abstract class Debuff {
     }
   }
 
-  // Concrete debuffs override this to affect the player's game state.
+  // Applies the debuff's initial effect at the start of a stage.
   abstract activateDebuff(engine: GameEngine): void;
 
   // Called during normal game execution to maintain or refresh persistent debuffs.
   executeDebuff(engine: GameEngine): void {
     // Default is no-op; concrete debuffs may override if needed.
+  }
+
+  modifyIncomingDamage(enemy: Enemy, amount: number): number {
+    return amount;
   }
 
   toJSON(): debuffData {

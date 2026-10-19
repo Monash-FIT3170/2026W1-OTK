@@ -10,6 +10,12 @@ import React, { useEffect, useRef, useState } from 'react';
 // derive a clock offset from lastActiveAt, a server timestamp the battle-screen
 // heartbeat (game.applyTimerTick) refreshes every ~2s, and count down against
 // that estimated server time.
+// Per-enemy nudge for the orb, in px from its default spot above the lion's
+// head (positive x = right, positive y = down). Keyed by enemyId.
+const ORB_OFFSETS = {
+  secretboss: { x: -210, y: 200 },
+};
+
 export default function TimerDebuff({ enemy, lastActiveAt }) {
   const [now, setNow] = useState(Date.now());
 
@@ -36,9 +42,14 @@ export default function TimerDebuff({ enemy, lastActiveAt }) {
   const msLeft = Math.max(0, enemy.timerDebuffDeadline - serverNow);
   const label = String(Math.ceil(msLeft / 1000));
 
+  const offset = ORB_OFFSETS[enemy.enemyId] ?? { x: 0, y: 0 };
+
   // Roughly above the lion's head; dimensions/placement to be tuned.
   return (
-    <div className="pointer-events-none absolute left-80 -top-12 -translate-x-1/2">
+    <div
+      className="pointer-events-none absolute left-80 -top-12 -translate-x-1/2"
+      style={{ marginLeft: offset.x, marginTop: offset.y }}
+    >
       <div className="relative h-50 w-50">
         <img
           src="/assets/sprites/enemies/orb.png"
@@ -49,7 +60,8 @@ export default function TimerDebuff({ enemy, lastActiveAt }) {
         <span
           className="absolute inset-0 flex items-center justify-center text-white text-6xl leading-none"
           style={{
-            fontFamily: '"Micro 5", monospace',
+            fontFamily: 'var(--game-font)',
+            fontSizeAdjust: 'var(--game-font-adjust)',
             transform: 'translateY(-5%)',
           }}
         >

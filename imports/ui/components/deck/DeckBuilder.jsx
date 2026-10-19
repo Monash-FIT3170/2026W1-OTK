@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Card from '../../cards/Card';
 import DeckBuilderHandCard from './DeckBuilderHandCard';
 import DeckBuilderDeckCard from './DeckBuilderDeckCard';
 
-let instanceCounter = 0;
+// Random rather than a counter: a counter restarts on every page load, while
+// the saved deck keeps its old ids, so a re-added card could reuse one.
 function nextUniqueId(cardId) {
-  instanceCounter += 1;
-  return `${cardId}-deck-${instanceCounter}`;
+  return `${cardId}-deck-${crypto.randomUUID()}`;
 }
 
 export function DeckBuilder({
@@ -62,10 +62,15 @@ export function DeckBuilder({
     }
   };
 
+  const sortedDeckCards = useMemo(
+  () => [...deckCards].sort((a, b) => a.name.localeCompare(b.name)),
+  [deckCards]
+);
+
   return (
     <div
       className="flex h-screen w-full flex-col bg-slate-950 text-white"
-      style={{ fontFamily: '"Micro 5", monospace' }}
+      style={{ fontFamily: 'var(--game-font)', fontSizeAdjust: 'var(--game-font-adjust)' }}
     >
       <div className="flex items-center justify-between border-b border-slate-700 px-8 py-5">
         <div>
@@ -139,7 +144,7 @@ export function DeckBuilder({
             ) : (
               <div className="flex flex-col gap-2">
                 <AnimatePresence initial={false}>
-                  {deckCards.map((card) => (
+                  {sortedDeckCards.map((card) => (
                     <DeckBuilderHandCard
                       key={card.uniqueId}
                       card={card}

@@ -14,7 +14,7 @@ import { tutorialSteps } from '../tutorial/tutorialSteps';
 
 if (Meteor.isClient) {
   describe('TutorialDemoScreen', function () {
-    it('keeps free play open until End Turn is pressed on the final step', async function () {
+    it('keeps free play open after Done until End Turn is pressed', async function () {
       let closed = false;
       let latestHand;
       let latestPlayCard;
@@ -52,13 +52,20 @@ if (Meteor.isClient) {
       fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
       expect(screen.getByText('Keep Practising')).to.exist;
-      expect(screen.queryByRole('button', { name: 'Done' })).to.not.exist;
+
+      // End Turn does not exit while the final step's overlay is still showing.
+      fireEvent.click(screen.getByRole('button', { name: 'End Turn' }));
+      expect(closed).to.equal(false);
+
+      // Done hides the overlay but leaves the demo open for free play.
+      fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+      expect(screen.queryByText('Keep Practising')).to.not.exist;
+      expect(closed).to.equal(false);
 
       // Cards remain playable without closing the tutorial.
       act(() => {
         latestPlayCard(latestHand[0].uniqueId);
       });
-      expect(screen.getByText('Keep Practising')).to.exist;
       expect(closed).to.equal(false);
 
       fireEvent.click(screen.getByRole('button', { name: 'End Turn' }));
